@@ -1,4 +1,4 @@
-CPPFLAGS = -Wall -Wextra -O0 -g -Isrc
+CPPFLAGS = -std=c++11 -Wall -Wextra -O0 -g -Isrc
 
 CXX = g++
 
