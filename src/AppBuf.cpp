@@ -66,3 +66,13 @@ AppBuf::~AppBuf()
 		delete[] this->data;
 	}
 }
+
+size_t AppBuf::bytesToRead(void) const
+{
+	return this->len - this->offset;
+}
+
+size_t AppBuf::bytesToWrite(void) const
+{
+	return this->size - this->len;
+}

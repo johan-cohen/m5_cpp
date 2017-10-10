@@ -55,6 +55,9 @@ private:
 public:
 	AppBuf(std::size_t size);
 	~AppBuf();
+
+	size_t bytesToRead(void) const;
+	size_t bytesToWrite(void) const;
 };
 
 #endif
