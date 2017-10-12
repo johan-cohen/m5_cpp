@@ -42,7 +42,7 @@
 
 int test_AppBuf(void)
 {
-	AppBuf *buf = new AppBuf(16);
+	m5::AppBuf *buf = new m5::AppBuf(16);
 	delete buf;
 
 	return 0;

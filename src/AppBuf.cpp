@@ -40,19 +40,28 @@
 
 #include "AppBuf.hpp"
 
-#include <cstring>
 #include <stdexcept>
+#include <cstring>
+
+namespace m5 {
 
 void AppBuf::init(std::size_t size)
 {
-	this->data = new uint8_t[size];
-	this->size = size;
+	if (size > 0) {
+		this->data = new uint8_t[size];
+	} else {
+		this->data = nullptr;
+	}
+
+	this->maxSize = size;
 	this->len = 0;
 	this->offset = 0;
+}
 
-	if (this->data == NULL) {
-		throw std::bad_alloc();
-	}
+AppBuf::AppBuf(const uint8_t *data, std::size_t size)
+{
+	init(size);
+	memcpy(this->data, data, size);
 }
 
 AppBuf::AppBuf(std::size_t size)
@@ -62,17 +71,189 @@ AppBuf::AppBuf(std::size_t size)
 
 AppBuf::~AppBuf()
 {
-	if (this->data != NULL) {
+	if (this->data != nullptr) {
 		delete[] this->data;
 	}
 }
 
-size_t AppBuf::bytesToRead(void) const
+void AppBuf::rewind(void)
+{
+	this->offset = 0;
+}
+
+void AppBuf::reset(void)
+{
+	this->offset = 0;
+	this->len = 0;
+}
+
+std::size_t AppBuf::bytesToRead(void) const
 {
 	return this->len - this->offset;
 }
 
-size_t AppBuf::bytesToWrite(void) const
+void AppBuf::read(uint8_t *d, std::size_t size)
 {
-	return this->size - this->len;
+	for (size_t i = 0; i < size; i++) {
+		d[i] = this->data[this->offset + i];
+	}
+
+	this->offset += size;
+}
+
+template <typename T> T AppBuf::_read(void)
+{
+	uint8_t *d;
+	T v = 0;
+
+	d = reinterpret_cast<uint8_t *>(&v);
+	read(d, sizeof(T));
+
+	return v;
+}
+
+uint8_t AppBuf::readNum8(void)
+{
+	return _read<uint8_t>();
+}
+
+uint16_t AppBuf::readNum16(void)
+{
+	return be16toh(_read<uint16_t>());
+}
+
+uint32_t AppBuf::readNum32(void)
+{
+	return be32toh(_read<uint32_t>());
+}
+
+void AppBuf::readBinary(uint8_t *data, uint16_t &len, uint16_t size)
+{
+	/* two bytes for the length, length could be 0... */
+	if (bytesToRead() < 2) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	len = this->readNum16();
+	if (len == 0) {
+		return;
+	}
+
+	if (len > bytesToRead()) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	if (len > size) {
+		throw std::out_of_range("No enough space in output buffer");
+	}
+
+	memcpy(data, this->data + this->offset, len);
+	this->offset += len;
+}
+
+void AppBuf::readVarByteInteger(uint32_t &v, uint8_t &wireSize)
+{
+	uint32_t multiplier = 1;
+	uint8_t encoded;
+
+	v = 0;
+	wireSize = 0;
+	do {
+		if (bytesToRead() < 1) {
+			throw std::out_of_range("No enough space in buffer");
+		}
+
+		if (multiplier > 128 * 128 * 128) {
+			throw std::invalid_argument("Error in input bytes");
+		}
+
+		encoded = readNum8();
+		wireSize += 1;
+
+		v += (encoded & 127) * multiplier;
+		multiplier *= 128;
+	} while ((encoded & 128) != 0);
+}
+
+void AppBuf::write(const uint8_t *d, std::size_t size)
+{
+	for (std::size_t i = 0; i < size; i++) {
+		this->data[this->len + i] = d[i];
+	}
+
+	this->len += size;
+}
+
+template <typename T> T host2net(T v)
+{
+	switch (sizeof(v)) {
+	case 1: return v;
+	case 2: return htobe16(v);
+	case 4: return htobe32(v);
+	}
+
+	return 0;
+}
+
+std::size_t AppBuf::bytesToWrite(void) const
+{
+	return this->maxSize - this->len;
+}
+
+template <typename T> void AppBuf::_write(const T &v)
+{
+	uint8_t *data;
+	T vv;
+
+	vv = host2net<T>(v);
+	data = reinterpret_cast<uint8_t *>(&vv);
+
+	this->write(data, sizeof(v));
+}
+
+void AppBuf::writeNum8(uint8_t v)
+{
+	this->_write<uint8_t>(v);
+}
+
+void AppBuf::writeNum16(uint16_t v)
+{
+	this->_write<uint16_t>(v);
+}
+
+void AppBuf::writeNum32(uint32_t v)
+{
+	this->_write<uint32_t>(v);
+}
+
+void AppBuf::writeBinary(const uint8_t *data, uint16_t size)
+{
+	this->writeNum16(size);
+	this->write(data, size);
+}
+
+void AppBuf::writeString(const char *str)
+{
+	this->writeBinary((uint8_t *)str, strlen(str));
+}
+
+void AppBuf::writeVarByteInteger(uint32_t v)
+{
+	do {
+		uint8_t encoded;
+
+		if (bytesToWrite() < 1) {
+			throw std::invalid_argument("Invalid input argument");
+		}
+
+		encoded = v % 128;
+		v = v / 128;
+		if (v > 0) {
+			encoded = encoded | 128;
+		}
+
+		writeNum8(encoded);
+	} while (v > 0);
+}
+
 }
