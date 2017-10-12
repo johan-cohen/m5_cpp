@@ -40,9 +40,94 @@
 
 #include "AppBuf.hpp"
 
-int test_AppBuf(void)
+#include <iostream>
+#include <iomanip>
+#include <cstring>
+
+#define error_exit(msg)						\
+	std::cout << __func__ << ": " << (msg) << " error"	\
+		  << std::endl;					\
+	return 1;
+
+#define test_rc(rc, msg)				\
+	std::cout << (((rc) != 0) ? "ERROR\t" : "OK\t")	\
+		  << (msg) << std::endl;		\
+	return 0;
+
+int test(void)
 {
-	m5::AppBuf *buf = new m5::AppBuf(16);
+	const char str[] = "Hello, World!";
+	char str2[sizeof(str)];
+	m5::AppBuf *buf;
+	uint16_t len;
+
+	buf = new m5::AppBuf(64);
+
+	for (std::size_t i = 0; i < buf->size(); i++) {
+		if (buf->bytesToWrite() != (buf->size() - i)) {
+			error_exit(": bytesToWrite error");
+		}
+
+		buf->writeNum8((uint8_t)i);
+	}
+
+	for (std::size_t i = 0; i < buf->size(); i++) {
+		buf->readNum8();
+	}
+
+	if (buf->bytesToRead() != 0) {
+		error_exit("bytesToRead");
+	}
+
+	if (buf->bytesToWrite() != 0) {
+		error_exit("bytesToWrite");
+	}
+
+	buf->rewind();
+	if (buf->bytesToRead() != buf->length()) {
+		error_exit("rewind");
+	}
+
+	/* Buffer data is 0x00 0x01 0x02 0x03 0x04 0x05 ... */
+	if (buf->readNum16() != 0x0001) {
+		error_exit("readNum16");
+	}
+
+	if (buf->bytesToRead() != (buf->length() - sizeof(uint16_t))) {
+		error_exit("readNum16");
+	}
+
+	if (buf->readNum32() != 0x02030405) {
+		error_exit("readNum32");
+	}
+
+	if (buf->bytesToRead() != (buf->length() - (sizeof(uint32_t) + sizeof(uint16_t)))) {
+		error_exit("readNum32");
+	}
+
+	buf->reset();
+	if (buf->length() != 0 || buf->bytesToWrite() != buf->size()) {
+		error_exit("reset");
+	}
+
+	buf->writeNum16(0x0A0B);
+	/* Now buf is 0x0A 0x0B */
+	if (buf->readNum16() != 0x0A0B) {
+		error_exit("writeNum16");
+	}
+
+	buf->writeNum32(0x0C0D0E0F);
+	/* Now buf is 0x0A 0x0B 0x0C 0x0D 0x0E 0x0F */
+	if (buf->readNum32() != 0x0C0D0E0F) {
+		error_exit("writeNum32");
+	}
+
+	buf->writeString(str);
+	buf->readBinary((uint8_t *)str2, len, sizeof(str2));
+	if (memcmp(str, str2, strlen(str)) != 0) {
+		error_exit("readBinary");
+	}
+
 	delete buf;
 
 	return 0;
@@ -50,7 +135,10 @@ int test_AppBuf(void)
 
 int main(void)
 {
-	test_AppBuf();
+	int rc;
+
+	rc = test();
+	test_rc(rc, "AppBuf");
 
 	return 0;
 }
