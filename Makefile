@@ -6,7 +6,7 @@ SRC_DIR = src
 OBJS_DIR = obj
 OBJS = $(OBJS_DIR)/AppBuf.o
 
-all: dirs $(OBJS) test
+all: dirs $(OBJS) test_AppBuf
 
 dirs:
 	mkdir -p obj
@@ -15,7 +15,7 @@ dirs:
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
-test:
+test_AppBuf: src/AppBuf.hpp
 	$(CXX) $(CPPFLAGS) -Isrc src/test_AppBuf.cpp $(OBJS) -o bin/test_AppBuf
 
 clean:
