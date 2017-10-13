@@ -140,5 +140,5 @@ int main(void)
 	rc = test();
 	test_rc(rc, "AppBuf");
 
-	return 0;
+	return rc;
 }
