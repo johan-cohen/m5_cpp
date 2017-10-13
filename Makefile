@@ -22,6 +22,9 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(BINS_DIR)/test_%: $(SRC_DIR)/test_Common.hpp $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/%.o $(OBJS_DIR)/test_%.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
+tests: $(TESTS)
+	@$(foreach test_case, $(TESTS), ./$(test_case);)
+
 clean:
 	rm -rf obj bin
 
