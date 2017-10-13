@@ -25,4 +25,4 @@ $(BINS_DIR)/test_%: $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/%.o $(OBJS_DIR)/test_%.o
 clean:
 	rm -rf obj bin
 
-.PHONY: clean
+.PHONY: all dirs clean
