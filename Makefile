@@ -19,7 +19,7 @@ dirs:
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
-$(BINS_DIR)/test_%: $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/%.o $(OBJS_DIR)/test_%.o
+$(BINS_DIR)/test_%: $(SRC_DIR)/test_Common.hpp $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/%.o $(OBJS_DIR)/test_%.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
 clean:

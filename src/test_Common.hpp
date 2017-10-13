@@ -38,21 +38,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PktConnect.hpp"
-#include "test_Common.hpp"
+#ifndef __TEST_COMMON_HPP__
+#define __TEST_COMMON_HPP__
 
-int test(void)
-{
-	m5::PktConnect *connect = new m5::PktConnect("m5_client");
-	delete connect;
+#include <iostream>
+#include <iomanip>
 
+#define error_exit(msg)						\
+	std::cout << __func__ << ": " << (msg) << " error"	\
+		  << std::endl;					\
+	return 1;
+
+#define test_rc(rc, msg)				\
+	std::cout << (((rc) != 0) ? "ERROR\t" : "OK\t")	\
+		  << (msg) << std::endl;		\
 	return 0;
-}
 
-int main(void)
-{
-	int rc = test();
-	test_rc(rc, "PktConnect");
-
-	return rc;
-}
+#endif

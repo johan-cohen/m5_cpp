@@ -39,20 +39,9 @@
  */
 
 #include "AppBuf.hpp"
+#include "test_Common.hpp"
 
-#include <iostream>
-#include <iomanip>
 #include <cstring>
-
-#define error_exit(msg)						\
-	std::cout << __func__ << ": " << (msg) << " error"	\
-		  << std::endl;					\
-	return 1;
-
-#define test_rc(rc, msg)				\
-	std::cout << (((rc) != 0) ? "ERROR\t" : "OK\t")	\
-		  << (msg) << std::endl;		\
-	return 0;
 
 int test(void)
 {
