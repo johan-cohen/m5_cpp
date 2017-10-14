@@ -25,7 +25,10 @@ $(BINS_DIR)/test_%: $(SRC_DIR)/test_Common.hpp $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/
 tests: $(TESTS)
 	@$(foreach test_case, $(TESTS), ./$(test_case);)
 
+memtest: $(TESTS)
+	@$(foreach test_case, $(TESTS), valgrind ./$(test_case);)
+
 clean:
 	rm -rf obj bin
 
-.PHONY: all dirs tests clean
+.PHONY: all dirs tests memtest clean
