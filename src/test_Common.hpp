@@ -42,7 +42,6 @@
 #define __TEST_COMMON_HPP__
 
 #include <iostream>
-#include <iomanip>
 
 #define error_exit(msg)						\
 	std::cout << __func__ << ": " << (msg) << " error"	\
