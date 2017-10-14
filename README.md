@@ -2,6 +2,8 @@
 
 ## m5_cpp: the MQTT 5 Low Level Packet Library
 
+[![Build Status](https://travis-ci.org/1byt3/m5_cpp.svg?branch=dev)](https://travis-ci.org/1byt3/m5_cpp)
+
 ### What is MQTT?
 
 From the [MQTT version 5 specification](http://docs.oasis-open.org/mqtt/mqtt/v5.0/):
