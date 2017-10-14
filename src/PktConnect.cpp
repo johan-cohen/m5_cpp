@@ -119,7 +119,7 @@ void PktConnect::writeProperties(AppBuf &buf, uint32_t propWireSize)
 	(void)propWireSize;
 
 	/* xxx So far, propWS is zero */
-	buf.writeVarByteInteger(0);
+	buf.writeVBI(0);
 }
 
 void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
@@ -169,7 +169,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	}
 
 	buf.writeNum8((uint8_t)PktType::CONNECT << 4);
-	buf.writeVarByteInteger(remLen);
+	buf.writeVBI(remLen);
 	buf.writeString(protocolStr);
 	buf.writeNum8(protocolVersion5);
 	buf.writeNum8(headerFlags());

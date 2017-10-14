@@ -153,7 +153,7 @@ void AppBuf::readBinary(uint8_t *data, uint16_t &len, uint16_t size)
 	this->offset += len;
 }
 
-void AppBuf::readVarByteInteger(uint32_t &v, uint8_t &wireSize)
+void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 {
 	uint32_t multiplier = 1;
 	uint8_t encoded;
@@ -239,7 +239,7 @@ void AppBuf::writeString(const char *str)
 	this->writeBinary((uint8_t *)str, strlen(str));
 }
 
-void AppBuf::writeVarByteInteger(uint32_t v)
+void AppBuf::writeVBI(uint32_t v)
 {
 	do {
 		uint8_t encoded;
