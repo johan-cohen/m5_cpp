@@ -28,4 +28,4 @@ tests: $(TESTS)
 clean:
 	rm -rf obj bin
 
-.PHONY: all dirs clean
+.PHONY: all dirs tests clean
