@@ -119,6 +119,20 @@ int test(void)
 
 	delete buf;
 
+	buf = new m5::AppBuf((uint8_t *)str, strlen(str));
+
+	if (buf->size() != strlen(str) || buf->length() != buf->size()) {
+		error_exit("size or length");
+	}
+	if (memcmp(buf->rawData(), str, buf->length()) != 0) {
+		error_exit("rawData");
+	}
+	if (buf->bytesToRead() != buf->length() || buf->bytesToWrite() != 0) {
+		error_exit("bytesToRead or bytesToWrite");
+	}
+
+	delete buf;
+
 	return 0;
 }
 
