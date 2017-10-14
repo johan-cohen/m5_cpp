@@ -1,2 +1,5 @@
-script: make && make tests
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y valgrind
 
+script: make && make tests && make memtest
