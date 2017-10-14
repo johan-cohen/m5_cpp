@@ -62,7 +62,7 @@ public:
 	const uint8_t *rawData() const { return data; }
 
 	AppBuf(const uint8_t *data, std::size_t size);
-	AppBuf(std::size_t size);
+	AppBuf(std::size_t size = 0);
 	~AppBuf();
 
 	std::size_t size(void) const { return maxSize; }

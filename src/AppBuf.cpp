@@ -61,7 +61,9 @@ void AppBuf::init(std::size_t size)
 AppBuf::AppBuf(const uint8_t *data, std::size_t size)
 {
 	init(size);
+
 	memcpy(this->data, data, size);
+	this->len = size;
 }
 
 AppBuf::AppBuf(std::size_t size)
