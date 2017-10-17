@@ -246,6 +246,10 @@ uint32_t PktConnect::getId(void) const
 
 void PktConnect::setClientId(const uint8_t *data, uint16_t size)
 {
+	if (this->clientId != nullptr) {
+		delete this->clientId;
+	}
+
 	this->clientId = new AppBuf(data, size);
 }
 
