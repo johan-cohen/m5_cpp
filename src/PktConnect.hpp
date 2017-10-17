@@ -68,6 +68,7 @@ private:
 
 	void init(const uint8_t *clientId, uint16_t len, bool cleanStart);
 public:
+	PktConnect() {};
 	PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart = true);
 	PktConnect(const char *clientId, bool cleanStart = true);
 	~PktConnect();
