@@ -77,7 +77,7 @@ enum class PktType {
 	AUTH
 };
 
-static inline int VBIWireSize(uint32_t value)
+static inline uint8_t VBIWireSize(uint32_t value)
 {
 	if (value <= 127) {
 		return 1;
