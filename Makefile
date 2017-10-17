@@ -10,6 +10,8 @@ BINS_DIR = bin
 
 TESTS = $(BINS_DIR)/test_AppBuf $(BINS_DIR)/test_PktConnect
 
+VALGRIND = valgrind -q --leak-check=full --error-exitcode=1
+
 all: dirs $(TESTS)
 
 dirs:
@@ -23,10 +25,10 @@ $(BINS_DIR)/test_%: $(SRC_DIR)/test_Common.hpp $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
 tests: $(TESTS)
-	@$(foreach test_case, $(TESTS), ./$(test_case);)
+	@$(foreach test_case, $(TESTS), ./$(test_case) || exit 1;)
 
 memtest: $(TESTS)
-	@$(foreach test_case, $(TESTS), valgrind ./$(test_case);)
+	@$(foreach test_case, $(TESTS), $(VALGRIND) ./$(test_case) || exit 1;)
 
 clean:
 	rm -rf obj bin
