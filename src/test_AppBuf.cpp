@@ -133,6 +133,23 @@ int test(void)
 
 	delete buf;
 
+	buf = new m5::AppBuf(16);
+	for (std::size_t i = 0; i < buf->size(); i++) {
+		buf->writeNum8(i);
+	}
+
+	buf->readSkip(5);
+	if (buf->rawData()[5] != buf->readNum8()) {
+		error_exit("readSkip forward");
+	}
+
+	buf->readSkip(6, false);
+	if (buf->rawData()[0] != buf->readNum8()) {
+		error_exit("readSkip");
+	}
+
+	delete buf;
+
 	return 0;
 }
 

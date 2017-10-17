@@ -177,6 +177,11 @@ void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 	} while ((encoded & 128) != 0);
 }
 
+void AppBuf::readSkip(std::size_t n, bool forward)
+{
+	this->offset += (forward ? 1 : -1) * n;
+}
+
 void AppBuf::write(const uint8_t *d, std::size_t size)
 {
 	for (std::size_t i = 0; i < size; i++) {

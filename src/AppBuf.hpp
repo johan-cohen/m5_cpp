@@ -88,6 +88,9 @@ public:
 
 	void readVBI(uint32_t &v, uint8_t &wireSize);
 
+	/* readSkip does not do bound checking, use bytesToRead */
+	void readSkip(std::size_t n, bool forward = true);
+
 	std::size_t bytesToWrite(void) const;
 
 	/* write does not do bound checking, use bytesToWrite */
