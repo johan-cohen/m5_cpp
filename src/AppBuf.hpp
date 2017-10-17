@@ -68,6 +68,7 @@ public:
 
 	std::size_t size(void) const { return maxSize; }
 	std::size_t length(void) const { return len; }
+	std::size_t traversed(void) const { return offset; }
 	void rewind();
 	void reset(void);
 
