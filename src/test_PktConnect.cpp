@@ -41,9 +41,110 @@
 #include "PktConnect.hpp"
 #include "test_Common.hpp"
 
+#include <stdexcept>
+#include <cstring>
+
 int test(void)
 {
-	m5::PktConnect *connect = new m5::PktConnect("m5_client");
+	const uint8_t protocolNameStr[] = {0, 4, 'M', 'Q', 'T', 'T'};
+	const char clientId[] = "m5";
+	const char willTopic[] = "msgs";
+	const char willMsg[] = "Bye!";
+	const char userName[] = "name";
+	const char password[] = "pass";
+	const uint16_t keepAlive = 0xABCD;
+
+	m5::PktConnect *connect;
+	uint8_t remLenWireSize;
+	uint8_t bigString[64];
+	uint32_t fullPktSize;
+	uint32_t remLen;
+	m5::AppBuf *buf;
+	uint16_t len;
+
+	connect = new m5::PktConnect("m5_client");
+	buf = new m5::AppBuf(128);
+
+	connect->setCleanStart(true);
+	/* this must call the clientId destructor and create a new obj */
+	connect->setClientId(clientId);
+	connect->setKeyAlive(keepAlive);
+	connect->setUserName(userName);
+	connect->setPassword(password);
+	connect->setWillTopic(willTopic);
+	connect->setWillMsg(willMsg);
+	connect->setWillQoS(m5::PktQoS::QoS2);
+	connect->setWillRetain(true);
+
+	/* RemLen: Variable Header min size: 10 + 1, plus the payload */
+	remLen = 10 + 1 +
+		 2 + strlen(clientId) + 2 + strlen(willTopic) +
+		 2 + strlen(willMsg) + 2 + strlen(userName) +
+		 2 + strlen(password);
+	remLenWireSize = m5::VBIWireSize(remLen);
+	fullPktSize = 1 + remLenWireSize + remLen;
+
+	connect->writeTo(*buf);
+
+	if (buf->length() != fullPktSize) {
+		throw std::logic_error("writeTo");
+	}
+
+	if (buf->readNum8() != ((uint8_t)m5::PktType::CONNECT << 4)) {
+		throw std::logic_error("writeTo: PktType");
+	}
+
+	if (remLen != buf->readVBI()) {
+		throw std::logic_error("writeTo: Remaining Length");
+	}
+
+	buf->read(bigString, sizeof(protocolNameStr));
+	if (memcmp(bigString, protocolNameStr, sizeof(protocolNameStr)) != 0) {
+		throw std::logic_error("writeTo: Protocol Name");
+	}
+
+	if (buf->readNum8() != 5) {
+		throw std::logic_error("writeTo: Protocol Version");
+	}
+
+	if (buf->readNum8() != 0xF6) {
+		throw std::logic_error("writeTo: Control Flags");
+	}
+
+	if (buf->readNum16() != keepAlive) {
+		throw std::logic_error("writeTo: Control Flags");
+	}
+
+	if (buf->readVBI() != 0) {
+		throw std::logic_error("writeTo: Properties Length");
+	}
+
+	buf->readBinary(bigString, len, strlen(clientId));
+	if (memcmp(bigString, clientId, strlen(clientId)) != 0) {
+		throw std::logic_error("writeTo: clientId");
+	}
+
+	buf->readBinary(bigString, len, strlen(willTopic));
+	if (memcmp(bigString, willTopic, strlen(willTopic)) != 0) {
+		throw std::logic_error("writeTo: willTopic");
+	}
+
+	buf->readBinary(bigString, len, strlen(willMsg));
+	if (memcmp(bigString, willMsg, strlen(willMsg)) != 0) {
+		throw std::logic_error("writeTo: willMsg");
+	}
+
+	buf->readBinary(bigString, len, strlen(userName));
+	if (memcmp(bigString, userName, strlen(userName)) != 0) {
+		throw std::logic_error("writeTo: userName");
+	}
+
+	buf->readBinary(bigString, len, strlen(password));
+	if (memcmp(bigString, password, strlen(password)) != 0) {
+		throw std::logic_error("writeTo: password");
+	}
+
+	delete buf;
 	delete connect;
 
 	return 0;
