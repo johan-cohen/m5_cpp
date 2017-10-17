@@ -44,11 +44,18 @@
 
 namespace  m5 {
 
-static const char protocolStr[] = "MQTT";
-static const uint32_t protocolVersion5 = 0x05;
-
 static const uint32_t clientIdMinLen = 1;
 static const uint32_t clientIdMaxLen = 23;
+
+static const uint8_t protocolVersion5 = 0x05;
+
+static const char protocolStr[] = "MQTT";
+static const uint8_t protocolNameStr[] = {0, 4, 'M', 'Q', 'T', 'T'};
+static const std::size_t protocolNameStrLen = sizeof(protocolNameStr);
+
+/* Protocol Name (2 + 4), Protocol Level (1), Conn Flags (1), Keep Alive (2) */
+static const uint32_t connectVarHdrMinSize = 10;
+static const uint32_t connectPktMinSize = 2 + connectVarHdrMinSize;
 
 uint8_t PktConnect::packConnectFlags(void)
 {
@@ -232,9 +239,70 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 
 uint32_t PktConnect::readFrom(AppBuf &buf)
 {
-	(void)buf;
+	std::size_t alreadyTraversed = buf.traversed();
+	uint8_t connectFlags;
+	uint8_t remLenWS;
+	uint32_t propLen;
+	uint32_t remLen;
+	uint8_t first;
 
-	/* xxx */
+	if (buf.bytesToRead() < m5::connectPktMinSize) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	first = buf.readNum8();
+	if (first != ((uint8_t)PktType::CONNECT << 4)) {
+		throw std::invalid_argument("CONNECT msg not found in buf");
+	}
+
+	buf.readVBI(remLen, remLenWS);
+
+	/* Add 1 to allow the min property length wire size to be 1 byte
+	 * Add the Client Id min len: 2 for field length and clientIdMinLen for
+	 * the content.
+	 */
+	if (remLen < m5::connectVarHdrMinSize + 1 + 2 + m5::clientIdMinLen) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	if (memcmp(buf.rawData() + buf.traversed(), m5::protocolNameStr, m5::protocolNameStrLen) != 0) {
+		throw std::invalid_argument("Invalid protocol name string");
+	}
+	buf.readSkip(m5::protocolNameStrLen);
+
+	if (buf.readNum8() != protocolVersion5) {
+		throw std::invalid_argument("Invalid protocol version");
+	}
+
+	connectFlags = buf.readNum8();
+	this->cleanStart = flagCleanStart(connectFlags);
+	this->willRetain = flagWillRetain(connectFlags);
+	this->willQoS = flagWillQoS(connectFlags);
+
+	keepAlive = buf.readNum16();
+
+	propLen = buf.readVBI();
+	/* xxx Implement properties reading */
+	buf.readSkip(propLen);
+
+	this->clientId = new AppBuf(buf, buf.readNum16());
+
+	if (flagWillMsg(connectFlags) == true) {
+		this->willTopic = new AppBuf(buf, buf.readNum16());
+		this->willMsg = new AppBuf(buf, buf.readNum16());
+	}
+
+	if (flagUserName(connectFlags) == true) {
+		this->userName = new AppBuf(buf, buf.readNum16());
+	}
+
+	if (flagPassword(connectFlags) == true) {
+		this->password = new AppBuf(buf, buf.readNum16());
+	}
+
+	if (buf.traversed() - alreadyTraversed != 1 + remLenWS + remLen) {
+		throw std::invalid_argument("Corrupted input buffer");
+	}
 
 	return 0;
 }
