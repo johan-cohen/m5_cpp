@@ -44,6 +44,12 @@
 
 namespace  m5 {
 
+static const char protocolStr[] = "MQTT";
+static const uint32_t protocolVersion5 = 0x05;
+
+static const uint32_t clientIdMinLen = 1;
+static const uint32_t clientIdMaxLen = 23;
+
 uint8_t PktConnect::headerFlags(void) const
 {
 	uint8_t f;
