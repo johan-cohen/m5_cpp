@@ -72,6 +72,36 @@ uint8_t PktConnect::packConnectFlags(void)
 	return flags;
 }
 
+bool PktConnect::flagCleanStart(uint8_t flags)
+{
+	return flags & (1 << 1);
+}
+
+bool PktConnect::flagWillMsg(uint8_t flags)
+{
+	return flags & (1 << 2);
+}
+
+uint8_t PktConnect::flagWillQoS(uint8_t flags)
+{
+	return (flags & (3 << 3)) >> 3;
+}
+
+bool PktConnect::flagWillRetain(uint8_t flags)
+{
+	return flags & (1 << 4);
+}
+
+bool PktConnect::flagPassword(uint8_t flags)
+{
+	return flags & (1 << 5);
+}
+
+bool PktConnect::flagUserName(uint8_t flags)
+{
+	return flags & (1 << 6);
+}
+
 uint32_t PktConnect::payloadWireSize(void) const
 {
 	uint32_t wireSize;

@@ -67,6 +67,14 @@ private:
 	void writeProperties(AppBuf &buf, uint32_t propWireSize);
 
 	void init(const uint8_t *clientId, uint16_t len, bool cleanStart);
+
+	bool flagCleanStart(uint8_t flags);
+	bool flagWillMsg(uint8_t flags);
+	uint8_t flagWillQoS(uint8_t flags);
+	bool flagWillRetain(uint8_t flags);
+	bool flagPassword(uint8_t flags);
+	bool flagUserName(uint8_t flags);
+
 public:
 	PktConnect() {};
 	PktConnect(AppBuf &buf);
