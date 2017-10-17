@@ -44,6 +44,68 @@
 #include <stdexcept>
 #include <cstring>
 
+namespace m5 {
+	bool operator==(const AppBuf &a, const AppBuf &b) {
+		if (a.length() != b.length()) {
+			return false;
+		}
+
+		if (memcmp(a.rawData(), b.rawData(), a.length()) != 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	bool operator!=(const AppBuf &a, const AppBuf &b) {
+		return !(a == b);
+	}
+
+	bool operator==(const PktConnect &a, const PktConnect &b) {
+		if (a.getKeepAlive() != b.getKeepAlive()) {
+			return false;
+		}
+
+		if (a.getWillRetain() != b.getWillRetain()) {
+			return false;
+		}
+
+		if (a.getWillQoS() != b.getWillQoS()) {
+			return false;
+		}
+
+		if (a.getCleanStart() != b.getCleanStart()) {
+			return false;
+		}
+
+		if (*a.clientId != *b.clientId) {
+			return false;
+		}
+
+		if (*a.willTopic != *b.willTopic) {
+			return false;
+		}
+
+		if (*a.willMsg != *b.willMsg) {
+			return false;
+		}
+
+		if (*a.userName != *b.userName) {
+			return false;
+		}
+
+		if (*a.password != *b.password) {
+			return false;
+		}
+
+		return true;
+	}
+
+	bool operator!=(const PktConnect &a, const PktConnect &b) {
+		return !(a == b);
+	}
+}
+
 int test(void)
 {
 	const uint8_t protocolNameStr[] = {0, 4, 'M', 'Q', 'T', 'T'};
@@ -62,8 +124,8 @@ int test(void)
 	m5::AppBuf *buf;
 	uint16_t len;
 
-	connect = new m5::PktConnect("m5_client");
 	buf = new m5::AppBuf(128);
+	connect = new m5::PktConnect("m5_client");
 
 	connect->setCleanStart(true);
 	/* this must call the clientId destructor and create a new obj */
@@ -144,8 +206,18 @@ int test(void)
 		throw std::logic_error("writeTo: password");
 	}
 
-	delete buf;
+	buf->rewind();
+
+	m5::PktConnect *connectRead = new m5::PktConnect(*buf);
+
+	if (*connect != *connectRead) {
+		throw std::logic_error("PktConnect constructor");
+	}
+
+	delete connectRead;
+
 	delete connect;
+	delete buf;
 
 	return 0;
 }
