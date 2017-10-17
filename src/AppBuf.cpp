@@ -96,10 +96,7 @@ std::size_t AppBuf::bytesToRead(void) const
 
 void AppBuf::read(uint8_t *d, std::size_t size)
 {
-	for (size_t i = 0; i < size; i++) {
-		d[i] = this->data[this->offset + i];
-	}
-
+	memcpy(d, this->data + this->offset, size);
 	this->offset += size;
 }
 
@@ -195,10 +192,7 @@ void AppBuf::readSkip(std::size_t n, bool forward)
 
 void AppBuf::write(const uint8_t *d, std::size_t size)
 {
-	for (std::size_t i = 0; i < size; i++) {
-		this->data[this->len + i] = d[i];
-	}
-
+	memcpy(this->data + this->len, d, size);
 	this->len += size;
 }
 
