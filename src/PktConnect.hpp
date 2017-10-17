@@ -47,7 +47,7 @@ namespace m5 {
 
 class PktConnect : public ProtoEntity {
 private:
-	AppBuf *clientId;
+	AppBuf *clientId = nullptr;
 	AppBuf *willTopic = nullptr;
 	AppBuf *willMsg = nullptr;
 	AppBuf *userName = nullptr;
