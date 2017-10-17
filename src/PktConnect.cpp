@@ -50,18 +50,26 @@ static const uint32_t protocolVersion5 = 0x05;
 static const uint32_t clientIdMinLen = 1;
 static const uint32_t clientIdMaxLen = 23;
 
-uint8_t PktConnect::headerFlags(void) const
+uint8_t PktConnect::packConnectFlags(void)
 {
-	uint8_t f;
+	uint8_t flags;
 
-	f = (cleanStart << 0x01) +
-	    ((willMsg != nullptr && willMsg->length() > 0) ? (0x01 << 2) : 0) +
-	    ((willQoS & 0x03) << 3) +
-	    (willRetain == 1 ? (1 << 5) : 0) +
-	    ((password != nullptr && password->length() > 0) ? (0x01 << 6) : 0) +
-	    ((userName != nullptr && userName->length() > 0) ? (0x01 << 7) : 0);
+	flags = (cleanStart << 0x01) + ((willQoS & 0x03) << 3) +
+		(willRetain == 1 ? (1 << 5) : 0);
 
-	return f;
+	if (willMsg != nullptr) {
+		flags += (willMsg->length() > 0 ? (0x01 << 2) : 0);
+	}
+
+	if (password != nullptr) {
+		flags += (password->length() > 0 ? (0x01 << 6) : 0);
+	}
+
+	if (userName != nullptr) {
+		flags += (userName->length() > 0 ? (0x01 << 6) : 0);
+	}
+
+	return flags;
 }
 
 uint32_t PktConnect::payloadWireSize(void) const
@@ -183,7 +191,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	buf.writeVBI(remLen);
 	buf.writeString(protocolStr);
 	buf.writeNum8(protocolVersion5);
-	buf.writeNum8(headerFlags());
+	buf.writeNum8(packConnectFlags());
 	buf.writeNum16(this->keepAlive);
 
 	writeProperties(buf, propWS);

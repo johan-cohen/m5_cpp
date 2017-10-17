@@ -59,7 +59,7 @@ private:
 	uint8_t willQoS = 0;
 	uint8_t cleanStart = 1;
 
-	uint8_t headerFlags(void) const;
+	uint8_t packConnectFlags(void);
 	uint32_t payloadWireSize(void) const;
 	uint32_t propertiesWireSize(void) const;
 
