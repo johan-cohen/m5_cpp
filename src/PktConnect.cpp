@@ -134,6 +134,11 @@ void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 	this->setCleanStart(cleanStart);
 }
 
+PktConnect::PktConnect(AppBuf &buf)
+{
+	this->readFrom(buf);
+}
+
 PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart)
 {
 	init(clientId, len, cleanStart);
