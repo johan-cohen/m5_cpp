@@ -51,6 +51,5 @@
 #define test_rc(rc, msg)				\
 	std::cout << (((rc) != 0) ? "ERROR\t" : "OK\t")	\
 		  << (msg) << std::endl;		\
-	return 0;
 
 #endif
