@@ -73,7 +73,7 @@ uint8_t PktConnect::packConnectFlags(void)
 	}
 
 	if (userName != nullptr) {
-		flags += (userName->length() > 0 ? (0x01 << 6) : 0);
+		flags += (userName->length() > 0 ? (0x01 << 7) : 0);
 	}
 
 	return flags;
