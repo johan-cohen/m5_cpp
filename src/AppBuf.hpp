@@ -87,6 +87,7 @@ public:
 	void readBinary(uint8_t *data, uint16_t &len, uint16_t size);
 
 	void readVBI(uint32_t &v, uint8_t &wireSize);
+	uint32_t readVBI(void);
 
 	/* readSkip does not do bound checking, use bytesToRead */
 	void readSkip(std::size_t n, bool forward = true);
