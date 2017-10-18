@@ -47,12 +47,6 @@ namespace m5 {
 
 class PktConnect : public ProtoEntity {
 private:
-	AppBuf *clientId = nullptr;
-	AppBuf *willTopic = nullptr;
-	AppBuf *willMsg = nullptr;
-	AppBuf *userName = nullptr;
-	AppBuf *password = nullptr;
-
 	uint16_t keepAlive = 0;
 
 	uint8_t willRetain = 0;
@@ -81,6 +75,20 @@ public:
 	PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart = true);
 	PktConnect(const char *clientId, bool cleanStart = true);
 	~PktConnect();
+
+	AppBuf *clientId = nullptr;
+	AppBuf *willTopic = nullptr;
+	AppBuf *willMsg = nullptr;
+	AppBuf *userName = nullptr;
+	AppBuf *password = nullptr;
+
+	uint16_t getKeepAlive(void) const { return this->keepAlive; }
+
+	bool getWillRetain(void) const { return this->willRetain; }
+
+	PktQoS getWillQoS(void) const { return (PktQoS)this->willQoS; }
+
+	bool getCleanStart(void) const { return this->cleanStart; }
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
