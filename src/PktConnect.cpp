@@ -113,8 +113,7 @@ uint32_t PktConnect::payloadWireSize(void) const
 {
 	uint32_t wireSize;
 
-	if (clientId == nullptr || clientId->length() < clientIdMinLen ||
-	    clientId->length() > clientIdMaxLen) {
+	if (clientId == nullptr) {
 		throw std::invalid_argument("Invalid ClientId");
 	}
 
@@ -316,6 +315,10 @@ void PktConnect::setClientId(const uint8_t *data, uint16_t size)
 {
 	if (this->clientId != nullptr) {
 		delete this->clientId;
+	}
+
+	if (size < clientIdMinLen || size > clientIdMaxLen) {
+			throw std::invalid_argument("Invalid ClientId length");
 	}
 
 	this->clientId = new AppBuf(data, size);
