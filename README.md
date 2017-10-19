@@ -43,11 +43,6 @@ This is a pre-alpha release.
 Nope, only version 5 is supported. There are no plans to support older versions
 of the MQTT protocol.
 
-##### Can the cpp/hpp files be integrated in my application/product/service?
-
-Yes, as long as your application/product/service follows the
-[GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html).
-
 ### References
 
 OASIS MQTT Version 5 [specification](http://docs.oasis-open.org/mqtt/mqtt/v5.0/)
