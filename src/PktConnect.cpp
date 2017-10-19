@@ -261,7 +261,8 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	if (memcmp(buf.rawData() + buf.traversed(), m5::protocolNameStr, m5::protocolNameStrLen) != 0) {
+	const uint8_t *ptr = buf.rawData() + buf.traversed();
+	if (memcmp(ptr, m5::protocolNameStr, m5::protocolNameStrLen) != 0) {
 		throw std::invalid_argument("Invalid protocol name string");
 	}
 	buf.readSkip(m5::protocolNameStrLen);
