@@ -119,13 +119,10 @@ uint32_t PktConnect::payloadWireSize(void) const
 
 	wireSize = stringLenSize  + clientId->length();
 
-	if (willMsg != nullptr && willTopic != nullptr) {
-		if (willMsg->length() > 0 && willTopic->length() > 0) {
-			wireSize += stringLenSize + willTopic->length() +
-				    binaryLenSize + willMsg->length();
-		} else if (willMsg->length() + willTopic->length() != 0) {
-			throw std::invalid_argument("Invalid Will Msg or Topic");
-		}
+	if (willMsg != nullptr && willMsg->length() > 0 &&
+	    willTopic != nullptr && willTopic->length() > 0) {
+		wireSize += stringLenSize + willTopic->length();
+		wireSize += binaryLenSize + willMsg->length();
 	}
 
 
