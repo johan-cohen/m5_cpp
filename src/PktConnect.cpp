@@ -61,8 +61,8 @@ uint8_t PktConnect::packConnectFlags(void)
 {
 	uint8_t flags;
 
-	flags = (cleanStart << 0x01) + ((willQoS & 0x03) << 3) +
-		(willRetain == 1 ? (1 << 5) : 0);
+	flags = (cleanStart << 0x01);
+	flags += ((willQoS & 0x03) << 3) + (willRetain == 1 ? (1 << 5) : 0);
 
 	if (willMsg != nullptr) {
 		flags += (willMsg->length() > 0 ? (0x01 << 2) : 0);
