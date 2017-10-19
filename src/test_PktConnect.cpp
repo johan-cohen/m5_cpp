@@ -133,8 +133,7 @@ int test(void)
 	connect->setKeyAlive(keepAlive);
 	connect->setUserName(userName);
 	connect->setPassword(password);
-	connect->setWillTopic(willTopic);
-	connect->setWillMsg(willMsg);
+	connect->setWill(willTopic, willMsg);
 	connect->setWillQoS(m5::PktQoS::QoS2);
 	connect->setWillRetain(true);
 

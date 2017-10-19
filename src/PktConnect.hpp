@@ -97,11 +97,9 @@ public:
 	void setClientId(const uint8_t *data, uint16_t size);
 	void setClientId(const char *str);
 
-	void setWillTopic(const uint8_t *data, uint16_t size);
-	void setWillTopic(const char *str);
-
-	void setWillMsg(const uint8_t *data, uint16_t size);
-	void setWillMsg(const char *str);
+	void setWill(const uint8_t *topic, uint16_t topic_size,
+		     const uint8_t *msg, uint16_t msg_size);
+	void setWill(const char *topic, const char *msg);
 
 	void setUserName(const uint8_t *data, uint16_t size);
 	void setUserName(const char *str);

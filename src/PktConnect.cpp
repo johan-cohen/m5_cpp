@@ -326,24 +326,21 @@ void PktConnect::setClientId(const char *str)
 	this->setClientId((const uint8_t *)str, strlen(str));
 }
 
-void PktConnect::setWillTopic(const uint8_t *data, uint16_t size)
+void PktConnect::setWill(const uint8_t *topic, uint16_t topic_size,
+			 const uint8_t *msg, uint16_t msg_size)
 {
-	this->willTopic = new AppBuf(data, size);
+	if (topic_size == 0 || msg_size == 0) {
+		throw std::invalid_argument("Invalid Will Topic or Msg length");
+	}
+
+	this->willTopic = new AppBuf(topic, topic_size);
+	this->willMsg = new AppBuf(msg, msg_size);
 }
 
-void PktConnect::setWillTopic(const char *str)
+void PktConnect::setWill(const char *topic, const char *msg)
 {
-	this->setWillTopic((const uint8_t *)str, strlen(str));
-}
-
-void PktConnect::setWillMsg(const uint8_t *data, uint16_t size)
-{
-	this->willMsg = new AppBuf(data, size);
-}
-
-void PktConnect::setWillMsg(const char *str)
-{
-	this->setWillMsg((const uint8_t *)str, strlen(str));
+	this->setWill((const uint8_t *)topic, strlen(topic),
+		      (const uint8_t *)msg, strlen(msg));
 }
 
 void PktConnect::setUserName(const uint8_t *data, uint16_t size)
