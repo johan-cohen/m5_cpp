@@ -99,14 +99,21 @@ void PropertiesList::computePktFlags(void)
 		properties += __POW2(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 		break;
 	case PktType::PUBLISH:
+		properties += __POW2(PropertyId::PAYLOAD_FORMAT_INDICATOR);
+		properties += __POW2(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
+		properties += __POW2(PropertyId::CONTENT_TYPE);
+		properties += __POW2(PropertyId::RESPONSE_TOPIC);
+		properties += __POW2(PropertyId::CORRELATION_DATA);
+		properties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
+		properties += __POW2(PropertyId::TOPIC_ALIAS);
+		properties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::PUBACK:
-		break;
 	case PktType::PUBREC:
-		break;
 	case PktType::PUBREL:
-		break;
 	case PktType::PUBCOMP:
+		properties += __POW2(PropertyId::REASON_STR);
+		properties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::SUBSCRIBE:
 		break;
