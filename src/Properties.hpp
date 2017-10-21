@@ -48,6 +48,51 @@
 
 namespace m5 {
 
+enum PropertyId {
+	PAYLOAD_FORMAT_INDICATOR = 0x01,
+	PUBLICATION_EXPIRY_INTERVAL,
+	CONTENT_TYPE,
+	/* empty */
+	/* empty */
+	/* empty */
+	/* empty */
+	RESPONSE_TOPIC = 0x08,
+	CORRELATION_DATA,
+	/* empty */
+	SUBSCRIPTION_IDENTIFIER = 0x0B,
+	/* empty */
+	/* empty */
+	/* empty */
+	/* empty */
+	/* empty */
+	SESSION_EXPIRY_INTERVAL = 0x11,
+	ASSIGNED_CLIENT_IDENTIFIER,
+	SERVER_KEEP_ALIVE,
+	/* empty */
+	AUTH_METHOD = 0x15,
+	AUTH_DATA,
+	REQUEST_PROBLEM_INFORMATION,
+	WILL_DELAY_INTERVAL,
+	REQUEST_RESPONSE_INFORMATION,
+	RESPONSE_INFORMATION,
+	/* empty */
+	SERVER_REFERENCE  = 0x1C,
+	/* empty */
+	/* empty */
+	REASON_STR = 0x1F,
+	/* empty */
+	RECEIVE_MAXIMUM = 0x21,
+	TOPIC_ALIAS_MAXIMUM,
+	TOPIC_ALIAS,
+	MAXIMUM_QOS,
+	RETAIN_AVAILABLE,
+	USER_PROPERTY,
+	MAXIMUM_PACKET_SIZE,
+	WILDCARD_SUBSCRIPTION_AVAILABLE,
+	SUBSCRIPTION_IDENTIFIER_AVAILABLE,
+	SHARED_SUBSCRIPTION_AVAILABLE,
+};
+
 class PropertiesList {
 private:
 	std::multimap<uint8_t, PropertyNode *> propList;
