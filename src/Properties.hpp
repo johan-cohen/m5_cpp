@@ -41,9 +41,19 @@
 #ifndef __PROPERTIES_HPP__
 #define __PROPERTIES_HPP__
 
+#include "PropertyNode.hpp"
+
+#include <map>
+
 namespace m5 {
 
 class PropertiesList {
+private:
+	std::multimap<uint8_t, PropertyNode *> propList;
+
+	void push(PropertyNode *node);
+	void deleteList();
+
 public:
 	PropertiesList();
 	~PropertiesList();
