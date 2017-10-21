@@ -42,6 +42,7 @@
 #define __PROPERTIES_HPP__
 
 #include "PropertyNode.hpp"
+#include "Common.hpp"
 
 #include <map>
 
@@ -50,13 +51,17 @@ namespace m5 {
 class PropertiesList {
 private:
 	std::multimap<uint8_t, PropertyNode *> propList;
+	enum PktType pktType = PktType::RESERVED;
 
 	void push(PropertyNode *node);
 	void deleteList();
 
 public:
-	PropertiesList();
+	PropertiesList(const PktType type = PktType::RESERVED);
 	~PropertiesList();
+
+	enum PktType packetType() const { return pktType; }
+	void resetPacketType(const enum PktType type);
 };
 
 }
