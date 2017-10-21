@@ -112,16 +112,15 @@ void PropertiesList::computePktFlags(void)
 	case PktType::PUBREC:
 	case PktType::PUBREL:
 	case PktType::PUBCOMP:
+	case PktType::SUBACK:
+	case PktType::UNSUBACK:
 		properties += __POW2(PropertyId::REASON_STR);
 		properties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::SUBSCRIBE:
-		break;
-	case PktType::SUBACK:
+		properties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
 		break;
 	case PktType::UNSUBSCRIBE:
-		break;
-	case PktType::UNSUBACK:
 		break;
 	case PktType::PINGREQ:
 		break;
