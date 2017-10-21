@@ -60,14 +60,21 @@ void PropertiesList::deleteList(void)
 	}
 }
 
-PropertiesList::PropertiesList()
+PropertiesList::PropertiesList(const PktType type)
 {
-	/* xxx */
+	this->resetPacketType(type);
 }
 
 PropertiesList::~PropertiesList()
 {
 	deleteList();
+}
+
+void PropertiesList::resetPacketType(const PktType type)
+{
+	deleteList();
+
+	this->pktType = type;
 }
 
 }
