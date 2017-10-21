@@ -121,14 +121,20 @@ void PropertiesList::computePktFlags(void)
 		properties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
 		break;
 	case PktType::UNSUBSCRIBE:
-		break;
 	case PktType::PINGREQ:
-		break;
 	case PktType::PINGRESP:
 		break;
 	case PktType::DISCONNECT:
+		properties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
+		properties += __POW2(PropertyId::SERVER_REFERENCE);
+		properties += __POW2(PropertyId::REASON_STR);
+		properties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::AUTH:
+		properties += __POW2(PropertyId::AUTH_METHOD);
+		properties += __POW2(PropertyId::AUTH_DATA);
+		properties += __POW2(PropertyId::REASON_STR);
+		properties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::RESERVED:
 	default:
