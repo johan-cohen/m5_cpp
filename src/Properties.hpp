@@ -114,6 +114,9 @@ public:
 
 	uint64_t allowed() const { return properties; }
 	uint64_t enabled() const { return enabledProperties; }
+
+	bool isAllowed(PropertyId id) const;
+	bool isEnabled(PropertyId id) const;
 };
 
 }
