@@ -88,4 +88,15 @@ PropertyData::~PropertyData()
 	release();
 }
 
+void PropertyData::reset(const uint8_t *data, uint16_t size)
+{
+	if (this->size() < size) {
+		release();
+		init(data, size);
+	} else {
+		this->_size = size;
+		memcpy(this->_data, data, size);
+	}
+}
+
 }

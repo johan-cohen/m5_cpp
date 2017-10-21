@@ -59,6 +59,8 @@ public:
 	PropertyData(const uint8_t *data = nullptr, uint16_t size = 0);
 	~PropertyData();
 
+	void reset(const uint8_t *data = nullptr, uint16_t size = 0);
+
 	uint8_t *data() { return _data; }
 	uint16_t size() const { return _size; }
 };
