@@ -170,4 +170,48 @@ bool PropertiesList::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
+void PropertiesList::add(PropertyId id, uint8_t *data, uint16_t size)
+{
+	if (!isAllowed(id)) {
+		return;
+	}
+
+	if (!isEnabled(id)) {
+		PropertyNode *node = new PropertyNode(id, data, size);
+		this->push(node);
+		this->enabledProperties += __POW2(id);
+	} else {
+		auto it = propList.find(id);
+
+		/* rewrite value */
+		PropertyNode *node = (*it).second;
+		node->id(id);
+		node->value.reset(data, size);
+	}
+}
+
+uint8_t *PropertiesList::value(PropertyId id, uint16_t &size)
+{
+	if (!isEnabled(id)) {
+		size = 0;
+
+		return nullptr;
+	}
+
+	auto it = propList.find(id);
+	if (it == propList.end()) {
+		return nullptr;
+	}
+
+	PropertyNode *node = (*it).second;
+	size = node->value.size();
+
+	return node->value.data();
+}
+
+template <typename T> void PropertiesList::addNum(PropertyId id, T v)
+{
+	this->add(id, (uint8_t *)&v, sizeof(v));
+}
+
 }

@@ -57,6 +57,7 @@ public:
 	}
 
 	uint8_t id() const { return _id; }
+	void id(uint8_t id) { _id = id; }
 };
 
 }
