@@ -160,4 +160,14 @@ void PropertiesList::resetPacketType(const PktType type)
 	this->computePktFlags();
 }
 
+bool PropertiesList::isAllowed(PropertyId id) const
+{
+	return allowed() & __POW2(id);
+}
+
+bool PropertiesList::isEnabled(PropertyId id) const
+{
+	return enabled() & __POW2(id);
+}
+
 }
