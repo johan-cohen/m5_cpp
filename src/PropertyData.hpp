@@ -38,36 +38,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Properties.hpp"
+#ifndef __PROPERTY_DATA_HPP__
+#define __PROPERTY_DATA_HPP__
 
-namespace  m5 {
+#include <cstdint>
 
-void PropertiesList::push(PropertyNode *node)
-{
-	propList.insert(std::pair<uint8_t, PropertyNode *>(node->id(), node));
-}
+namespace m5 {
 
-void PropertiesList::deleteList(void)
-{
-	std::multimap<uint8_t, PropertyNode *>::iterator it;
+class PropertyData {
+private:
+	uint8_t *_data = nullptr;
+	bool useNum = false;
+	uint16_t _size = 0;
+	uint64_t num = 0;
 
-	it = propList.begin();
-	while (it != propList.end()) {
-		struct PropertyNode *node = (*it).second;
-		delete node;
+	void init(const uint8_t *data, uint16_t size);
+	void release(void);
 
-		it++;
-	}
-}
+public:
+	PropertyData(const uint8_t *data = nullptr, uint16_t size = 0);
+	~PropertyData();
 
-PropertiesList::PropertiesList()
-{
-	/* xxx */
-}
-
-PropertiesList::~PropertiesList()
-{
-	deleteList();
-}
+	uint8_t *data() { return _data; }
+	uint16_t size() const { return _size; }
+};
 
 }
+
+#endif
+

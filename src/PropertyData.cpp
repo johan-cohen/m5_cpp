@@ -38,36 +38,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Properties.hpp"
+#include "PropertyData.hpp"
 
-namespace  m5 {
+#include <cstring>
 
-void PropertiesList::push(PropertyNode *node)
+namespace m5 {
+
+void PropertyData::release(void)
 {
-	propList.insert(std::pair<uint8_t, PropertyNode *>(node->id(), node));
-}
-
-void PropertiesList::deleteList(void)
-{
-	std::multimap<uint8_t, PropertyNode *>::iterator it;
-
-	it = propList.begin();
-	while (it != propList.end()) {
-		struct PropertyNode *node = (*it).second;
-		delete node;
-
-		it++;
+	if (!useNum) {
+		delete[] _data;
 	}
+
+	_data = nullptr;
+	useNum = false;
+	_size = 0;
+	num = 0;
 }
 
-PropertiesList::PropertiesList()
+void PropertyData::init(const uint8_t *data, uint16_t size)
 {
-	/* xxx */
+	if (size == 0) {
+		return;
+	}
+
+	useNum = (sizeof(this->num) >= size);
+	this->_size = size;
+
+	if (data == nullptr) {
+		return;
+	}
+
+	if (useNum) {
+		this->_data = (uint8_t *)&(this->num);
+	} else {
+		this->_data = new uint8_t[size];
+	}
+
+	memcpy(this->_data, data, size);
 }
 
-PropertiesList::~PropertiesList()
+PropertyData::PropertyData(const uint8_t *data, uint16_t size)
 {
-	deleteList();
+	this->init(data, size);
+}
+
+PropertyData::~PropertyData()
+{
+	release();
 }
 
 }

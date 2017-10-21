@@ -39,35 +39,25 @@
  */
 
 #include "Properties.hpp"
+#include "test_Common.hpp"
 
-namespace  m5 {
-
-void PropertiesList::push(PropertyNode *node)
+int test_PropertiesList()
 {
-	propList.insert(std::pair<uint8_t, PropertyNode *>(node->id(), node));
-}
+	m5::PropertiesList *propList;
 
-void PropertiesList::deleteList(void)
-{
-	std::multimap<uint8_t, PropertyNode *>::iterator it;
-
-	it = propList.begin();
-	while (it != propList.end()) {
-		struct PropertyNode *node = (*it).second;
-		delete node;
-
-		it++;
-	}
-}
-
-PropertiesList::PropertiesList()
-{
 	/* xxx */
+	propList = new m5::PropertiesList();
+	delete propList;
+
+	return 0;
 }
 
-PropertiesList::~PropertiesList()
+int main(void)
 {
-	deleteList();
-}
+	int rc;
 
+	rc = test_PropertiesList();
+	test_rc(rc, "PropertiesList");
+
+	return 0;
 }
