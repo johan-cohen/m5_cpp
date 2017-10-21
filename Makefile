@@ -8,7 +8,7 @@ OBJS_DIR = obj
 
 BINS_DIR = bin
 
-TESTS = $(BINS_DIR)/test_AppBuf $(BINS_DIR)/test_PktConnect $(BINS_DIR)/test_Properties
+TESTS = $(BINS_DIR)/test_AppBuf $(BINS_DIR)/test_PktConnect $(BINS_DIR)/test_PropertyData  $(BINS_DIR)/test_Properties
 
 VALGRIND = valgrind -q --leak-check=full --error-exitcode=1
 
