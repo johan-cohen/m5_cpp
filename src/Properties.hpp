@@ -97,9 +97,13 @@ class PropertiesList {
 private:
 	std::multimap<uint8_t, PropertyNode *> propList;
 	enum PktType pktType = PktType::RESERVED;
+	uint64_t enabledProperties = 0;
+	uint64_t properties = 0;
 
 	void push(PropertyNode *node);
 	void deleteList();
+
+	void computePktFlags(void);
 
 public:
 	PropertiesList(const PktType type = PktType::RESERVED);
@@ -107,6 +111,9 @@ public:
 
 	enum PktType packetType() const { return pktType; }
 	void resetPacketType(const enum PktType type);
+
+	uint64_t allowed() const { return properties; }
+	uint64_t enabled() const { return enabledProperties; }
 };
 
 }

@@ -46,7 +46,8 @@ int test_PropertiesList()
 	m5::PropertiesList *propList;
 
 	/* xxx */
-	propList = new m5::PropertiesList();
+	propList = new m5::PropertiesList(m5::PktType::CONNECT);
+	std::cout << "Allowed properties: 0x" << std::hex << propList->allowed() << "\n";
 	delete propList;
 
 	return 0;
