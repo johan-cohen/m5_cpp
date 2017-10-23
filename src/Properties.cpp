@@ -305,4 +305,14 @@ bool PropertiesList::requestResponseInformation(void)
 	return valueNum<uint8_t>(PropertyId::REQUEST_RESPONSE_INFORMATION);
 }
 
+void PropertiesList::receiveMaximum(uint16_t v)
+{
+	addNum<uint16_t>(PropertyId::RECEIVE_MAXIMUM, v);
+}
+
+uint16_t PropertiesList::receiveMaximum(void)
+{
+	return valueNum<uint16_t>(PropertyId::RECEIVE_MAXIMUM);
+}
+
 }
