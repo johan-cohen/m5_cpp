@@ -395,4 +395,14 @@ bool PropertiesList::subscriptionIdentifierAvailable(void)
 	return valueNum<uint8_t>(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
 }
 
+void PropertiesList::sharedSubscriptionAvailable(bool v)
+{
+	addNum<uint8_t>(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v);
+}
+
+bool PropertiesList::sharedSubscriptionAvailable(void)
+{
+	return valueNum<uint8_t>(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
+}
+
 }
