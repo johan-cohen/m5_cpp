@@ -132,6 +132,9 @@ public:
 
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void);
+
+	void serverKeepAlive(uint16_t v);
+	uint16_t serverKeepAlive(void);
 };
 
 }

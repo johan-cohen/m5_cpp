@@ -265,4 +265,14 @@ uint32_t PropertiesList::sessionExpiryInterval(void)
 	return valueNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL);
 }
 
+void PropertiesList::serverKeepAlive(uint16_t v)
+{
+	addNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE, v);
+}
+
+uint16_t PropertiesList::serverKeepAlive(void)
+{
+	return valueNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE);
+}
+
 }
