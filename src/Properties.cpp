@@ -285,4 +285,14 @@ bool PropertiesList::requestProblemInformation(void)
 	return valueNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION);
 }
 
+void PropertiesList::willDelayInterval(uint32_t v)
+{
+	addNum<uint32_t>(PropertyId::WILL_DELAY_INTERVAL, v);
+}
+
+uint32_t PropertiesList::willDelayInterval(void)
+{
+	return valueNum<uint32_t>(PropertyId::WILL_DELAY_INTERVAL);
+}
+
 }
