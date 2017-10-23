@@ -54,10 +54,6 @@ private:
 	uint8_t *data;
 
 	void init(std::size_t size);
-
-	template <typename T> T _read(void);
-	template <typename T> void _write(const T &v);
-
 public:
 	const uint8_t *rawData() const { return data; }
 
@@ -73,6 +69,8 @@ public:
 	void reset(void);
 
 	std::size_t bytesToRead(void) const;
+
+	template <typename T> T readNum(void);
 
 	/* read does not do bound checking, use bytesToRead */
 	void read(uint8_t *d, std::size_t size);
@@ -95,6 +93,8 @@ public:
 	void readSkip(std::size_t n, bool forward = true);
 
 	std::size_t bytesToWrite(void) const;
+
+	template <typename T> void writeNum(const T &v);
 
 	/* write does not do bound checking, use bytesToWrite */
 	void write(const uint8_t *d, std::size_t size);

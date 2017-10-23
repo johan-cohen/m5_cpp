@@ -112,7 +112,7 @@ void AppBuf::read(uint8_t *d, std::size_t size)
 	this->offset += size;
 }
 
-template <typename T> T AppBuf::_read(void)
+template <typename T> T AppBuf::readNum(void)
 {
 	uint8_t *d;
 	T v = 0;
@@ -120,22 +120,31 @@ template <typename T> T AppBuf::_read(void)
 	d = reinterpret_cast<uint8_t *>(&v);
 	read(d, sizeof(T));
 
+	switch (sizeof(T)) {
+	case 1: return v;
+	case 2: return be16toh(v);
+	case 4: return be32toh(v);
+	case 8: return be64toh(v);
+	default:
+		throw std::invalid_argument("Error in template argument");
+	}
+
 	return v;
 }
 
 uint8_t AppBuf::readNum8(void)
 {
-	return _read<uint8_t>();
+	return readNum<uint8_t>();
 }
 
 uint16_t AppBuf::readNum16(void)
 {
-	return be16toh(_read<uint16_t>());
+	return readNum<uint16_t>();
 }
 
 uint32_t AppBuf::readNum32(void)
 {
-	return be32toh(_read<uint32_t>());
+	return readNum<uint32_t>();
 }
 
 void AppBuf::readBinary(uint8_t *data, uint16_t &len, uint16_t size)
@@ -224,7 +233,7 @@ std::size_t AppBuf::bytesToWrite(void) const
 	return this->maxSize - this->len;
 }
 
-template <typename T> void AppBuf::_write(const T &v)
+template <typename T> void AppBuf::writeNum(const T &v)
 {
 	uint8_t *data;
 	T vv;
@@ -237,17 +246,17 @@ template <typename T> void AppBuf::_write(const T &v)
 
 void AppBuf::writeNum8(uint8_t v)
 {
-	this->_write<uint8_t>(v);
+	this->writeNum<uint8_t>(v);
 }
 
 void AppBuf::writeNum16(uint16_t v)
 {
-	this->_write<uint16_t>(v);
+	this->writeNum<uint16_t>(v);
 }
 
 void AppBuf::writeNum32(uint32_t v)
 {
-	this->_write<uint32_t>(v);
+	this->writeNum<uint32_t>(v);
 }
 
 void AppBuf::writeBinary(const uint8_t *data, uint16_t size)
