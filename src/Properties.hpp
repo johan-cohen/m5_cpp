@@ -138,6 +138,9 @@ public:
 
 	void requestProblemInformation(bool v);
 	bool requestProblemInformation(void);
+
+	void willDelayInterval(uint32_t v);
+	uint32_t willDelayInterval(void);
 };
 
 }
