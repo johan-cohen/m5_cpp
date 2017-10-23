@@ -153,6 +153,9 @@ public:
 
 	void topicAlias(uint16_t v);
 	uint16_t topicAlias(void);
+
+	void maximumQoS(PktQoS qos);
+	PktQoS maximumQoS(void);
 };
 
 }

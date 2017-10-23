@@ -40,6 +40,7 @@
 
 #include "Properties.hpp"
 
+#include <stdexcept>
 #include <cstring>
 
 #define __POW2(n) (uint64_t)(((uint64_t)1) << (n))
@@ -333,6 +334,25 @@ void PropertiesList::topicAlias(uint16_t v)
 uint16_t PropertiesList::topicAlias(void)
 {
 	return valueNum<uint16_t>(PropertyId::TOPIC_ALIAS);
+}
+
+void PropertiesList::maximumQoS(PktQoS qos)
+{
+	switch (qos) {
+	case PktQoS::QoS0:
+	case PktQoS::QoS1:
+	case PktQoS::QoS2:
+		break;
+	default:
+		throw std::invalid_argument("Invalid QoS value");
+	}
+
+	addNum<uint8_t>(PropertyId::MAXIMUM_QOS, (uint8_t)qos);
+}
+
+PktQoS PropertiesList::maximumQoS(void)
+{
+	return (PktQoS)valueNum<uint8_t>(PropertyId::MAXIMUM_QOS);
 }
 
 }
