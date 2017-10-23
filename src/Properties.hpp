@@ -162,6 +162,9 @@ public:
 
 	void maximumPacketSize(uint32_t v);
 	uint32_t maximumPacketSize(void);
+
+	void wildcardSubscriptionAvailable(bool v);
+	bool wildcardSubscriptionAvailable(void);
 };
 
 }
