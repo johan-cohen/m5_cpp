@@ -365,4 +365,14 @@ bool PropertiesList::retainAvailable(void)
 	return valueNum<uint8_t>(PropertyId::RETAIN_AVAILABLE);
 }
 
+void PropertiesList::maximumPacketSize(uint32_t v)
+{
+	addNum<uint32_t>(PropertyId::MAXIMUM_PACKET_SIZE, v);
+}
+
+uint32_t PropertiesList::maximumPacketSize(void)
+{
+	return valueNum<uint32_t>(PropertyId::MAXIMUM_PACKET_SIZE);
+}
+
 }
