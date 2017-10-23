@@ -235,6 +235,16 @@ template <typename T> T PropertiesList::valueNum(PropertyId id)
 	return v;
 }
 
+void PropertiesList::payloadFormatIndicator(uint8_t v)
+{
+	addNum<uint8_t>(PropertyId::PAYLOAD_FORMAT_INDICATOR, v);
+}
+
+uint8_t PropertiesList::payloadFormatIndicator(void)
+{
+	return valueNum<uint8_t>(PropertyId::PAYLOAD_FORMAT_INDICATOR);
+}
+
 void PropertiesList::publicationExpiryInterval(uint32_t v)
 {
 	addNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v);
