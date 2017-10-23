@@ -255,4 +255,14 @@ uint32_t PropertiesList::publicationExpiryInterval(void)
 	return valueNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
 }
 
+void PropertiesList::sessionExpiryInterval(uint32_t v)
+{
+	addNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL, v);
+}
+
+uint32_t PropertiesList::sessionExpiryInterval(void)
+{
+	return valueNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL);
+}
+
 }

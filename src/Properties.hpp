@@ -129,6 +129,9 @@ public:
 
 	void publicationExpiryInterval(uint32_t v);
 	uint32_t publicationExpiryInterval(void);
+
+	void sessionExpiryInterval(uint32_t v);
+	uint32_t sessionExpiryInterval(void);
 };
 
 }
