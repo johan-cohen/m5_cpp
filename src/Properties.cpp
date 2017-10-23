@@ -235,4 +235,14 @@ template <typename T> T PropertiesList::valueNum(PropertyId id)
 	return v;
 }
 
+void PropertiesList::publicationExpiryInterval(uint32_t v)
+{
+	addNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v);
+}
+
+uint32_t PropertiesList::publicationExpiryInterval(void)
+{
+	return valueNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
+}
+
 }

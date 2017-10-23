@@ -41,13 +41,21 @@
 #include "Properties.hpp"
 #include "test_Common.hpp"
 
+#define testU32	0xABCDEDF1U
+
 int test_PropertiesList()
 {
 	m5::PropertiesList *propList;
 
 	/* xxx */
-	propList = new m5::PropertiesList(m5::PktType::CONNECT);
-	std::cout << "Allowed properties: 0x" << std::hex << propList->allowed() << "\n";
+	propList = new m5::PropertiesList(m5::PktType::PUBLISH);
+
+	propList->publicationExpiryInterval(testU32);
+	uint32_t v = propList->publicationExpiryInterval();
+	if (v != testU32) {
+		throw std::logic_error("publicationExpiryInterval");
+	}
+
 	delete propList;
 
 	return 0;
