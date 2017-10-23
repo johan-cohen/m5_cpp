@@ -123,6 +123,9 @@ public:
 
 	template <typename T> T valueNum(PropertyId id);
 	uint8_t *value(PropertyId id, uint16_t &size);
+
+	void publicationExpiryInterval(uint32_t v);
+	uint32_t publicationExpiryInterval(void);
 };
 
 }
