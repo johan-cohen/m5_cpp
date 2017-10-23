@@ -168,6 +168,9 @@ public:
 
 	void subscriptionIdentifierAvailable(bool v);
 	bool subscriptionIdentifierAvailable(void);
+
+	void sharedSubscriptionAvailable(bool v);
+	bool sharedSubscriptionAvailable(void);
 };
 
 }
