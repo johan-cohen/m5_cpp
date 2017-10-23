@@ -355,4 +355,14 @@ PktQoS PropertiesList::maximumQoS(void)
 	return (PktQoS)valueNum<uint8_t>(PropertyId::MAXIMUM_QOS);
 }
 
+void PropertiesList::retainAvailable(bool v)
+{
+	addNum<uint8_t>(PropertyId::RETAIN_AVAILABLE, v);
+}
+
+bool PropertiesList::retainAvailable(void)
+{
+	return valueNum<uint8_t>(PropertyId::RETAIN_AVAILABLE);
+}
+
 }

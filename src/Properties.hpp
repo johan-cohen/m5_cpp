@@ -156,6 +156,9 @@ public:
 
 	void maximumQoS(PktQoS qos);
 	PktQoS maximumQoS(void);
+
+	void retainAvailable(bool v);
+	bool retainAvailable(void);
 };
 
 }
