@@ -165,6 +165,9 @@ public:
 
 	void wildcardSubscriptionAvailable(bool v);
 	bool wildcardSubscriptionAvailable(void);
+
+	void subscriptionIdentifierAvailable(bool v);
+	bool subscriptionIdentifierAvailable(void);
 };
 
 }

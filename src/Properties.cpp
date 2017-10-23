@@ -385,4 +385,14 @@ bool PropertiesList::wildcardSubscriptionAvailable(void)
 	return valueNum<uint8_t>(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
 }
 
+void PropertiesList::subscriptionIdentifierAvailable(bool v)
+{
+	addNum<uint8_t>(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v);
+}
+
+bool PropertiesList::subscriptionIdentifierAvailable(void)
+{
+	return valueNum<uint8_t>(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
+}
+
 }
