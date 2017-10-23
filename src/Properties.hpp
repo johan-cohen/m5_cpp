@@ -159,6 +159,9 @@ public:
 
 	void retainAvailable(bool v);
 	bool retainAvailable(void);
+
+	void maximumPacketSize(uint32_t v);
+	uint32_t maximumPacketSize(void);
 };
 
 }
