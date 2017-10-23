@@ -40,6 +40,8 @@
 
 #include "Properties.hpp"
 
+#include <cstring>
+
 #define __POW2(n) (uint64_t)(((uint64_t)1) << (n))
 
 namespace  m5 {
@@ -212,6 +214,25 @@ uint8_t *PropertiesList::value(PropertyId id, uint16_t &size)
 template <typename T> void PropertiesList::addNum(PropertyId id, T v)
 {
 	this->add(id, (uint8_t *)&v, sizeof(v));
+}
+
+template <typename T> T PropertiesList::valueNum(PropertyId id)
+{
+	uint16_t size;
+	T v;
+
+	uint8_t *data = value(id, size);
+	if (data == nullptr) {
+		return 0;
+	}
+
+	if (size > sizeof(T)) {
+		throw std::invalid_argument("Error in template argument");
+	}
+
+	memcpy((uint8_t *)&v, data, size);
+
+	return v;
 }
 
 }

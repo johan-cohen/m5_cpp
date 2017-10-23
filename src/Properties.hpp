@@ -121,6 +121,7 @@ public:
 	template <typename T> void addNum(PropertyId id, T v);
 	void add(PropertyId id, uint8_t *data, uint16_t size);
 
+	template <typename T> T valueNum(PropertyId id);
 	uint8_t *value(PropertyId id, uint16_t &size);
 };
 
