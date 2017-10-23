@@ -375,4 +375,14 @@ uint32_t PropertiesList::maximumPacketSize(void)
 	return valueNum<uint32_t>(PropertyId::MAXIMUM_PACKET_SIZE);
 }
 
+void PropertiesList::wildcardSubscriptionAvailable(bool v)
+{
+	addNum<uint8_t>(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v);
+}
+
+bool PropertiesList::wildcardSubscriptionAvailable(void)
+{
+	return valueNum<uint8_t>(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
+}
+
 }
