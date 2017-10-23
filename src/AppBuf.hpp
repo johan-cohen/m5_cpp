@@ -58,7 +58,6 @@ public:
 	const uint8_t *rawData() const { return data; }
 
 	AppBuf(const uint8_t *data, std::size_t size);
-	AppBuf(AppBuf &src, std::size_t size);
 	AppBuf(std::size_t size = 0);
 	~AppBuf();
 
@@ -69,6 +68,9 @@ public:
 	void reset(void);
 
 	std::size_t bytesToRead(void) const;
+
+	/* createFrom reads size bytes from src to create a new AppBuf */
+	static AppBuf *createFrom(AppBuf &src, std::size_t bytesToRead);
 
 	template <typename T> T readNum(void);
 

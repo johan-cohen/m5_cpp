@@ -66,21 +66,22 @@ AppBuf::AppBuf(const uint8_t *data, std::size_t size)
 	this->len = size;
 }
 
-AppBuf::AppBuf(AppBuf &src, std::size_t size)
-{
-	if (src.bytesToRead() < size) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	init(size);
-
-	src.read(this->data, size);
-	this->len = size;
-}
-
 AppBuf::AppBuf(std::size_t size)
 {
 	init(size);
+}
+
+AppBuf *AppBuf::createFrom(AppBuf &src, std::size_t bytesToRead)
+{
+	if (src.bytesToRead() < bytesToRead) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	AppBuf *buf = new AppBuf(bytesToRead);
+	src.read(buf->data, bytesToRead);
+	buf->len = bytesToRead;
+
+	return buf;
 }
 
 AppBuf::~AppBuf()

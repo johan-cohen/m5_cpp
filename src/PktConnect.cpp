@@ -282,19 +282,19 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	/* xxx Implement properties reading */
 	buf.readSkip(propLen);
 
-	this->clientId = new AppBuf(buf, buf.readNum16());
+	this->clientId = AppBuf::createFrom(buf, buf.readNum16());
 
 	if (flagWillMsg(connectFlags) == true) {
-		this->willTopic = new AppBuf(buf, buf.readNum16());
-		this->willMsg = new AppBuf(buf, buf.readNum16());
+		this->willTopic = AppBuf::createFrom(buf, buf.readNum16());
+		this->willMsg = AppBuf::createFrom(buf, buf.readNum16());
 	}
 
 	if (flagUserName(connectFlags) == true) {
-		this->userName = new AppBuf(buf, buf.readNum16());
+		this->userName = AppBuf::createFrom(buf, buf.readNum16());
 	}
 
 	if (flagPassword(connectFlags) == true) {
-		this->password = new AppBuf(buf, buf.readNum16());
+		this->password = AppBuf::createFrom(buf, buf.readNum16());
 	}
 
 	if (buf.traversed() - alreadyTraversed != 1 + remLenWS + remLen) {
