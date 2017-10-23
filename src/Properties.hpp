@@ -144,6 +144,9 @@ public:
 
 	void requestResponseInformation(bool v);
 	bool requestResponseInformation(void);
+
+	void receiveMaximum(uint16_t v);
+	uint16_t receiveMaximum(void);
 };
 
 }
