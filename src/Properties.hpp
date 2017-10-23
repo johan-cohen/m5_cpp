@@ -147,6 +147,9 @@ public:
 
 	void receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void);
+
+	void topicAliasMaximum(uint16_t v);
+	uint16_t topicAliasMaximum(void);
 };
 
 }
