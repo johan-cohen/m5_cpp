@@ -135,6 +135,9 @@ public:
 
 	void serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void);
+
+	void requestProblemInformation(bool v);
+	bool requestProblemInformation(void);
 };
 
 }

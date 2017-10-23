@@ -275,4 +275,14 @@ uint16_t PropertiesList::serverKeepAlive(void)
 	return valueNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE);
 }
 
+void PropertiesList::requestProblemInformation(bool v)
+{
+	addNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION, v);
+}
+
+bool PropertiesList::requestProblemInformation(void)
+{
+	return valueNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION);
+}
+
 }
