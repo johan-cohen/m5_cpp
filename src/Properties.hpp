@@ -141,6 +141,9 @@ public:
 
 	void willDelayInterval(uint32_t v);
 	uint32_t willDelayInterval(void);
+
+	void requestResponseInformation(bool v);
+	bool requestResponseInformation(void);
 };
 
 }

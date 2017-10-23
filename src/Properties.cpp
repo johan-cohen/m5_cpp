@@ -295,4 +295,14 @@ uint32_t PropertiesList::willDelayInterval(void)
 	return valueNum<uint32_t>(PropertyId::WILL_DELAY_INTERVAL);
 }
 
+void PropertiesList::requestResponseInformation(bool v)
+{
+	addNum<uint8_t>(PropertyId::REQUEST_RESPONSE_INFORMATION, v);
+}
+
+bool PropertiesList::requestResponseInformation(void)
+{
+	return valueNum<uint8_t>(PropertyId::REQUEST_RESPONSE_INFORMATION);
+}
+
 }
