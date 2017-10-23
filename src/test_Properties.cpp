@@ -41,6 +41,7 @@
 #include "Properties.hpp"
 #include "test_Common.hpp"
 
+#define testU8	0xAB
 #define testU32	0xABCDEDF1U
 
 int test_PropertiesList()
@@ -50,9 +51,15 @@ int test_PropertiesList()
 	/* xxx */
 	propList = new m5::PropertiesList(m5::PktType::PUBLISH);
 
+	propList->payloadFormatIndicator(testU8);
+	uint8_t u8 = propList->payloadFormatIndicator();
+	if (u8 != testU8) {
+		throw std::logic_error("payloadFormatIndicator");
+	}
+
 	propList->publicationExpiryInterval(testU32);
-	uint32_t v = propList->publicationExpiryInterval();
-	if (v != testU32) {
+	uint32_t u32 = propList->publicationExpiryInterval();
+	if (u32 != testU32) {
 		throw std::logic_error("publicationExpiryInterval");
 	}
 
