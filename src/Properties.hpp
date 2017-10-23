@@ -150,6 +150,9 @@ public:
 
 	void topicAliasMaximum(uint16_t v);
 	uint16_t topicAliasMaximum(void);
+
+	void topicAlias(uint16_t v);
+	uint16_t topicAlias(void);
 };
 
 }

@@ -325,4 +325,14 @@ uint16_t PropertiesList::topicAliasMaximum(void)
 	return valueNum<uint16_t>(PropertyId::TOPIC_ALIAS_MAXIMUM);
 }
 
+void PropertiesList::topicAlias(uint16_t v)
+{
+	addNum<uint16_t>(PropertyId::TOPIC_ALIAS, v);
+}
+
+uint16_t PropertiesList::topicAlias(void)
+{
+	return valueNum<uint16_t>(PropertyId::TOPIC_ALIAS);
+}
+
 }
