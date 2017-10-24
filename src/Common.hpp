@@ -38,6 +38,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#ifndef __COMMON_HPP__
+#define __COMMON_HPP__
+
 #include <cstdint>
 
 namespace m5 {
@@ -98,3 +102,5 @@ static inline uint8_t VBIWireSize(uint32_t value)
 }
 
 }
+
+#endif
