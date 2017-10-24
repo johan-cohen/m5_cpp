@@ -401,6 +401,21 @@ const uint8_t *PropertiesList::responseInformation(uint16_t &size)
 	return value(PropertyId::RESPONSE_INFORMATION, size);
 }
 
+void PropertiesList::serverReference(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::SERVER_REFERENCE, data, size);
+}
+
+void PropertiesList::serverReference(const char *str)
+{
+	serverReference((const uint8_t *)str, strlen(str));
+}
+
+const uint8_t *PropertiesList::serverReference(uint16_t &size)
+{
+	return value(PropertyId::SERVER_REFERENCE, size);
+}
+
 void PropertiesList::receiveMaximum(uint16_t v)
 {
 	addNum<uint16_t>(PropertyId::RECEIVE_MAXIMUM, v);
