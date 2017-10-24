@@ -38,6 +38,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __PKT_CONNECT_HPP__
+#define __PKT_CONNECT_HPP__
+
 #include "ProtoEntity.hpp"
 #include "Common.hpp"
 
@@ -117,3 +120,5 @@ public:
 };
 
 }
+
+#endif
