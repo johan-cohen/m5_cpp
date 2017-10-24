@@ -256,6 +256,21 @@ uint32_t PropertiesList::publicationExpiryInterval(void)
 	return valueNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
 }
 
+void PropertiesList::contentType(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::CONTENT_TYPE, data, size);
+}
+
+void PropertiesList::contentType(const char *str)
+{
+	contentType((const uint8_t *)str, strlen(str));
+}
+
+const uint8_t *PropertiesList::contentType(uint16_t &size)
+{
+	return value(PropertyId::CONTENT_TYPE, size);
+}
+
 void PropertiesList::sessionExpiryInterval(uint32_t v)
 {
 	addNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL, v);
