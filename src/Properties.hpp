@@ -130,6 +130,10 @@ public:
 	void publicationExpiryInterval(uint32_t v);
 	uint32_t publicationExpiryInterval(void);
 
+	void contentType(const uint8_t *data, uint16_t size);
+	void contentType(const char *str);
+	const uint8_t *contentType(uint16_t &size);
+
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void);
 
