@@ -175,6 +175,10 @@ public:
 	void serverReference(const char *str);
 	const uint8_t *serverReference(uint16_t &size);
 
+	void reasonString(const uint8_t *data, uint16_t size);
+	void reasonString(const char *str);
+	const uint8_t *reasonString(uint16_t &size);
+
 	void receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void);
 
