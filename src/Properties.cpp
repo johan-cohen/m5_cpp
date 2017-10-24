@@ -173,7 +173,7 @@ bool PropertiesList::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
-void PropertiesList::add(PropertyId id, uint8_t *data, uint16_t size)
+void PropertiesList::add(PropertyId id, const uint8_t *data, uint16_t size)
 {
 	if (!isAllowed(id)) {
 		return;
