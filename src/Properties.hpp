@@ -105,6 +105,12 @@ private:
 
 	void computePktFlags(void);
 
+	template <typename T> void addNum(PropertyId id, T v);
+	void add(PropertyId id, uint8_t *data, uint16_t size);
+
+	template <typename T> T valueNum(PropertyId id);
+	uint8_t *value(PropertyId id, uint16_t &size);
+
 public:
 	PropertiesList(const PktType type = PktType::RESERVED);
 	~PropertiesList();
@@ -117,12 +123,6 @@ public:
 
 	bool isAllowed(PropertyId id) const;
 	bool isEnabled(PropertyId id) const;
-
-	template <typename T> void addNum(PropertyId id, T v);
-	void add(PropertyId id, uint8_t *data, uint16_t size);
-
-	template <typename T> T valueNum(PropertyId id);
-	uint8_t *value(PropertyId id, uint16_t &size);
 
 	void payloadFormatIndicator(uint8_t v);
 	uint8_t payloadFormatIndicator(void);
