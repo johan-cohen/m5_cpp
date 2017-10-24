@@ -155,6 +155,9 @@ public:
 	void authenticationMethod(const char *str);
 	const uint8_t *authenticationMethod(uint16_t &size);
 
+	void authenticationData(const uint8_t *data, uint16_t size);
+	const uint8_t *authenticationData(uint16_t &size);
+
 	void requestProblemInformation(bool v);
 	bool requestProblemInformation(void);
 

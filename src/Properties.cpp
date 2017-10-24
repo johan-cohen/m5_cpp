@@ -346,6 +346,16 @@ const uint8_t *PropertiesList::authenticationMethod(uint16_t &size)
 	return value(PropertyId::AUTH_METHOD, size);
 }
 
+void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::AUTH_DATA, data, size);
+}
+
+const uint8_t *PropertiesList::authenticationData(uint16_t &size)
+{
+	return value(PropertyId::AUTH_DATA, size);
+}
+
 void PropertiesList::requestProblemInformation(bool v)
 {
 	addNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION, v);
