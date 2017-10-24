@@ -286,6 +286,16 @@ const uint8_t *PropertiesList::responseTopic(uint16_t &size)
 	return value(PropertyId::RESPONSE_TOPIC, size);
 }
 
+void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::CORRELATION_DATA, data, size);
+}
+
+const uint8_t *PropertiesList::correlationData(uint16_t &size)
+{
+	return value(PropertyId::CORRELATION_DATA, size);
+}
+
 void PropertiesList::sessionExpiryInterval(uint32_t v)
 {
 	addNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL, v);

@@ -138,6 +138,9 @@ public:
 	void responseTopic(const char *str);
 	const uint8_t *responseTopic(uint16_t &size);
 
+	void correlationData(const uint8_t *data, uint16_t size);
+	const uint8_t *correlationData(uint16_t &size);
+
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void);
 
