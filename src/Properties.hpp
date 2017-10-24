@@ -144,6 +144,10 @@ public:
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void);
 
+	void assignedClientIdentifier(const uint8_t *data, uint16_t size);
+	void assignedClientIdentifier(const char *str);
+	const uint8_t *assignedClientIdentifier(uint16_t &size);
+
 	void serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void);
 

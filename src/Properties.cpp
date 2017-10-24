@@ -306,6 +306,21 @@ uint32_t PropertiesList::sessionExpiryInterval(void)
 	return valueNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL);
 }
 
+void PropertiesList::assignedClientIdentifier(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, data, size);
+}
+
+void PropertiesList::assignedClientIdentifier(const char *str)
+{
+	assignedClientIdentifier((const uint8_t *)str, strlen(str));
+}
+
+const uint8_t *PropertiesList::assignedClientIdentifier(uint16_t &size)
+{
+	return value(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, size);
+}
+
 void PropertiesList::serverKeepAlive(uint16_t v)
 {
 	addNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE, v);
