@@ -171,6 +171,10 @@ public:
 	void responseInformation(const char *str);
 	const uint8_t *responseInformation(uint16_t &size);
 
+	void serverReference(const uint8_t *data, uint16_t size);
+	void serverReference(const char *str);
+	const uint8_t *serverReference(uint16_t &size);
+
 	void receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void);
 
