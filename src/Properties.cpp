@@ -386,6 +386,21 @@ bool PropertiesList::requestResponseInformation(void)
 	return valueNum<uint8_t>(PropertyId::REQUEST_RESPONSE_INFORMATION);
 }
 
+void PropertiesList::responseInformation(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::RESPONSE_INFORMATION, data, size);
+}
+
+void PropertiesList::responseInformation(const char *str)
+{
+	responseInformation((const uint8_t *)str, strlen(str));
+}
+
+const uint8_t *PropertiesList::responseInformation(uint16_t &size)
+{
+	return value(PropertyId::RESPONSE_INFORMATION, size);
+}
+
 void PropertiesList::receiveMaximum(uint16_t v)
 {
 	addNum<uint16_t>(PropertyId::RECEIVE_MAXIMUM, v);
