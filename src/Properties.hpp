@@ -151,6 +151,10 @@ public:
 	void serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void);
 
+	void authenticationMethod(const uint8_t *data, uint16_t size);
+	void authenticationMethod(const char *str);
+	const uint8_t *authenticationMethod(uint16_t &size);
+
 	void requestProblemInformation(bool v);
 	bool requestProblemInformation(void);
 

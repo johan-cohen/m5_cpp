@@ -331,6 +331,21 @@ uint16_t PropertiesList::serverKeepAlive(void)
 	return valueNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE);
 }
 
+void PropertiesList::authenticationMethod(const uint8_t *data, uint16_t size)
+{
+	add(PropertyId::AUTH_METHOD, data, size);
+}
+
+void PropertiesList::authenticationMethod(const char *str)
+{
+	authenticationMethod((const uint8_t *)str, strlen(str));
+}
+
+const uint8_t *PropertiesList::authenticationMethod(uint16_t &size)
+{
+	return value(PropertyId::AUTH_METHOD, size);
+}
+
 void PropertiesList::requestProblemInformation(bool v)
 {
 	addNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION, v);
