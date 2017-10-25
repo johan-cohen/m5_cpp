@@ -49,6 +49,20 @@
 #define testU16	0xABCDU
 #define testU8	0xABU
 
+int cmp_data(const m5::BasicBuf &buf, const uint8_t *d, std::size_t size)
+{
+	if (buf.size != size) {
+		return 1;
+	}
+
+	return memcmp(buf.data, d, size);
+}
+
+int cmp_str(const m5::BasicBuf &buf, const char *str)
+{
+	return cmp_data(buf, (const uint8_t *)str, strlen(str));
+}
+
 int test_PropertiesList()
 {
 	m5::PropertiesList *propList;
@@ -75,6 +89,12 @@ int test_PropertiesList()
 	u16 = propList->topicAlias();
 	if (u16 != testU16) {
 		throw std::logic_error("topicAlias");
+	}
+
+	propList->responseTopic(HELLO_WORLD);
+	buf = propList->responseTopic();
+	if (cmp_str(buf, HELLO_WORLD) != 0) {
+		throw std::logic_error("responseTopic");
 	}
 
 	propList->contentType(HELLO_WORLD);
