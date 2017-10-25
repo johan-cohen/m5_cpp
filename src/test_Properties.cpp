@@ -99,8 +99,7 @@ int test_PropertiesList()
 
 	propList->contentType(HELLO_WORLD);
 	buf = propList->contentType();
-	if (buf.size != strlen(HELLO_WORLD) ||
-	    memcmp(buf.data, HELLO_WORLD, buf.size) != 0) {
+	if (cmp_str(buf, HELLO_WORLD) != 0) {
 		throw std::logic_error("contentType");
 	}
 
