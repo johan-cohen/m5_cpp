@@ -45,26 +45,28 @@
 
 #define HELLO_WORLD	"Hello, World!"
 
-#define testU16	0xABCD
-#define testU8	0xAB
 #define testU32	0xABCDEDF1U
+#define testU16	0xABCDU
+#define testU8	0xABU
 
 int test_PropertiesList()
 {
 	m5::PropertiesList *propList;
+	m5::BasicBuf buf;
+	uint32_t u32;
 	uint16_t u16;
+	uint8_t u8;
 
-	/* xxx */
 	propList = new m5::PropertiesList(m5::PktType::PUBLISH);
 
 	propList->payloadFormatIndicator(testU8);
-	uint8_t u8 = propList->payloadFormatIndicator();
+	u8 = propList->payloadFormatIndicator();
 	if (u8 != testU8) {
 		throw std::logic_error("payloadFormatIndicator");
 	}
 
 	propList->publicationExpiryInterval(testU32);
-	uint32_t u32 = propList->publicationExpiryInterval();
+	u32 = propList->publicationExpiryInterval();
 	if (u32 != testU32) {
 		throw std::logic_error("publicationExpiryInterval");
 	}
@@ -76,7 +78,7 @@ int test_PropertiesList()
 	}
 
 	propList->contentType(HELLO_WORLD);
-	m5::BasicBuf buf = propList->contentType();
+	buf = propList->contentType();
 	if (buf.size != strlen(HELLO_WORLD) ||
 	    memcmp(buf.data, HELLO_WORLD, buf.size) != 0) {
 		throw std::logic_error("contentType");
