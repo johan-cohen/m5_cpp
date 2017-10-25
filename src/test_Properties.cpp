@@ -41,6 +41,10 @@
 #include "Properties.hpp"
 #include "test_Common.hpp"
 
+#include <cstring>
+
+#define HELLO_WORLD	"Hello, World!"
+
 #define testU8	0xAB
 #define testU32	0xABCDEDF1U
 
@@ -61,6 +65,13 @@ int test_PropertiesList()
 	uint32_t u32 = propList->publicationExpiryInterval();
 	if (u32 != testU32) {
 		throw std::logic_error("publicationExpiryInterval");
+	}
+
+	propList->contentType(HELLO_WORLD);
+	m5::BasicBuf buf = propList->contentType();
+	if (buf.size != strlen(HELLO_WORLD) ||
+	    memcmp(buf.data, HELLO_WORLD, buf.size) != 0) {
+		throw std::logic_error("contentType");
 	}
 
 	delete propList;
