@@ -44,6 +44,8 @@
 #include <cstring>
 
 #define HELLO_WORLD	"Hello, World!"
+#define DATA		(const uint8_t *)HELLO_WORLD
+#define DATA_LEN	strlen(HELLO_WORLD)
 
 #define testU32	0xABCDEDF1U
 #define testU16	0xABCDU
@@ -95,6 +97,12 @@ int test_PropertiesList()
 	buf = propList->responseTopic();
 	if (cmp_str(buf, HELLO_WORLD) != 0) {
 		throw std::logic_error("responseTopic");
+	}
+
+	propList->correlationData(DATA, DATA_LEN);
+	buf = propList->responseTopic();
+	if (cmp_data(buf, DATA, DATA_LEN) != 0) {
+		throw std::logic_error("correlationData");
 	}
 
 	propList->contentType(HELLO_WORLD);
