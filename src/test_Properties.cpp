@@ -45,12 +45,14 @@
 
 #define HELLO_WORLD	"Hello, World!"
 
+#define testU16	0xABCD
 #define testU8	0xAB
 #define testU32	0xABCDEDF1U
 
 int test_PropertiesList()
 {
 	m5::PropertiesList *propList;
+	uint16_t u16;
 
 	/* xxx */
 	propList = new m5::PropertiesList(m5::PktType::PUBLISH);
@@ -65,6 +67,12 @@ int test_PropertiesList()
 	uint32_t u32 = propList->publicationExpiryInterval();
 	if (u32 != testU32) {
 		throw std::logic_error("publicationExpiryInterval");
+	}
+
+	propList->topicAlias(testU16);
+	u16 = propList->topicAlias();
+	if (u16 != testU16) {
+		throw std::logic_error("topicAlias");
 	}
 
 	propList->contentType(HELLO_WORLD);
