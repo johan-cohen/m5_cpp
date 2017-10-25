@@ -193,12 +193,10 @@ void PropertiesList::add(PropertyId id, const uint8_t *data, uint16_t size)
 	}
 }
 
-uint8_t *PropertiesList::value(PropertyId id, uint16_t &size)
+BasicBuf PropertiesList::value(PropertyId id)
 {
 	if (!isEnabled(id)) {
-		size = 0;
-
-		return nullptr;
+		return BasicBuf(nullptr, 0);
 	}
 
 	auto it = propList.find(id);
@@ -207,9 +205,8 @@ uint8_t *PropertiesList::value(PropertyId id, uint16_t &size)
 	}
 
 	PropertyNode *node = (*it).second;
-	size = node->value.size();
 
-	return node->value.data();
+	return BasicBuf(node->value.data(), node->value.size());
 }
 
 template <typename T> void PropertiesList::addNum(PropertyId id, T v)
@@ -219,19 +216,17 @@ template <typename T> void PropertiesList::addNum(PropertyId id, T v)
 
 template <typename T> T PropertiesList::valueNum(PropertyId id)
 {
-	uint16_t size;
-	T v;
-
-	uint8_t *data = value(id, size);
-	if (data == nullptr) {
+	BasicBuf buf = value(id);
+	if (buf.data == nullptr || buf.size == 0) {
 		return 0;
 	}
 
-	if (size > sizeof(T)) {
+	if (buf.size > sizeof(T)) {
 		throw std::invalid_argument("Error in template argument");
 	}
 
-	memcpy((uint8_t *)&v, data, size);
+	T v;
+	memcpy((uint8_t *)&v, buf.data, buf.size);
 
 	return v;
 }
@@ -266,9 +261,9 @@ void PropertiesList::contentType(const char *str)
 	contentType((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::contentType(uint16_t &size)
+BasicBuf PropertiesList::contentType(void)
 {
-	return value(PropertyId::CONTENT_TYPE, size);
+	return value(PropertyId::CONTENT_TYPE);
 }
 
 void PropertiesList::responseTopic(const uint8_t *data, uint16_t size)
@@ -281,9 +276,9 @@ void PropertiesList::responseTopic(const char *str)
 	responseTopic((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::responseTopic(uint16_t &size)
+BasicBuf PropertiesList::responseTopic(void)
 {
-	return value(PropertyId::RESPONSE_TOPIC, size);
+	return value(PropertyId::RESPONSE_TOPIC);
 }
 
 void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
@@ -291,9 +286,9 @@ void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
 	add(PropertyId::CORRELATION_DATA, data, size);
 }
 
-const uint8_t *PropertiesList::correlationData(uint16_t &size)
+BasicBuf PropertiesList::correlationData(void)
 {
-	return value(PropertyId::CORRELATION_DATA, size);
+	return value(PropertyId::CORRELATION_DATA);
 }
 
 void PropertiesList::sessionExpiryInterval(uint32_t v)
@@ -316,9 +311,9 @@ void PropertiesList::assignedClientIdentifier(const char *str)
 	assignedClientIdentifier((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::assignedClientIdentifier(uint16_t &size)
+BasicBuf PropertiesList::assignedClientIdentifier(void)
 {
-	return value(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, size);
+	return value(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
 
 void PropertiesList::serverKeepAlive(uint16_t v)
@@ -341,9 +336,9 @@ void PropertiesList::authenticationMethod(const char *str)
 	authenticationMethod((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::authenticationMethod(uint16_t &size)
+BasicBuf PropertiesList::authenticationMethod(void)
 {
-	return value(PropertyId::AUTH_METHOD, size);
+	return value(PropertyId::AUTH_METHOD);
 }
 
 void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
@@ -351,9 +346,9 @@ void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
 	add(PropertyId::AUTH_DATA, data, size);
 }
 
-const uint8_t *PropertiesList::authenticationData(uint16_t &size)
+BasicBuf PropertiesList::authenticationData(void)
 {
-	return value(PropertyId::AUTH_DATA, size);
+	return value(PropertyId::AUTH_DATA);
 }
 
 void PropertiesList::requestProblemInformation(bool v)
@@ -396,9 +391,9 @@ void PropertiesList::responseInformation(const char *str)
 	responseInformation((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::responseInformation(uint16_t &size)
+BasicBuf PropertiesList::responseInformation(void)
 {
-	return value(PropertyId::RESPONSE_INFORMATION, size);
+	return value(PropertyId::RESPONSE_INFORMATION);
 }
 
 void PropertiesList::serverReference(const uint8_t *data, uint16_t size)
@@ -411,9 +406,9 @@ void PropertiesList::serverReference(const char *str)
 	serverReference((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::serverReference(uint16_t &size)
+BasicBuf PropertiesList::serverReference(void)
 {
-	return value(PropertyId::SERVER_REFERENCE, size);
+	return value(PropertyId::SERVER_REFERENCE);
 }
 
 void PropertiesList::reasonString(const uint8_t *data, uint16_t size)
@@ -426,9 +421,9 @@ void PropertiesList::reasonString(const char *str)
 	reasonString((const uint8_t *)str, strlen(str));
 }
 
-const uint8_t *PropertiesList::reasonString(uint16_t &size)
+BasicBuf PropertiesList::reasonString(void)
 {
-	return value(PropertyId::REASON_STR, size);
+	return value(PropertyId::REASON_STR);
 }
 
 void PropertiesList::receiveMaximum(uint16_t v)

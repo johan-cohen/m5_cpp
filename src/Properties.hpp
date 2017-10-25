@@ -109,7 +109,7 @@ private:
 	void add(PropertyId id, const uint8_t *data, uint16_t size);
 
 	template <typename T> T valueNum(PropertyId id);
-	uint8_t *value(PropertyId id, uint16_t &size);
+	BasicBuf value(PropertyId id);
 
 public:
 	PropertiesList(const PktType type = PktType::RESERVED);
@@ -132,31 +132,31 @@ public:
 
 	void contentType(const uint8_t *data, uint16_t size);
 	void contentType(const char *str);
-	const uint8_t *contentType(uint16_t &size);
+	BasicBuf contentType(void);
 
 	void responseTopic(const uint8_t *data, uint16_t size);
 	void responseTopic(const char *str);
-	const uint8_t *responseTopic(uint16_t &size);
+	BasicBuf responseTopic(void);
 
 	void correlationData(const uint8_t *data, uint16_t size);
-	const uint8_t *correlationData(uint16_t &size);
+	BasicBuf correlationData(void);
 
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void);
 
 	void assignedClientIdentifier(const uint8_t *data, uint16_t size);
 	void assignedClientIdentifier(const char *str);
-	const uint8_t *assignedClientIdentifier(uint16_t &size);
+	BasicBuf assignedClientIdentifier(void);
 
 	void serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void);
 
 	void authenticationMethod(const uint8_t *data, uint16_t size);
 	void authenticationMethod(const char *str);
-	const uint8_t *authenticationMethod(uint16_t &size);
+	BasicBuf authenticationMethod(void);
 
 	void authenticationData(const uint8_t *data, uint16_t size);
-	const uint8_t *authenticationData(uint16_t &size);
+	BasicBuf authenticationData(void);
 
 	void requestProblemInformation(bool v);
 	bool requestProblemInformation(void);
@@ -169,15 +169,15 @@ public:
 
 	void responseInformation(const uint8_t *data, uint16_t size);
 	void responseInformation(const char *str);
-	const uint8_t *responseInformation(uint16_t &size);
+	BasicBuf responseInformation(void);
 
 	void serverReference(const uint8_t *data, uint16_t size);
 	void serverReference(const char *str);
-	const uint8_t *serverReference(uint16_t &size);
+	BasicBuf serverReference(void);
 
 	void reasonString(const uint8_t *data, uint16_t size);
 	void reasonString(const char *str);
-	const uint8_t *reasonString(uint16_t &size);
+	BasicBuf reasonString(void);
 
 	void receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void);
