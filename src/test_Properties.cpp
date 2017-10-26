@@ -145,6 +145,12 @@ int test_PropertiesList()
 		throw std::logic_error("maximumPacketSize");
 	}
 
+	propList->topicAliasMaximum(testU16);
+	u16 = propList->topicAliasMaximum();
+	if (u16 != testU16) {
+		throw std::logic_error("topicAliasMaximum");
+	}
+
 	delete propList;
 
 	return 0;
