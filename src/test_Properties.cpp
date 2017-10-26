@@ -105,6 +105,12 @@ int test_PropertiesList()
 		throw std::logic_error("correlationData");
 	}
 
+	propList->subscriptionIdentifier(testU32);
+	u32 = propList->subscriptionIdentifier();
+	if (u32 != testU32) {
+		throw std::logic_error("subscriptionIdentifier");
+	}
+
 	propList->contentType(HELLO_WORLD);
 	buf = propList->contentType();
 	if (cmp_str(buf, HELLO_WORLD) != 0) {
