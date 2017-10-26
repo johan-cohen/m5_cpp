@@ -119,6 +119,16 @@ int test_PropertiesList()
 
 	delete propList;
 
+	propList = new m5::PropertiesList(m5::PktType::CONNECT);
+
+	propList->sessionExpiryInterval(testU32);
+	u32 = propList->sessionExpiryInterval();
+	if (u32 != testU32) {
+		throw std::logic_error("sessionExpiryInterval");
+	}
+
+	delete propList;
+
 	return 0;
 }
 
