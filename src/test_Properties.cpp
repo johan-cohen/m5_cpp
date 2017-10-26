@@ -51,6 +51,21 @@
 #define testU16	0xABCDU
 #define testU8	0xABU
 
+struct key_val {
+	const char *key;
+	const char *val;
+};
+
+/* xxx */
+key_val KeyVal[] = {
+	{.key = "Key #1", .val = "Val #1"},
+	{.key = "Key #2", .val = "Val #2"},
+	{.key = "Key #3", .val = "Val #3"},
+	{.key = "Key #4", .val = "Val #4"},
+	{.key = "Key #5", .val = "Val #5"},
+	{.key = nullptr, .val = nullptr}
+};
+
 int cmp_data(const m5::BasicBuf &buf, const uint8_t *d, std::size_t size)
 {
 	if (buf.size != size) {
@@ -67,6 +82,7 @@ int cmp_str(const m5::BasicBuf &buf, const char *str)
 
 int test_PropertiesList()
 {
+	std::list< std::pair<m5::BasicBuf, m5::BasicBuf> > userProps;
 	m5::PropertiesList *propList;
 	m5::BasicBuf buf;
 	uint32_t u32;
@@ -174,6 +190,34 @@ int test_PropertiesList()
 	buf = propList->authenticationData();
 	if (cmp_data(buf, DATA, DATA_LEN) != 0) {
 		throw std::logic_error("authenticationData");
+	}
+
+	int i = 0;
+	while (KeyVal[i].key != nullptr) {
+		propList->userProperty(KeyVal[i].key, KeyVal[i].val);
+
+		i++;
+	}
+
+	propList->userProperty(userProps);
+
+	int j = 0;
+	for (auto it = userProps.begin(); it != userProps.end(); it++) {
+		auto pair = (*it);
+
+		if (cmp_str(pair.first, KeyVal[j].key) != 0) {
+			throw std::logic_error("userProperty key");
+		}
+
+		if (cmp_str(pair.second, KeyVal[j].val) != 0) {
+			throw std::logic_error("userProperty value");
+		}
+
+		j++;
+	}
+
+	if (i != j) {
+		throw std::logic_error("userProperty");
 	}
 
 	delete propList;
