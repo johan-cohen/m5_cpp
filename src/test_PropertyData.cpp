@@ -44,10 +44,11 @@
 #include <stdexcept>
 #include <cstring>
 
+uint8_t data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		   0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+
 int test(void)
 {
-	uint8_t data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-			   0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 	m5::PropertyData *pData;
 
 	pData = new m5::PropertyData(nullptr, 0);
@@ -87,12 +88,44 @@ int test(void)
 	return 0;
 }
 
+int test2(void)
+{
+	uint64_t v = 0xABCDEF0123456789;
+	m5::PropertyData *pData;
+
+	pData = new m5::PropertyData(v);
+	if (!pData->isNumber()) {
+		throw std::logic_error("PropertyData constructor num");
+	}
+
+	if (pData->toNumber() != v) {
+		throw std::logic_error("PropertyData constructor num");
+	}
+
+	pData->reset(data, sizeof(data));
+	if (pData->isNumber()) {
+		throw std::logic_error("PropertyData constructor data -> num?");
+	}
+	if (pData->data() == nullptr || pData->size() != sizeof(data)) {
+		throw std::logic_error("PropertyData constructor data");
+	}
+	if (memcmp(pData->data(), data, sizeof(data)) != 0) {
+		throw std::logic_error("PropertyData constructor data");
+	}
+	delete pData;
+
+	return 0;
+}
+
 int main(void)
 {
 	int rc;
 
 	rc = test();
 	test_rc(rc, "PropertyData");
+
+	rc = test2();
+	test_rc(rc, "PropertyData (2)");
 
 	return 0;
 }
