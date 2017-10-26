@@ -72,6 +72,7 @@ int test_PropertiesList()
 	uint32_t u32;
 	uint16_t u16;
 	uint8_t u8;
+	bool res;
 
 	propList = new m5::PropertiesList(m5::PktType::PUBLISH);
 
@@ -149,6 +150,12 @@ int test_PropertiesList()
 	u16 = propList->topicAliasMaximum();
 	if (u16 != testU16) {
 		throw std::logic_error("topicAliasMaximum");
+	}
+
+	propList->requestResponseInformation(true);
+	res = propList->requestResponseInformation();
+	if (!res) {
+		throw std::logic_error("requestResponseInformation");
 	}
 
 	delete propList;
