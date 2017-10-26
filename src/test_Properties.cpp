@@ -127,6 +127,12 @@ int test_PropertiesList()
 		throw std::logic_error("sessionExpiryInterval");
 	}
 
+	propList->willDelayInterval(testU32);
+	u32 = propList->willDelayInterval();
+	if (u32 != testU32) {
+		throw std::logic_error("willDelayInterval");
+	}
+
 	delete propList;
 
 	return 0;
