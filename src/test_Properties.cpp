@@ -170,6 +170,12 @@ int test_PropertiesList()
 		throw std::logic_error("authenticationMethod");
 	}
 
+	propList->authenticationData(DATA, DATA_LEN);
+	buf = propList->authenticationData();
+	if (cmp_data(buf, DATA, DATA_LEN) != 0) {
+		throw std::logic_error("authenticationData");
+	}
+
 	delete propList;
 
 	return 0;
