@@ -44,6 +44,7 @@
 #include "PropertyNode.hpp"
 #include "Common.hpp"
 
+#include <list>
 #include <map>
 
 namespace m5 {
@@ -196,6 +197,11 @@ public:
 
 	void retainAvailable(bool v);
 	bool retainAvailable(void);
+
+	void userProperty(const uint8_t *key, uint16_t key_size,
+			  const uint8_t *val, uint16_t val_size);
+	void userProperty(const char *key, const char *val);
+	void userProperty(std::list< std::pair<BasicBuf, BasicBuf> > &l);
 
 	void maximumPacketSize(uint32_t v);
 	uint32_t maximumPacketSize(void);

@@ -495,6 +495,43 @@ bool PropertiesList::retainAvailable(void)
 	return valueNum<uint8_t>(PropertyId::RETAIN_AVAILABLE);
 }
 
+void PropertiesList::userProperty(const uint8_t *key, uint16_t key_size,
+				  const uint8_t *val, uint16_t val_size)
+{
+	if (!isAllowed(PropertyId::USER_PROPERTY)) {
+		return;
+	}
+
+	PropertyNodeKeyVal *kv;
+	kv = new PropertyNodeKeyVal(PropertyId::USER_PROPERTY,
+				    key, key_size,
+				    val, val_size);
+	this->push(kv);
+	this->enabledProperties += __POW2(PropertyId::USER_PROPERTY);
+}
+
+void PropertiesList::userProperty(const char *key, const char *val)
+{
+	userProperty((const uint8_t *)key, strlen(key),
+		     (const uint8_t *)val, strlen(val));
+}
+
+//typedef std::multimap<uint8_t, PropertyNode *> __map;
+
+void PropertiesList::userProperty(std::list< std::pair<BasicBuf, BasicBuf> > &l)
+{
+//	std::pair< __map::iterator, __map::iterator > all;
+
+	auto all = propList.equal_range(PropertyId::USER_PROPERTY);
+	for (auto it = all.first; it != all.second; it++) {
+		PropertyNodeKeyVal *node = (PropertyNodeKeyVal *)((*it).second);
+
+		BasicBuf key(node->key.data(), node->key.size());
+		BasicBuf value(node->value.data(), node->value.size());
+		l.push_back(std::pair<BasicBuf, BasicBuf>(key, value));
+	}
+}
+
 void PropertiesList::maximumPacketSize(uint32_t v)
 {
 	addNum<uint32_t>(PropertyId::MAXIMUM_PACKET_SIZE, v);
