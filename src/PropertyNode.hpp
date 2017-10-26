@@ -56,6 +56,11 @@ public:
 		_id = id;
 	}
 
+	PropertyNode(uint8_t id, uint64_t v) : value(v)
+	{
+		_id = id;
+	}
+
 	virtual ~PropertyNode(){}
 
 	uint8_t id() const { return _id; }
