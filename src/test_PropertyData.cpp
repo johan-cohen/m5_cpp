@@ -47,6 +47,8 @@
 uint8_t data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
 		   0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
+uint64_t u64 = 0xABCDEF0123456789;
+
 int test(void)
 {
 	m5::PropertyData *pData;
@@ -90,15 +92,14 @@ int test(void)
 
 int test2(void)
 {
-	uint64_t v = 0xABCDEF0123456789;
 	m5::PropertyData *pData;
 
-	pData = new m5::PropertyData(v);
+	pData = new m5::PropertyData(u64);
 	if (!pData->isNumber()) {
 		throw std::logic_error("PropertyData constructor num");
 	}
 
-	if (pData->toNumber() != v) {
+	if (pData->toNumber() != u64) {
 		throw std::logic_error("PropertyData constructor num");
 	}
 
@@ -117,6 +118,45 @@ int test2(void)
 	return 0;
 }
 
+int test3(void)
+{
+	m5::PropertyData *pdData;
+	m5::PropertyData *pdNum;
+
+	pdData = new m5::PropertyData(data, sizeof(data));
+	pdNum = new m5::PropertyData(u64);
+
+	*pdData = *pdNum;
+	if (!pdData->isNumber()) {
+		throw std::logic_error("PropertyData operator= num -> data");
+	}
+
+	if (pdData->toNumber() != u64) {
+		throw std::logic_error("PropertyData operator= invalid num");
+	}
+
+	delete pdData;
+
+	pdData = new m5::PropertyData(data, sizeof(data));
+	*pdNum = *pdData;
+
+	if (pdNum->isNumber()) {
+		throw std::logic_error("PropertyData operator= data -> num");
+	}
+
+	if (pdNum->data() == nullptr || pdNum->size() != sizeof(data)) {
+		throw std::logic_error("PropertyData operator= invalid data");
+	}
+	if (memcmp(pdNum->data(), data, sizeof(data)) != 0) {
+		throw std::logic_error("PropertyData operator= invalid data");
+	}
+
+	delete pdData;
+	delete pdNum;
+
+	return 0;
+}
+
 int main(void)
 {
 	int rc;
@@ -126,6 +166,9 @@ int main(void)
 
 	rc = test2();
 	test_rc(rc, "PropertyData (2)");
+
+	rc = test3();
+	test_rc(rc, "PropertyData (3)");
 
 	return 0;
 }
