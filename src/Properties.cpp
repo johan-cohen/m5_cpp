@@ -281,6 +281,16 @@ BasicBuf PropertiesList::responseTopic(void)
 	return value(PropertyId::RESPONSE_TOPIC);
 }
 
+void PropertiesList::subscriptionIdentifier(uint32_t v)
+{
+	addNum<uint32_t>(PropertyId::SUBSCRIPTION_IDENTIFIER, v);
+}
+
+uint32_t PropertiesList::subscriptionIdentifier(void)
+{
+	return valueNum<uint32_t>(PropertyId::SUBSCRIPTION_IDENTIFIER);
+}
+
 void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
 {
 	add(PropertyId::CORRELATION_DATA, data, size);
