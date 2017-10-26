@@ -70,7 +70,9 @@ public:
 	bool isNumber(void) const { return scalar; }
 	uint64_t toNumber(void) const { return num; }
 
+	const uint8_t *data() const { return _data; }
 	uint8_t *data() { return _data; }
+
 	uint16_t size() const { return _size; }
 };
 
