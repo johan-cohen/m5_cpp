@@ -139,6 +139,12 @@ int test_PropertiesList()
 		throw std::logic_error("receiveMaximum");
 	}
 
+	propList->maximumPacketSize(testU32);
+	u32 = propList->maximumPacketSize();
+	if (u32 != testU32) {
+		throw std::logic_error("maximumPacketSize");
+	}
+
 	delete propList;
 
 	return 0;
