@@ -138,6 +138,9 @@ public:
 	void responseTopic(const char *str);
 	BasicBuf responseTopic(void);
 
+	void subscriptionIdentifier(uint32_t v);
+	uint32_t subscriptionIdentifier(void);
+
 	void correlationData(const uint8_t *data, uint16_t size);
 	BasicBuf correlationData(void);
 
