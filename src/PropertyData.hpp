@@ -62,6 +62,8 @@ public:
 	PropertyData(uint64_t v);
 	~PropertyData();
 
+	PropertyData &operator=(const PropertyData &src);
+
 	void reset(const uint8_t *data = nullptr, uint16_t size = 0);
 	void reset(uint64_t v);
 

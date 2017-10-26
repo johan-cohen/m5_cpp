@@ -104,6 +104,17 @@ PropertyData::~PropertyData()
 	release();
 }
 
+PropertyData &PropertyData::operator=(const PropertyData &src)
+{
+	if (src.isNumber()) {
+		reset(src.toNumber());
+	} else {
+		reset(src.data(), src.size());
+	}
+
+	return *this;
+}
+
 void PropertyData::reset(const uint8_t *data, uint16_t size)
 {
 	if (this->size() < size) {
