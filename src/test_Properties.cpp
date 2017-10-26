@@ -164,6 +164,12 @@ int test_PropertiesList()
 		throw std::logic_error("requestProblemInformation");
 	}
 
+	propList->authenticationMethod(HELLO_WORLD);
+	buf = propList->authenticationMethod();
+	if (cmp_str(buf, HELLO_WORLD) != 0) {
+		throw std::logic_error("authenticationMethod");
+	}
+
 	delete propList;
 
 	return 0;
