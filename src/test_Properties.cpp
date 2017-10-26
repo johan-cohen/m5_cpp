@@ -133,6 +133,12 @@ int test_PropertiesList()
 		throw std::logic_error("willDelayInterval");
 	}
 
+	propList->receiveMaximum(testU16);
+	u16 = propList->receiveMaximum();
+	if (u16 != testU16) {
+		throw std::logic_error("receiveMaximum");
+	}
+
 	delete propList;
 
 	return 0;
