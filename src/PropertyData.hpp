@@ -48,18 +48,25 @@ namespace m5 {
 class PropertyData {
 private:
 	uint8_t *_data = nullptr;
+	bool scalar = false;
 	bool useNum = false;
 	uint16_t _size = 0;
 	uint64_t num = 0;
 
 	void init(const uint8_t *data, uint16_t size);
+	void init(uint64_t v);
 	void release(void);
 
 public:
 	PropertyData(const uint8_t *data = nullptr, uint16_t size = 0);
+	PropertyData(uint64_t v);
 	~PropertyData();
 
 	void reset(const uint8_t *data = nullptr, uint16_t size = 0);
+	void reset(uint64_t v);
+
+	bool isNumber(void) const { return scalar; }
+	uint64_t toNumber(void) const { return num; }
 
 	uint8_t *data() { return _data; }
 	uint16_t size() const { return _size; }
@@ -68,4 +75,3 @@ public:
 }
 
 #endif
-

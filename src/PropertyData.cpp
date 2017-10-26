@@ -51,6 +51,7 @@ void PropertyData::release(void)
 	}
 
 	_data = nullptr;
+	scalar = false;
 	useNum = false;
 	_size = 0;
 	num = 0;
@@ -78,10 +79,25 @@ void PropertyData::init(const uint8_t *data, uint16_t size)
 	memcpy(this->_data, data, size);
 }
 
+void PropertyData::init(uint64_t v)
+{
+	this->_data = (uint8_t *)&(this->num);
+	this->_size = sizeof(this->num);
+	this->useNum = true;
+	this->scalar = true;
+	this->num = v;
+}
+
 PropertyData::PropertyData(const uint8_t *data, uint16_t size)
 {
 	this->init(data, size);
 }
+
+PropertyData::PropertyData(uint64_t v)
+{
+	init(v);
+}
+
 
 PropertyData::~PropertyData()
 {
@@ -94,9 +110,19 @@ void PropertyData::reset(const uint8_t *data, uint16_t size)
 		release();
 		init(data, size);
 	} else {
+		scalar = false;
 		this->_size = size;
 		memcpy(this->_data, data, size);
 	}
+}
+
+void PropertyData::reset(uint64_t v)
+{
+	if (!scalar) {
+		release();
+	}
+
+	init(v);
 }
 
 }
