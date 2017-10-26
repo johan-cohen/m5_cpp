@@ -158,6 +158,12 @@ int test_PropertiesList()
 		throw std::logic_error("requestResponseInformation");
 	}
 
+	propList->requestProblemInformation(true);
+	res = propList->requestProblemInformation();
+	if (!res) {
+		throw std::logic_error("requestProblemInformation");
+	}
+
 	delete propList;
 
 	return 0;
