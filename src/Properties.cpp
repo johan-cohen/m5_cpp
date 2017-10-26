@@ -173,30 +173,38 @@ bool PropertiesList::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
-void PropertiesList::add(PropertyId id, const uint8_t *data, uint16_t size)
+void PropertiesList::add(PropertyNode *node)
 {
+	PropertyId id = (PropertyId)node->id();
+
 	if (!isAllowed(id)) {
 		return;
 	}
 
 	if (!isEnabled(id)) {
-		PropertyNode *node = new PropertyNode(id, data, size);
 		this->push(node);
 		this->enabledProperties += __POW2(id);
 	} else {
 		auto it = propList.find(id);
 
 		/* rewrite value */
-		PropertyNode *node = (*it).second;
-		node->id(id);
-		node->value.reset(data, size);
+		PropertyNode *current = (*it).second;
+		current->value = node->value;
 	}
 }
 
-BasicBuf PropertiesList::value(PropertyId id)
+void PropertiesList::add(PropertyId id, const uint8_t *data, uint16_t size)
+{
+	PropertyNode *node;
+
+	node = new PropertyNode(id, data, size);
+	add(node);
+}
+
+PropertyNode *PropertiesList::value(PropertyId id)
 {
 	if (!isEnabled(id)) {
-		return BasicBuf(nullptr, 0);
+		return nullptr;
 	}
 
 	auto it = propList.find(id);
@@ -204,31 +212,40 @@ BasicBuf PropertiesList::value(PropertyId id)
 		return nullptr;
 	}
 
-	PropertyNode *node = (*it).second;
+	return (*it).second;
+}
+
+BasicBuf PropertiesList::valueBuf(PropertyId id)
+{
+	PropertyNode *node = value(id);
+
+	if (node == nullptr) {
+		return BasicBuf(nullptr, 0);
+	}
 
 	return BasicBuf(node->value.data(), node->value.size());
 }
 
 template <typename T> void PropertiesList::addNum(PropertyId id, T v)
 {
-	this->add(id, (uint8_t *)&v, sizeof(v));
+	PropertyNode *node;
+
+	node = new PropertyNode(id, v);
+	this->add(node);
 }
 
-template <typename T> T PropertiesList::valueNum(PropertyId id)
+uint64_t PropertiesList::valueNum(PropertyId id)
 {
-	BasicBuf buf = value(id);
-	if (buf.data == nullptr || buf.size == 0) {
+	PropertyNode *node = value(id);
+	if (node == nullptr) {
 		return 0;
 	}
 
-	if (buf.size > sizeof(T)) {
-		throw std::invalid_argument("Error in template argument");
+	if (!node->value.isNumber()) {
+		throw std::invalid_argument("Error in recovered node");
 	}
 
-	T v;
-	memcpy((uint8_t *)&v, buf.data, buf.size);
-
-	return v;
+	return node->value.toNumber();
 }
 
 void PropertiesList::payloadFormatIndicator(uint8_t v)
@@ -238,7 +255,7 @@ void PropertiesList::payloadFormatIndicator(uint8_t v)
 
 uint8_t PropertiesList::payloadFormatIndicator(void)
 {
-	return valueNum<uint8_t>(PropertyId::PAYLOAD_FORMAT_INDICATOR);
+	return valueNum(PropertyId::PAYLOAD_FORMAT_INDICATOR);
 }
 
 void PropertiesList::publicationExpiryInterval(uint32_t v)
@@ -248,7 +265,7 @@ void PropertiesList::publicationExpiryInterval(uint32_t v)
 
 uint32_t PropertiesList::publicationExpiryInterval(void)
 {
-	return valueNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
+	return valueNum(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
 }
 
 void PropertiesList::contentType(const uint8_t *data, uint16_t size)
@@ -263,7 +280,7 @@ void PropertiesList::contentType(const char *str)
 
 BasicBuf PropertiesList::contentType(void)
 {
-	return value(PropertyId::CONTENT_TYPE);
+	return valueBuf(PropertyId::CONTENT_TYPE);
 }
 
 void PropertiesList::responseTopic(const uint8_t *data, uint16_t size)
@@ -278,7 +295,7 @@ void PropertiesList::responseTopic(const char *str)
 
 BasicBuf PropertiesList::responseTopic(void)
 {
-	return value(PropertyId::RESPONSE_TOPIC);
+	return valueBuf(PropertyId::RESPONSE_TOPIC);
 }
 
 void PropertiesList::subscriptionIdentifier(uint32_t v)
@@ -288,7 +305,7 @@ void PropertiesList::subscriptionIdentifier(uint32_t v)
 
 uint32_t PropertiesList::subscriptionIdentifier(void)
 {
-	return valueNum<uint32_t>(PropertyId::SUBSCRIPTION_IDENTIFIER);
+	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER);
 }
 
 void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
@@ -298,7 +315,7 @@ void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
 
 BasicBuf PropertiesList::correlationData(void)
 {
-	return value(PropertyId::CORRELATION_DATA);
+	return valueBuf(PropertyId::CORRELATION_DATA);
 }
 
 void PropertiesList::sessionExpiryInterval(uint32_t v)
@@ -308,7 +325,7 @@ void PropertiesList::sessionExpiryInterval(uint32_t v)
 
 uint32_t PropertiesList::sessionExpiryInterval(void)
 {
-	return valueNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL);
+	return valueNum(PropertyId::SESSION_EXPIRY_INTERVAL);
 }
 
 void PropertiesList::assignedClientIdentifier(const uint8_t *data, uint16_t size)
@@ -323,7 +340,7 @@ void PropertiesList::assignedClientIdentifier(const char *str)
 
 BasicBuf PropertiesList::assignedClientIdentifier(void)
 {
-	return value(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
+	return valueBuf(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
 
 void PropertiesList::serverKeepAlive(uint16_t v)
@@ -333,7 +350,7 @@ void PropertiesList::serverKeepAlive(uint16_t v)
 
 uint16_t PropertiesList::serverKeepAlive(void)
 {
-	return valueNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE);
+	return valueNum(PropertyId::SERVER_KEEP_ALIVE);
 }
 
 void PropertiesList::authenticationMethod(const uint8_t *data, uint16_t size)
@@ -348,7 +365,7 @@ void PropertiesList::authenticationMethod(const char *str)
 
 BasicBuf PropertiesList::authenticationMethod(void)
 {
-	return value(PropertyId::AUTH_METHOD);
+	return valueBuf(PropertyId::AUTH_METHOD);
 }
 
 void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
@@ -358,7 +375,7 @@ void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
 
 BasicBuf PropertiesList::authenticationData(void)
 {
-	return value(PropertyId::AUTH_DATA);
+	return valueBuf(PropertyId::AUTH_DATA);
 }
 
 void PropertiesList::requestProblemInformation(bool v)
@@ -368,7 +385,7 @@ void PropertiesList::requestProblemInformation(bool v)
 
 bool PropertiesList::requestProblemInformation(void)
 {
-	return valueNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION);
+	return valueNum(PropertyId::REQUEST_PROBLEM_INFORMATION);
 }
 
 void PropertiesList::willDelayInterval(uint32_t v)
@@ -378,7 +395,7 @@ void PropertiesList::willDelayInterval(uint32_t v)
 
 uint32_t PropertiesList::willDelayInterval(void)
 {
-	return valueNum<uint32_t>(PropertyId::WILL_DELAY_INTERVAL);
+	return valueNum(PropertyId::WILL_DELAY_INTERVAL);
 }
 
 void PropertiesList::requestResponseInformation(bool v)
@@ -388,7 +405,7 @@ void PropertiesList::requestResponseInformation(bool v)
 
 bool PropertiesList::requestResponseInformation(void)
 {
-	return valueNum<uint8_t>(PropertyId::REQUEST_RESPONSE_INFORMATION);
+	return valueNum(PropertyId::REQUEST_RESPONSE_INFORMATION);
 }
 
 void PropertiesList::responseInformation(const uint8_t *data, uint16_t size)
@@ -403,7 +420,7 @@ void PropertiesList::responseInformation(const char *str)
 
 BasicBuf PropertiesList::responseInformation(void)
 {
-	return value(PropertyId::RESPONSE_INFORMATION);
+	return valueBuf(PropertyId::RESPONSE_INFORMATION);
 }
 
 void PropertiesList::serverReference(const uint8_t *data, uint16_t size)
@@ -418,7 +435,7 @@ void PropertiesList::serverReference(const char *str)
 
 BasicBuf PropertiesList::serverReference(void)
 {
-	return value(PropertyId::SERVER_REFERENCE);
+	return valueBuf(PropertyId::SERVER_REFERENCE);
 }
 
 void PropertiesList::reasonString(const uint8_t *data, uint16_t size)
@@ -433,7 +450,7 @@ void PropertiesList::reasonString(const char *str)
 
 BasicBuf PropertiesList::reasonString(void)
 {
-	return value(PropertyId::REASON_STR);
+	return valueBuf(PropertyId::REASON_STR);
 }
 
 void PropertiesList::receiveMaximum(uint16_t v)
@@ -443,7 +460,7 @@ void PropertiesList::receiveMaximum(uint16_t v)
 
 uint16_t PropertiesList::receiveMaximum(void)
 {
-	return valueNum<uint16_t>(PropertyId::RECEIVE_MAXIMUM);
+	return valueNum(PropertyId::RECEIVE_MAXIMUM);
 }
 
 void PropertiesList::topicAliasMaximum(uint16_t v)
@@ -453,7 +470,7 @@ void PropertiesList::topicAliasMaximum(uint16_t v)
 
 uint16_t PropertiesList::topicAliasMaximum(void)
 {
-	return valueNum<uint16_t>(PropertyId::TOPIC_ALIAS_MAXIMUM);
+	return valueNum(PropertyId::TOPIC_ALIAS_MAXIMUM);
 }
 
 void PropertiesList::topicAlias(uint16_t v)
@@ -463,7 +480,7 @@ void PropertiesList::topicAlias(uint16_t v)
 
 uint16_t PropertiesList::topicAlias(void)
 {
-	return valueNum<uint16_t>(PropertyId::TOPIC_ALIAS);
+	return valueNum(PropertyId::TOPIC_ALIAS);
 }
 
 void PropertiesList::maximumQoS(PktQoS qos)
@@ -482,7 +499,7 @@ void PropertiesList::maximumQoS(PktQoS qos)
 
 PktQoS PropertiesList::maximumQoS(void)
 {
-	return (PktQoS)valueNum<uint8_t>(PropertyId::MAXIMUM_QOS);
+	return (PktQoS)valueNum(PropertyId::MAXIMUM_QOS);
 }
 
 void PropertiesList::retainAvailable(bool v)
@@ -492,7 +509,7 @@ void PropertiesList::retainAvailable(bool v)
 
 bool PropertiesList::retainAvailable(void)
 {
-	return valueNum<uint8_t>(PropertyId::RETAIN_AVAILABLE);
+	return valueNum(PropertyId::RETAIN_AVAILABLE);
 }
 
 void PropertiesList::userProperty(const uint8_t *key, uint16_t key_size,
@@ -516,12 +533,8 @@ void PropertiesList::userProperty(const char *key, const char *val)
 		     (const uint8_t *)val, strlen(val));
 }
 
-//typedef std::multimap<uint8_t, PropertyNode *> __map;
-
 void PropertiesList::userProperty(std::list< std::pair<BasicBuf, BasicBuf> > &l)
 {
-//	std::pair< __map::iterator, __map::iterator > all;
-
 	auto all = propList.equal_range(PropertyId::USER_PROPERTY);
 	for (auto it = all.first; it != all.second; it++) {
 		PropertyNodeKeyVal *node = (PropertyNodeKeyVal *)((*it).second);
@@ -539,7 +552,7 @@ void PropertiesList::maximumPacketSize(uint32_t v)
 
 uint32_t PropertiesList::maximumPacketSize(void)
 {
-	return valueNum<uint32_t>(PropertyId::MAXIMUM_PACKET_SIZE);
+	return valueNum(PropertyId::MAXIMUM_PACKET_SIZE);
 }
 
 void PropertiesList::wildcardSubscriptionAvailable(bool v)
@@ -549,7 +562,7 @@ void PropertiesList::wildcardSubscriptionAvailable(bool v)
 
 bool PropertiesList::wildcardSubscriptionAvailable(void)
 {
-	return valueNum<uint8_t>(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
+	return valueNum(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
 }
 
 void PropertiesList::subscriptionIdentifierAvailable(bool v)
@@ -559,7 +572,7 @@ void PropertiesList::subscriptionIdentifierAvailable(bool v)
 
 bool PropertiesList::subscriptionIdentifierAvailable(void)
 {
-	return valueNum<uint8_t>(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
+	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
 }
 
 void PropertiesList::sharedSubscriptionAvailable(bool v)
@@ -569,7 +582,7 @@ void PropertiesList::sharedSubscriptionAvailable(bool v)
 
 bool PropertiesList::sharedSubscriptionAvailable(void)
 {
-	return valueNum<uint8_t>(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
+	return valueNum(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 }
 
 }

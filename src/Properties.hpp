@@ -106,11 +106,14 @@ private:
 
 	void computePktFlags(void);
 
-	template <typename T> void addNum(PropertyId id, T v);
 	void add(PropertyId id, const uint8_t *data, uint16_t size);
+	template <typename T> void addNum(PropertyId id, T v);
+	void add(PropertyNode *node);
 
-	template <typename T> T valueNum(PropertyId id);
-	BasicBuf value(PropertyId id);
+	PropertyNode *value(PropertyId id);
+
+	BasicBuf valueBuf(PropertyId id);
+	uint64_t valueNum(PropertyId id);
 
 public:
 	PropertiesList(const PktType type = PktType::RESERVED);
