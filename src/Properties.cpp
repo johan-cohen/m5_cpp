@@ -58,7 +58,7 @@ void PropertiesList::deleteList(void)
 
 	it = propList.begin();
 	while (it != propList.end()) {
-		struct PropertyNode *node = (*it).second;
+		class PropertyNode *node = (*it).second;
 		delete node;
 
 		it++;
