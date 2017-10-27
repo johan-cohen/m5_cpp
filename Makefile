@@ -18,13 +18,22 @@ dirs:
 	@mkdir -p obj
 	@mkdir -p bin
 
+$(OBJS_DIR)/Properties.o: $(SRC_DIR)/Properties.cpp $(SRC_DIR)/PropertyNode.hpp $(SRC_DIR)/PropertyData.hpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $<
+
+$(OBJS_DIR)/test_AppBuf.o: $(SRC_DIR)/test_AppBuf.cpp $(SRC_DIR)/AppBuf.hpp $(SRC_DIR)/test_Common.hpp
+	$(CXX) $(CPPFLAGS) -c -o $@ $<
+
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
-$(BINS_DIR)/test_Properties: $(OBJS_DIR)/test_Properties.o $(OBJS_DIR)/PropertyData.o $(OBJS_DIR)/PropertyNode.o $(OBJS_DIR)/Properties.o
+$(BINS_DIR)/test_Properties: $(OBJS_DIR)/test_Properties.o $(OBJS_DIR)/PropertyData.o $(OBJS_DIR)/PropertyNode.o $(OBJS_DIR)/Properties.o $(OBJS_DIR)/AppBuf.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
-$(BINS_DIR)/test_%: $(SRC_DIR)/test_Common.hpp $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/%.o $(OBJS_DIR)/test_%.o
+$(BINS_DIR)/test_PropertyData: $(OBJS_DIR)/test_PropertyData.o $(OBJS_DIR)/PropertyData.o
+	$(CXX) $(CPPFLAGS) -o $@ $^
+
+$(BINS_DIR)/test_%: $(OBJS_DIR)/test_%.o $(OBJS_DIR)/AppBuf.o $(OBJS_DIR)/%.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
 tests: $(TESTS)
