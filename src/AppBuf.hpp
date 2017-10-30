@@ -57,6 +57,8 @@ private:
 public:
 	const uint8_t *rawData() const { return data; }
 
+	const uint8_t *current(void) const { return data + offset; }
+
 	AppBuf(const uint8_t *data, std::size_t size);
 	AppBuf(std::size_t size = 0);
 	~AppBuf();
