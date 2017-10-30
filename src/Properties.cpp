@@ -169,7 +169,7 @@ void PropertiesList::append(const uint8_t *key, uint16_t key_size,
 
 	userProps.push_back(KeyValuePair(_key, _val));
 
-	this->enabledProperties |= __POW2(PropertyId::USER_PROPERTY);
+	enableProperty(PropertyId::USER_PROPERTY);
 }
 
 void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
@@ -190,7 +190,7 @@ void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
 	} else {
 		binProps.insert(
 			BinaryPropPair(id, std::vector<uint8_t>(data, data + size)));
-		this->enabledProperties |= __POW2(id);
+		enableProperty(id);
 	}
 }
 
@@ -207,7 +207,7 @@ void PropertiesList::append(PropertyId id, uint32_t value)
 		numProps.insert(NumPropPair((uint8_t)id, value));
 	}
 
-	this->enabledProperties |= __POW2(id);
+	enableProperty(id);
 }
 
 const std::vector<uint8_t> &PropertiesList::valueBinary(PropertyId id)
@@ -232,6 +232,11 @@ uint32_t PropertiesList::valueNum(PropertyId id)
 	auto it = numProps.find(id);
 
 	return (*it).second;
+}
+
+void PropertiesList::enableProperty(PropertyId id)
+{
+	this->enabledProperties |= __POW2(id);
 }
 
 void PropertiesList::payloadFormatIndicator(uint8_t v)

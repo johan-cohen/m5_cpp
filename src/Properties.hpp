@@ -119,6 +119,8 @@ private:
 	const std::vector<uint8_t> &valueBinary(PropertyId id);
 	uint32_t valueNum(PropertyId id);
 
+	void enableProperty(PropertyId id);
+
 public:
 	PropertiesList(const PktType type = PktType::RESERVED);
 	~PropertiesList();
