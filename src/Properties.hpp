@@ -119,6 +119,11 @@ private:
 	const std::vector<uint8_t> &valueBinary(PropertyId id);
 	uint32_t valueNum(PropertyId id);
 
+	void resetPacketType(const enum PktType type);
+
+	uint64_t allowed() const { return properties; }
+	uint64_t enabled() const { return enabledProperties; }
+
 	void enableProperty(PropertyId id);
 
 public:
@@ -126,10 +131,6 @@ public:
 	~PropertiesList();
 
 	enum PktType packetType() const { return pktType; }
-	void resetPacketType(const enum PktType type);
-
-	uint64_t allowed() const { return properties; }
-	uint64_t enabled() const { return enabledProperties; }
 
 	bool isAllowed(PropertyId id) const;
 	bool isAllowed(uint8_t id) const;
