@@ -96,3 +96,4 @@ static inline uint8_t VBIWireSize(uint32_t value)
 }
 
 #endif
+

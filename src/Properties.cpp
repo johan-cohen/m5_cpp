@@ -560,3 +560,4 @@ bool PropertiesList::sharedSubscriptionAvailable(void)
 }
 
 }
+
