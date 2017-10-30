@@ -130,6 +130,8 @@ public:
 	uint64_t enabled() const { return enabledProperties; }
 
 	bool isAllowed(PropertyId id) const;
+	bool isAllowed(uint8_t id) const;
+
 	bool isEnabled(PropertyId id) const;
 
 	void payloadFormatIndicator(uint8_t v);
