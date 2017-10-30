@@ -41,9 +41,9 @@
 #ifndef __PROPERTIES_HPP__
 #define __PROPERTIES_HPP__
 
-#include "PropertyNode.hpp"
 #include "Common.hpp"
 
+#include <vector>
 #include <list>
 #include <map>
 
@@ -94,26 +94,30 @@ enum PropertyId {
 	SHARED_SUBSCRIPTION_AVAILABLE,
 };
 
+typedef std::pair<std::vector<uint8_t>, std::vector<uint8_t> > KeyValuePair;
+typedef std::pair<uint8_t, std::vector<uint8_t> > BinaryPropPair;
+typedef std::pair<uint8_t, uint32_t> NumPropPair;
+typedef std::list<KeyValuePair> UserProperty;
+
 class PropertiesList {
 private:
-	std::multimap<uint8_t, PropertyNode *> propList;
+	std::map<uint8_t, std::vector<uint8_t> > binProps;
+	std::map<uint8_t, uint32_t> numProps;
+	UserProperty userProps;
+
 	enum PktType pktType = PktType::RESERVED;
 	uint64_t enabledProperties = 0;
 	uint64_t properties = 0;
 
-	void push(PropertyNode *node);
-	void deleteList();
-
 	void computePktFlags(void);
 
-	void add(PropertyId id, const uint8_t *data, uint16_t size);
-	template <typename T> void addNum(PropertyId id, T v);
-	void add(PropertyNode *node);
+	void append(PropertyId id, const uint8_t *data, uint16_t size);
+	void append(PropertyId id, uint32_t v);
+	void append(const uint8_t *key, uint16_t key_size,
+		    const uint8_t *value, uint16_t value_size);
 
-	PropertyNode *value(PropertyId id);
-
-	BasicBuf valueBuf(PropertyId id);
-	uint64_t valueNum(PropertyId id);
+	const std::vector<uint8_t> &valueBinary(PropertyId id);
+	uint32_t valueNum(PropertyId id);
 
 public:
 	PropertiesList(const PktType type = PktType::RESERVED);
@@ -136,34 +140,34 @@ public:
 
 	void contentType(const uint8_t *data, uint16_t size);
 	void contentType(const char *str);
-	BasicBuf contentType(void);
+	const std::vector<uint8_t> &contentType(void);
 
 	void responseTopic(const uint8_t *data, uint16_t size);
 	void responseTopic(const char *str);
-	BasicBuf responseTopic(void);
+	const std::vector<uint8_t> &responseTopic(void);
 
 	void subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void);
 
 	void correlationData(const uint8_t *data, uint16_t size);
-	BasicBuf correlationData(void);
+	const std::vector<uint8_t> &correlationData(void);
 
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void);
 
 	void assignedClientIdentifier(const uint8_t *data, uint16_t size);
 	void assignedClientIdentifier(const char *str);
-	BasicBuf assignedClientIdentifier(void);
+	const std::vector<uint8_t> &assignedClientIdentifier(void);
 
 	void serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void);
 
 	void authenticationMethod(const uint8_t *data, uint16_t size);
 	void authenticationMethod(const char *str);
-	BasicBuf authenticationMethod(void);
+	const std::vector<uint8_t> &authenticationMethod(void);
 
 	void authenticationData(const uint8_t *data, uint16_t size);
-	BasicBuf authenticationData(void);
+	const std::vector<uint8_t> &authenticationData(void);
 
 	void requestProblemInformation(bool v);
 	bool requestProblemInformation(void);
@@ -176,15 +180,15 @@ public:
 
 	void responseInformation(const uint8_t *data, uint16_t size);
 	void responseInformation(const char *str);
-	BasicBuf responseInformation(void);
+	const std::vector<uint8_t> &responseInformation(void);
 
 	void serverReference(const uint8_t *data, uint16_t size);
 	void serverReference(const char *str);
-	BasicBuf serverReference(void);
+	const std::vector<uint8_t> &serverReference(void);
 
 	void reasonString(const uint8_t *data, uint16_t size);
 	void reasonString(const char *str);
-	BasicBuf reasonString(void);
+	const std::vector<uint8_t> &reasonString(void);
 
 	void receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void);
@@ -202,9 +206,9 @@ public:
 	bool retainAvailable(void);
 
 	void userProperty(const uint8_t *key, uint16_t key_size,
-			  const uint8_t *val, uint16_t val_size);
+			  const uint8_t *value, uint16_t value_size);
 	void userProperty(const char *key, const char *val);
-	void userProperty(std::list< std::pair<BasicBuf, BasicBuf> > &l);
+	const UserProperty &userProperty(void);
 
 	void maximumPacketSize(uint32_t v);
 	uint32_t maximumPacketSize(void);

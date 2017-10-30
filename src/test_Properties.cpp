@@ -43,9 +43,10 @@
 
 #include <cstring>
 
-#define HELLO_WORLD	"Hello, World!"
-#define DATA		(const uint8_t *)HELLO_WORLD
-#define DATA_LEN	strlen(HELLO_WORLD)
+#define MSG		"Hello, World!"
+#define MSG_LEN		strlen(MSG)
+#define DATA		(uint8_t *)MSG
+#define DATA_LEN	MSG_LEN
 
 #define testU32	0xABCDEDF1U
 #define testU16	0xABCDU
@@ -57,7 +58,7 @@ struct key_val {
 };
 
 /* xxx */
-key_val KeyVal[] = {
+static key_val KeyVal[] = {
 	{.key = "Key #1", .val = "Val #1"},
 	{.key = "Key #2", .val = "Val #2"},
 	{.key = "Key #3", .val = "Val #3"},
@@ -66,25 +67,11 @@ key_val KeyVal[] = {
 	{.key = nullptr, .val = nullptr}
 };
 
-int cmp_data(const m5::BasicBuf &buf, const uint8_t *d, std::size_t size)
-{
-	if (buf.size != size) {
-		return 1;
-	}
-
-	return memcmp(buf.data, d, size);
-}
-
-int cmp_str(const m5::BasicBuf &buf, const char *str)
-{
-	return cmp_data(buf, (const uint8_t *)str, strlen(str));
-}
+static const std::vector<uint8_t> msg(MSG, MSG + MSG_LEN);
 
 int test_PropertiesList()
 {
-	std::list< std::pair<m5::BasicBuf, m5::BasicBuf> > userProps;
 	m5::PropertiesList *propList;
-	m5::BasicBuf buf;
 	uint32_t u32;
 	uint16_t u16;
 	uint8_t u8;
@@ -110,27 +97,26 @@ int test_PropertiesList()
 		throw std::logic_error("topicAlias");
 	}
 
-	propList->responseTopic(HELLO_WORLD);
-	buf = propList->responseTopic();
-	if (cmp_str(buf, HELLO_WORLD) != 0) {
+	propList->responseTopic(MSG);
+	if (msg != propList->responseTopic()) {
+		throw std::logic_error("responseTopic");
+	}
+
+	/* rewrite property value */
+	propList->responseTopic("hello");
+	if (msg == propList->responseTopic()) {
 		throw std::logic_error("responseTopic");
 	}
 
 	propList->correlationData(DATA, DATA_LEN);
-	buf = propList->responseTopic();
-	if (cmp_data(buf, DATA, DATA_LEN) != 0) {
+	if (msg != propList->correlationData()) {
 		throw std::logic_error("correlationData");
 	}
 
 	propList->subscriptionIdentifier(testU32);
-	u32 = propList->subscriptionIdentifier();
-	if (u32 != testU32) {
-		throw std::logic_error("subscriptionIdentifier");
-	}
 
-	propList->contentType(HELLO_WORLD);
-	buf = propList->contentType();
-	if (cmp_str(buf, HELLO_WORLD) != 0) {
+	propList->contentType(MSG);
+	if (msg != propList->contentType()) {
 		throw std::logic_error("contentType");
 	}
 
@@ -180,17 +166,16 @@ int test_PropertiesList()
 		throw std::logic_error("requestProblemInformation");
 	}
 
-	propList->authenticationMethod(HELLO_WORLD);
-	buf = propList->authenticationMethod();
-	if (cmp_str(buf, HELLO_WORLD) != 0) {
+	propList->authenticationMethod(MSG);
+	if (msg != propList->authenticationMethod()) {
 		throw std::logic_error("authenticationMethod");
 	}
 
 	propList->authenticationData(DATA, DATA_LEN);
-	buf = propList->authenticationData();
-	if (cmp_data(buf, DATA, DATA_LEN) != 0) {
+	if (msg != propList->authenticationData()) {
 		throw std::logic_error("authenticationData");
 	}
+
 
 	int i = 0;
 	while (KeyVal[i].key != nullptr) {
@@ -199,18 +184,24 @@ int test_PropertiesList()
 		i++;
 	}
 
-	propList->userProperty(userProps);
+	auto userProps = propList->userProperty();
 
 	int j = 0;
 	for (auto it = userProps.begin(); it != userProps.end(); it++) {
 		auto pair = (*it);
 
-		if (cmp_str(pair.first, KeyVal[j].key) != 0) {
+		if (strlen(KeyVal[j].key) != pair.first.size()) {
+			throw std::logic_error("userProperty key len");
+		}
+		if (memcmp(&pair.first[0], KeyVal[j].key, pair.first.size()) != 0) {
 			throw std::logic_error("userProperty key");
 		}
 
-		if (cmp_str(pair.second, KeyVal[j].val) != 0) {
-			throw std::logic_error("userProperty value");
+		if (strlen(KeyVal[j].val) != pair.second.size()) {
+			throw std::logic_error("userProperty val len");
+		}
+		if (memcmp(&pair.second[0], KeyVal[j].val, pair.second.size()) != 0) {
+			throw std::logic_error("userProperty val");
 		}
 
 		j++;
@@ -234,3 +225,4 @@ int main(void)
 
 	return 0;
 }
+

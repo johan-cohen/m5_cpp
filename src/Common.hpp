@@ -75,14 +75,6 @@ enum class PktType {
 	AUTH
 };
 
-struct BasicBuf {
-	uint8_t *data = nullptr;
-	std::size_t size = 0;
-
-	BasicBuf(uint8_t *data = nullptr, std::size_t size = 0)
-		: data(data), size(size) {}
-};
-
 static inline uint8_t VBIWireSize(uint32_t value)
 {
 	if (value <= 127) {

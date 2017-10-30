@@ -47,24 +47,6 @@
 
 namespace  m5 {
 
-void PropertiesList::push(PropertyNode *node)
-{
-	propList.insert(std::pair<uint8_t, PropertyNode *>(node->id(), node));
-}
-
-void PropertiesList::deleteList(void)
-{
-	std::multimap<uint8_t, PropertyNode *>::iterator it;
-
-	it = propList.begin();
-	while (it != propList.end()) {
-		class PropertyNode *node = (*it).second;
-		delete node;
-
-		it++;
-	}
-}
-
 void PropertiesList::computePktFlags(void)
 {
 	properties = 0;
@@ -152,13 +134,10 @@ PropertiesList::PropertiesList(const PktType type)
 
 PropertiesList::~PropertiesList()
 {
-	deleteList();
 }
 
 void PropertiesList::resetPacketType(const PktType type)
 {
-	deleteList();
-
 	this->pktType = type;
 	this->computePktFlags();
 }
@@ -173,84 +152,86 @@ bool PropertiesList::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
-void PropertiesList::add(PropertyNode *node)
+void PropertiesList::append(const uint8_t *key, uint16_t key_size,
+			    const uint8_t *value, uint16_t value_size)
 {
-	PropertyId id = (PropertyId)node->id();
+	if (!isAllowed(PropertyId::USER_PROPERTY)) {
+		return;
+	}
 
+	std::vector<uint8_t> _key(key, key + key_size);
+	std::vector<uint8_t> _val(value, value + value_size);
+
+	userProps.push_back(KeyValuePair(_key, _val));
+
+	this->enabledProperties |= __POW2(PropertyId::USER_PROPERTY);
+}
+
+void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
+{
 	if (!isAllowed(id)) {
 		return;
 	}
 
-	if (!isEnabled(id)) {
-		this->push(node);
-		this->enabledProperties += __POW2(id);
+	if (isEnabled(id)) {
+		auto it = binProps.find(id);
+		if (it == binProps.end()) {
+			throw std::out_of_range("Property enabled but not found");
+		}
+
+		std::vector<uint8_t> &item = (*it).second;
+		item.assign(data, data + size);
+
 	} else {
-		auto it = propList.find(id);
-
-		/* rewrite value */
-		PropertyNode *current = (*it).second;
-		current->value = node->value;
+		binProps.insert(
+			BinaryPropPair(id, std::vector<uint8_t>(data, data + size)));
+		this->enabledProperties |= __POW2(id);
 	}
 }
 
-void PropertiesList::add(PropertyId id, const uint8_t *data, uint16_t size)
+void PropertiesList::append(PropertyId id, uint32_t value)
 {
-	PropertyNode *node;
+	if (!isAllowed(id)) {
+		return;
+	}
 
-	node = new PropertyNode(id, data, size);
-	add(node);
+	if (isEnabled(id)) {
+		auto it = numProps.find(id);
+		(*it).second = value;
+	} else {
+		numProps.insert(NumPropPair((uint8_t)id, value));
+	}
+
+	this->enabledProperties |= __POW2(id);
 }
 
-PropertyNode *PropertiesList::value(PropertyId id)
+const std::vector<uint8_t> &PropertiesList::valueBinary(PropertyId id)
 {
 	if (!isEnabled(id)) {
-		return nullptr;
+		static auto none = std::vector<uint8_t>();
+
+		return none;
 	}
 
-	auto it = propList.find(id);
-	if (it == propList.end()) {
-		return nullptr;
-	}
+	auto it = binProps.find(id);
 
 	return (*it).second;
 }
 
-BasicBuf PropertiesList::valueBuf(PropertyId id)
+uint32_t PropertiesList::valueNum(PropertyId id)
 {
-	PropertyNode *node = value(id);
-
-	if (node == nullptr) {
-		return BasicBuf(nullptr, 0);
-	}
-
-	return BasicBuf(node->value.data(), node->value.size());
-}
-
-template <typename T> void PropertiesList::addNum(PropertyId id, T v)
-{
-	PropertyNode *node;
-
-	node = new PropertyNode(id, v);
-	this->add(node);
-}
-
-uint64_t PropertiesList::valueNum(PropertyId id)
-{
-	PropertyNode *node = value(id);
-	if (node == nullptr) {
+	if (!isEnabled(id)) {
 		return 0;
 	}
 
-	if (!node->value.isNumber()) {
-		throw std::invalid_argument("Error in recovered node");
-	}
+	auto it = numProps.find(id);
 
-	return node->value.toNumber();
+	return (*it).second;
 }
 
 void PropertiesList::payloadFormatIndicator(uint8_t v)
 {
-	addNum<uint8_t>(PropertyId::PAYLOAD_FORMAT_INDICATOR, v);
+	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v);
 }
 
 uint8_t PropertiesList::payloadFormatIndicator(void)
@@ -260,7 +241,7 @@ uint8_t PropertiesList::payloadFormatIndicator(void)
 
 void PropertiesList::publicationExpiryInterval(uint32_t v)
 {
-	addNum<uint32_t>(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v);
+	append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v);
 }
 
 uint32_t PropertiesList::publicationExpiryInterval(void)
@@ -270,7 +251,7 @@ uint32_t PropertiesList::publicationExpiryInterval(void)
 
 void PropertiesList::contentType(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::CONTENT_TYPE, data, size);
+	append(PropertyId::CONTENT_TYPE, data, size);
 }
 
 void PropertiesList::contentType(const char *str)
@@ -278,14 +259,14 @@ void PropertiesList::contentType(const char *str)
 	contentType((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::contentType(void)
+const std::vector<uint8_t> &PropertiesList::contentType(void)
 {
-	return valueBuf(PropertyId::CONTENT_TYPE);
+	return valueBinary(PropertyId::CONTENT_TYPE);
 }
 
 void PropertiesList::responseTopic(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::RESPONSE_TOPIC, data, size);
+	append(PropertyId::RESPONSE_TOPIC, data, size);
 }
 
 void PropertiesList::responseTopic(const char *str)
@@ -293,14 +274,14 @@ void PropertiesList::responseTopic(const char *str)
 	responseTopic((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::responseTopic(void)
+const std::vector<uint8_t> &PropertiesList::responseTopic(void)
 {
-	return valueBuf(PropertyId::RESPONSE_TOPIC);
+	return valueBinary(PropertyId::RESPONSE_TOPIC);
 }
 
 void PropertiesList::subscriptionIdentifier(uint32_t v)
 {
-	addNum<uint32_t>(PropertyId::SUBSCRIPTION_IDENTIFIER, v);
+	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v);
 }
 
 uint32_t PropertiesList::subscriptionIdentifier(void)
@@ -310,17 +291,17 @@ uint32_t PropertiesList::subscriptionIdentifier(void)
 
 void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::CORRELATION_DATA, data, size);
+	append(PropertyId::CORRELATION_DATA, data, size);
 }
 
-BasicBuf PropertiesList::correlationData(void)
+const std::vector<uint8_t> &PropertiesList::correlationData(void)
 {
-	return valueBuf(PropertyId::CORRELATION_DATA);
+	return valueBinary(PropertyId::CORRELATION_DATA);
 }
 
 void PropertiesList::sessionExpiryInterval(uint32_t v)
 {
-	addNum<uint32_t>(PropertyId::SESSION_EXPIRY_INTERVAL, v);
+	append(PropertyId::SESSION_EXPIRY_INTERVAL, v);
 }
 
 uint32_t PropertiesList::sessionExpiryInterval(void)
@@ -330,7 +311,7 @@ uint32_t PropertiesList::sessionExpiryInterval(void)
 
 void PropertiesList::assignedClientIdentifier(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, data, size);
+	append(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, data, size);
 }
 
 void PropertiesList::assignedClientIdentifier(const char *str)
@@ -338,14 +319,14 @@ void PropertiesList::assignedClientIdentifier(const char *str)
 	assignedClientIdentifier((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::assignedClientIdentifier(void)
+const std::vector<uint8_t> &PropertiesList::assignedClientIdentifier(void)
 {
-	return valueBuf(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
+	return valueBinary(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
 
 void PropertiesList::serverKeepAlive(uint16_t v)
 {
-	addNum<uint16_t>(PropertyId::SERVER_KEEP_ALIVE, v);
+	append(PropertyId::SERVER_KEEP_ALIVE, v);
 }
 
 uint16_t PropertiesList::serverKeepAlive(void)
@@ -355,7 +336,7 @@ uint16_t PropertiesList::serverKeepAlive(void)
 
 void PropertiesList::authenticationMethod(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::AUTH_METHOD, data, size);
+	append(PropertyId::AUTH_METHOD, data, size);
 }
 
 void PropertiesList::authenticationMethod(const char *str)
@@ -363,24 +344,24 @@ void PropertiesList::authenticationMethod(const char *str)
 	authenticationMethod((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::authenticationMethod(void)
+const std::vector<uint8_t> &PropertiesList::authenticationMethod(void)
 {
-	return valueBuf(PropertyId::AUTH_METHOD);
+	return valueBinary(PropertyId::AUTH_METHOD);
 }
 
 void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::AUTH_DATA, data, size);
+	append(PropertyId::AUTH_DATA, data, size);
 }
 
-BasicBuf PropertiesList::authenticationData(void)
+const std::vector<uint8_t> &PropertiesList::authenticationData(void)
 {
-	return valueBuf(PropertyId::AUTH_DATA);
+	return valueBinary(PropertyId::AUTH_DATA);
 }
 
 void PropertiesList::requestProblemInformation(bool v)
 {
-	addNum<uint8_t>(PropertyId::REQUEST_PROBLEM_INFORMATION, v);
+	append(PropertyId::REQUEST_PROBLEM_INFORMATION, v);
 }
 
 bool PropertiesList::requestProblemInformation(void)
@@ -390,7 +371,7 @@ bool PropertiesList::requestProblemInformation(void)
 
 void PropertiesList::willDelayInterval(uint32_t v)
 {
-	addNum<uint32_t>(PropertyId::WILL_DELAY_INTERVAL, v);
+	append(PropertyId::WILL_DELAY_INTERVAL, v);
 }
 
 uint32_t PropertiesList::willDelayInterval(void)
@@ -400,7 +381,7 @@ uint32_t PropertiesList::willDelayInterval(void)
 
 void PropertiesList::requestResponseInformation(bool v)
 {
-	addNum<uint8_t>(PropertyId::REQUEST_RESPONSE_INFORMATION, v);
+	append(PropertyId::REQUEST_RESPONSE_INFORMATION, v);
 }
 
 bool PropertiesList::requestResponseInformation(void)
@@ -410,7 +391,7 @@ bool PropertiesList::requestResponseInformation(void)
 
 void PropertiesList::responseInformation(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::RESPONSE_INFORMATION, data, size);
+	append(PropertyId::RESPONSE_INFORMATION, data, size);
 }
 
 void PropertiesList::responseInformation(const char *str)
@@ -418,14 +399,14 @@ void PropertiesList::responseInformation(const char *str)
 	responseInformation((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::responseInformation(void)
+const std::vector<uint8_t> &PropertiesList::responseInformation(void)
 {
-	return valueBuf(PropertyId::RESPONSE_INFORMATION);
+	return valueBinary(PropertyId::RESPONSE_INFORMATION);
 }
 
 void PropertiesList::serverReference(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::SERVER_REFERENCE, data, size);
+	append(PropertyId::SERVER_REFERENCE, data, size);
 }
 
 void PropertiesList::serverReference(const char *str)
@@ -433,14 +414,14 @@ void PropertiesList::serverReference(const char *str)
 	serverReference((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::serverReference(void)
+const std::vector<uint8_t> &PropertiesList::serverReference(void)
 {
-	return valueBuf(PropertyId::SERVER_REFERENCE);
+	return valueBinary(PropertyId::SERVER_REFERENCE);
 }
 
 void PropertiesList::reasonString(const uint8_t *data, uint16_t size)
 {
-	add(PropertyId::REASON_STR, data, size);
+	append(PropertyId::REASON_STR, data, size);
 }
 
 void PropertiesList::reasonString(const char *str)
@@ -448,14 +429,14 @@ void PropertiesList::reasonString(const char *str)
 	reasonString((const uint8_t *)str, strlen(str));
 }
 
-BasicBuf PropertiesList::reasonString(void)
+const std::vector<uint8_t> &PropertiesList::reasonString(void)
 {
-	return valueBuf(PropertyId::REASON_STR);
+	return valueBinary(PropertyId::REASON_STR);
 }
 
 void PropertiesList::receiveMaximum(uint16_t v)
 {
-	addNum<uint16_t>(PropertyId::RECEIVE_MAXIMUM, v);
+	append(PropertyId::RECEIVE_MAXIMUM, v);
 }
 
 uint16_t PropertiesList::receiveMaximum(void)
@@ -465,7 +446,7 @@ uint16_t PropertiesList::receiveMaximum(void)
 
 void PropertiesList::topicAliasMaximum(uint16_t v)
 {
-	addNum<uint16_t>(PropertyId::TOPIC_ALIAS_MAXIMUM, v);
+	append(PropertyId::TOPIC_ALIAS_MAXIMUM, v);
 }
 
 uint16_t PropertiesList::topicAliasMaximum(void)
@@ -475,7 +456,7 @@ uint16_t PropertiesList::topicAliasMaximum(void)
 
 void PropertiesList::topicAlias(uint16_t v)
 {
-	addNum<uint16_t>(PropertyId::TOPIC_ALIAS, v);
+	append(PropertyId::TOPIC_ALIAS, v);
 }
 
 uint16_t PropertiesList::topicAlias(void)
@@ -494,7 +475,7 @@ void PropertiesList::maximumQoS(PktQoS qos)
 		throw std::invalid_argument("Invalid QoS value");
 	}
 
-	addNum<uint8_t>(PropertyId::MAXIMUM_QOS, (uint8_t)qos);
+	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos);
 }
 
 PktQoS PropertiesList::maximumQoS(void)
@@ -504,7 +485,7 @@ PktQoS PropertiesList::maximumQoS(void)
 
 void PropertiesList::retainAvailable(bool v)
 {
-	addNum<uint8_t>(PropertyId::RETAIN_AVAILABLE, v);
+	append(PropertyId::RETAIN_AVAILABLE, v);
 }
 
 bool PropertiesList::retainAvailable(void)
@@ -512,42 +493,25 @@ bool PropertiesList::retainAvailable(void)
 	return valueNum(PropertyId::RETAIN_AVAILABLE);
 }
 
-void PropertiesList::userProperty(const uint8_t *key, uint16_t key_size,
-				  const uint8_t *val, uint16_t val_size)
+void PropertiesList::userProperty(const uint8_t *key, uint16_t key_len,
+				  const uint8_t *value, uint16_t value_len)
 {
-	if (!isAllowed(PropertyId::USER_PROPERTY)) {
-		return;
-	}
-
-	PropertyNodeKeyVal *kv;
-	kv = new PropertyNodeKeyVal(PropertyId::USER_PROPERTY,
-				    key, key_size,
-				    val, val_size);
-	this->push(kv);
-	this->enabledProperties += __POW2(PropertyId::USER_PROPERTY);
+	append(key, key_len, value, value_len);
 }
 
 void PropertiesList::userProperty(const char *key, const char *val)
 {
-	userProperty((const uint8_t *)key, strlen(key),
-		     (const uint8_t *)val, strlen(val));
+	userProperty((const uint8_t *)key, strlen(key), (const uint8_t *)val, strlen(val));
 }
 
-void PropertiesList::userProperty(std::list< std::pair<BasicBuf, BasicBuf> > &l)
+const UserProperty &PropertiesList::userProperty(void)
 {
-	auto all = propList.equal_range(PropertyId::USER_PROPERTY);
-	for (auto it = all.first; it != all.second; it++) {
-		PropertyNodeKeyVal *node = (PropertyNodeKeyVal *)((*it).second);
-
-		BasicBuf key(node->key.data(), node->key.size());
-		BasicBuf value(node->value.data(), node->value.size());
-		l.push_back(std::pair<BasicBuf, BasicBuf>(key, value));
-	}
+	return userProps;
 }
 
 void PropertiesList::maximumPacketSize(uint32_t v)
 {
-	addNum<uint32_t>(PropertyId::MAXIMUM_PACKET_SIZE, v);
+	append(PropertyId::MAXIMUM_PACKET_SIZE, v);
 }
 
 uint32_t PropertiesList::maximumPacketSize(void)
@@ -557,7 +521,7 @@ uint32_t PropertiesList::maximumPacketSize(void)
 
 void PropertiesList::wildcardSubscriptionAvailable(bool v)
 {
-	addNum<uint8_t>(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v);
+	append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v);
 }
 
 bool PropertiesList::wildcardSubscriptionAvailable(void)
@@ -567,7 +531,7 @@ bool PropertiesList::wildcardSubscriptionAvailable(void)
 
 void PropertiesList::subscriptionIdentifierAvailable(bool v)
 {
-	addNum<uint8_t>(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v);
+	append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v);
 }
 
 bool PropertiesList::subscriptionIdentifierAvailable(void)
@@ -577,7 +541,7 @@ bool PropertiesList::subscriptionIdentifierAvailable(void)
 
 void PropertiesList::sharedSubscriptionAvailable(bool v)
 {
-	addNum<uint8_t>(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v);
+	append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v);
 }
 
 bool PropertiesList::sharedSubscriptionAvailable(void)
