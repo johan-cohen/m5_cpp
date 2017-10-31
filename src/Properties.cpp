@@ -219,7 +219,7 @@ void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
 	enableProperty(id);
 }
 
-const std::vector<uint8_t> &PropertiesList::valueBinary(PropertyId id)
+const std::vector<uint8_t> &PropertiesList::valueBinary(PropertyId id) const
 {
 	if (!isEnabled(id)) {
 		static auto none = std::vector<uint8_t>();
@@ -232,7 +232,7 @@ const std::vector<uint8_t> &PropertiesList::valueBinary(PropertyId id)
 	return (*it).second;
 }
 
-uint32_t PropertiesList::valueNum(PropertyId id)
+uint32_t PropertiesList::valueNum(PropertyId id) const
 {
 	if (!isEnabled(id)) {
 		return 0;
@@ -253,7 +253,7 @@ void PropertiesList::payloadFormatIndicator(uint8_t v)
 	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v, 1);
 }
 
-uint8_t PropertiesList::payloadFormatIndicator(void)
+uint8_t PropertiesList::payloadFormatIndicator(void) const
 {
 	return valueNum(PropertyId::PAYLOAD_FORMAT_INDICATOR);
 }
@@ -263,7 +263,7 @@ void PropertiesList::publicationExpiryInterval(uint32_t v)
 	append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v, 4);
 }
 
-uint32_t PropertiesList::publicationExpiryInterval(void)
+uint32_t PropertiesList::publicationExpiryInterval(void) const
 {
 	return valueNum(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
 }
@@ -278,7 +278,7 @@ void PropertiesList::contentType(const char *str)
 	contentType((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::contentType(void)
+const std::vector<uint8_t> &PropertiesList::contentType(void) const
 {
 	return valueBinary(PropertyId::CONTENT_TYPE);
 }
@@ -293,7 +293,7 @@ void PropertiesList::responseTopic(const char *str)
 	responseTopic((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::responseTopic(void)
+const std::vector<uint8_t> &PropertiesList::responseTopic(void) const
 {
 	return valueBinary(PropertyId::RESPONSE_TOPIC);
 }
@@ -304,7 +304,7 @@ void PropertiesList::subscriptionIdentifier(uint32_t v)
 	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v, ws);
 }
 
-uint32_t PropertiesList::subscriptionIdentifier(void)
+uint32_t PropertiesList::subscriptionIdentifier(void) const
 {
 	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER);
 }
@@ -314,7 +314,7 @@ void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
 	append(PropertyId::CORRELATION_DATA, data, size);
 }
 
-const std::vector<uint8_t> &PropertiesList::correlationData(void)
+const std::vector<uint8_t> &PropertiesList::correlationData(void) const
 {
 	return valueBinary(PropertyId::CORRELATION_DATA);
 }
@@ -324,7 +324,7 @@ void PropertiesList::sessionExpiryInterval(uint32_t v)
 	append(PropertyId::SESSION_EXPIRY_INTERVAL, v, 4);
 }
 
-uint32_t PropertiesList::sessionExpiryInterval(void)
+uint32_t PropertiesList::sessionExpiryInterval(void) const
 {
 	return valueNum(PropertyId::SESSION_EXPIRY_INTERVAL);
 }
@@ -339,7 +339,7 @@ void PropertiesList::assignedClientIdentifier(const char *str)
 	assignedClientIdentifier((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::assignedClientIdentifier(void)
+const std::vector<uint8_t> &PropertiesList::assignedClientIdentifier(void) const
 {
 	return valueBinary(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
@@ -349,7 +349,7 @@ void PropertiesList::serverKeepAlive(uint16_t v)
 	append(PropertyId::SERVER_KEEP_ALIVE, v, 2);
 }
 
-uint16_t PropertiesList::serverKeepAlive(void)
+uint16_t PropertiesList::serverKeepAlive(void) const
 {
 	return valueNum(PropertyId::SERVER_KEEP_ALIVE);
 }
@@ -364,7 +364,7 @@ void PropertiesList::authenticationMethod(const char *str)
 	authenticationMethod((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::authenticationMethod(void)
+const std::vector<uint8_t> &PropertiesList::authenticationMethod(void) const
 {
 	return valueBinary(PropertyId::AUTH_METHOD);
 }
@@ -374,7 +374,7 @@ void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
 	append(PropertyId::AUTH_DATA, data, size);
 }
 
-const std::vector<uint8_t> &PropertiesList::authenticationData(void)
+const std::vector<uint8_t> &PropertiesList::authenticationData(void) const
 {
 	return valueBinary(PropertyId::AUTH_DATA);
 }
@@ -384,7 +384,7 @@ void PropertiesList::requestProblemInformation(bool v)
 	append(PropertyId::REQUEST_PROBLEM_INFORMATION, v, 1);
 }
 
-bool PropertiesList::requestProblemInformation(void)
+bool PropertiesList::requestProblemInformation(void) const
 {
 	return valueNum(PropertyId::REQUEST_PROBLEM_INFORMATION);
 }
@@ -394,7 +394,7 @@ void PropertiesList::willDelayInterval(uint32_t v)
 	append(PropertyId::WILL_DELAY_INTERVAL, v, 4);
 }
 
-uint32_t PropertiesList::willDelayInterval(void)
+uint32_t PropertiesList::willDelayInterval(void) const
 {
 	return valueNum(PropertyId::WILL_DELAY_INTERVAL);
 }
@@ -404,7 +404,7 @@ void PropertiesList::requestResponseInformation(bool v)
 	append(PropertyId::REQUEST_RESPONSE_INFORMATION, v, 1);
 }
 
-bool PropertiesList::requestResponseInformation(void)
+bool PropertiesList::requestResponseInformation(void) const
 {
 	return valueNum(PropertyId::REQUEST_RESPONSE_INFORMATION);
 }
@@ -419,7 +419,7 @@ void PropertiesList::responseInformation(const char *str)
 	responseInformation((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::responseInformation(void)
+const std::vector<uint8_t> &PropertiesList::responseInformation(void) const
 {
 	return valueBinary(PropertyId::RESPONSE_INFORMATION);
 }
@@ -434,7 +434,7 @@ void PropertiesList::serverReference(const char *str)
 	serverReference((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::serverReference(void)
+const std::vector<uint8_t> &PropertiesList::serverReference(void) const
 {
 	return valueBinary(PropertyId::SERVER_REFERENCE);
 }
@@ -449,7 +449,7 @@ void PropertiesList::reasonString(const char *str)
 	reasonString((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::reasonString(void)
+const std::vector<uint8_t> &PropertiesList::reasonString(void) const
 {
 	return valueBinary(PropertyId::REASON_STR);
 }
@@ -459,7 +459,7 @@ void PropertiesList::receiveMaximum(uint16_t v)
 	append(PropertyId::RECEIVE_MAXIMUM, v, 2);
 }
 
-uint16_t PropertiesList::receiveMaximum(void)
+uint16_t PropertiesList::receiveMaximum(void) const
 {
 	return valueNum(PropertyId::RECEIVE_MAXIMUM);
 }
@@ -469,7 +469,7 @@ void PropertiesList::topicAliasMaximum(uint16_t v)
 	append(PropertyId::TOPIC_ALIAS_MAXIMUM, v, 2);
 }
 
-uint16_t PropertiesList::topicAliasMaximum(void)
+uint16_t PropertiesList::topicAliasMaximum(void) const
 {
 	return valueNum(PropertyId::TOPIC_ALIAS_MAXIMUM);
 }
@@ -479,7 +479,7 @@ void PropertiesList::topicAlias(uint16_t v)
 	append(PropertyId::TOPIC_ALIAS, v, 2);
 }
 
-uint16_t PropertiesList::topicAlias(void)
+uint16_t PropertiesList::topicAlias(void) const
 {
 	return valueNum(PropertyId::TOPIC_ALIAS);
 }
@@ -498,7 +498,7 @@ void PropertiesList::maximumQoS(PktQoS qos)
 	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
 }
 
-PktQoS PropertiesList::maximumQoS(void)
+PktQoS PropertiesList::maximumQoS(void) const
 {
 	return (PktQoS)valueNum(PropertyId::MAXIMUM_QOS);
 }
@@ -508,7 +508,7 @@ void PropertiesList::retainAvailable(bool v)
 	append(PropertyId::RETAIN_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::retainAvailable(void)
+bool PropertiesList::retainAvailable(void) const
 {
 	return valueNum(PropertyId::RETAIN_AVAILABLE);
 }
@@ -524,7 +524,7 @@ void PropertiesList::userProperty(const char *key, const char *val)
 	userProperty((const uint8_t *)key, strlen(key), (const uint8_t *)val, strlen(val));
 }
 
-const UserProperty &PropertiesList::userProperty(void)
+const UserProperty &PropertiesList::userProperty(void) const
 {
 	return userProps;
 }
@@ -534,7 +534,7 @@ void PropertiesList::maximumPacketSize(uint32_t v)
 	append(PropertyId::MAXIMUM_PACKET_SIZE, v, 4);
 }
 
-uint32_t PropertiesList::maximumPacketSize(void)
+uint32_t PropertiesList::maximumPacketSize(void) const
 {
 	return valueNum(PropertyId::MAXIMUM_PACKET_SIZE);
 }
@@ -544,7 +544,7 @@ void PropertiesList::wildcardSubscriptionAvailable(bool v)
 	append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::wildcardSubscriptionAvailable(void)
+bool PropertiesList::wildcardSubscriptionAvailable(void) const
 {
 	return valueNum(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
 }
@@ -554,7 +554,7 @@ void PropertiesList::subscriptionIdentifierAvailable(bool v)
 	append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::subscriptionIdentifierAvailable(void)
+bool PropertiesList::subscriptionIdentifierAvailable(void) const
 {
 	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
 }
@@ -564,7 +564,7 @@ void PropertiesList::sharedSubscriptionAvailable(bool v)
 	append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::sharedSubscriptionAvailable(void)
+bool PropertiesList::sharedSubscriptionAvailable(void) const
 {
 	return valueNum(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 }

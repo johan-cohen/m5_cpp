@@ -72,8 +72,8 @@ private:
 	void append(const uint8_t *key, uint16_t key_size,
 		    const uint8_t *value, uint16_t value_size);
 
-	const std::vector<uint8_t> &valueBinary(PropertyId id);
-	uint32_t valueNum(PropertyId id);
+	const std::vector<uint8_t> &valueBinary(PropertyId id) const;
+	uint32_t valueNum(PropertyId id) const;
 
 	void resetPacketType(const enum PktType type);
 
@@ -94,94 +94,94 @@ public:
 	bool isEnabled(PropertyId id) const;
 
 	void payloadFormatIndicator(uint8_t v);
-	uint8_t payloadFormatIndicator(void);
+	uint8_t payloadFormatIndicator(void) const;
 
 	void publicationExpiryInterval(uint32_t v);
-	uint32_t publicationExpiryInterval(void);
+	uint32_t publicationExpiryInterval(void) const;
 
 	void contentType(const uint8_t *data, uint16_t size);
 	void contentType(const char *str);
-	const std::vector<uint8_t> &contentType(void);
+	const std::vector<uint8_t> &contentType(void) const;
 
 	void responseTopic(const uint8_t *data, uint16_t size);
 	void responseTopic(const char *str);
-	const std::vector<uint8_t> &responseTopic(void);
+	const std::vector<uint8_t> &responseTopic(void) const;
 
 	void subscriptionIdentifier(uint32_t v);
-	uint32_t subscriptionIdentifier(void);
+	uint32_t subscriptionIdentifier(void) const;
 
 	void correlationData(const uint8_t *data, uint16_t size);
-	const std::vector<uint8_t> &correlationData(void);
+	const std::vector<uint8_t> &correlationData(void) const;
 
 	void sessionExpiryInterval(uint32_t v);
-	uint32_t sessionExpiryInterval(void);
+	uint32_t sessionExpiryInterval(void) const;
 
 	void assignedClientIdentifier(const uint8_t *data, uint16_t size);
 	void assignedClientIdentifier(const char *str);
-	const std::vector<uint8_t> &assignedClientIdentifier(void);
+	const std::vector<uint8_t> &assignedClientIdentifier(void) const;
 
 	void serverKeepAlive(uint16_t v);
-	uint16_t serverKeepAlive(void);
+	uint16_t serverKeepAlive(void) const;
 
 	void authenticationMethod(const uint8_t *data, uint16_t size);
 	void authenticationMethod(const char *str);
-	const std::vector<uint8_t> &authenticationMethod(void);
+	const std::vector<uint8_t> &authenticationMethod(void) const;
 
 	void authenticationData(const uint8_t *data, uint16_t size);
-	const std::vector<uint8_t> &authenticationData(void);
+	const std::vector<uint8_t> &authenticationData(void) const;
 
 	void requestProblemInformation(bool v);
-	bool requestProblemInformation(void);
+	bool requestProblemInformation(void) const;
 
 	void willDelayInterval(uint32_t v);
-	uint32_t willDelayInterval(void);
+	uint32_t willDelayInterval(void) const;
 
 	void requestResponseInformation(bool v);
-	bool requestResponseInformation(void);
+	bool requestResponseInformation(void) const;
 
 	void responseInformation(const uint8_t *data, uint16_t size);
 	void responseInformation(const char *str);
-	const std::vector<uint8_t> &responseInformation(void);
+	const std::vector<uint8_t> &responseInformation(void) const;
 
 	void serverReference(const uint8_t *data, uint16_t size);
 	void serverReference(const char *str);
-	const std::vector<uint8_t> &serverReference(void);
+	const std::vector<uint8_t> &serverReference(void) const;
 
 	void reasonString(const uint8_t *data, uint16_t size);
 	void reasonString(const char *str);
-	const std::vector<uint8_t> &reasonString(void);
+	const std::vector<uint8_t> &reasonString(void) const;
 
 	void receiveMaximum(uint16_t v);
-	uint16_t receiveMaximum(void);
+	uint16_t receiveMaximum(void) const;
 
 	void topicAliasMaximum(uint16_t v);
-	uint16_t topicAliasMaximum(void);
+	uint16_t topicAliasMaximum(void) const;
 
 	void topicAlias(uint16_t v);
-	uint16_t topicAlias(void);
+	uint16_t topicAlias(void) const;
 
 	void maximumQoS(PktQoS qos);
-	PktQoS maximumQoS(void);
+	PktQoS maximumQoS(void) const;
 
 	void retainAvailable(bool v);
-	bool retainAvailable(void);
+	bool retainAvailable(void) const;
 
 	void userProperty(const uint8_t *key, uint16_t key_size,
 			  const uint8_t *value, uint16_t value_size);
 	void userProperty(const char *key, const char *val);
-	const UserProperty &userProperty(void);
+	const UserProperty &userProperty(void) const;
 
 	void maximumPacketSize(uint32_t v);
-	uint32_t maximumPacketSize(void);
+	uint32_t maximumPacketSize(void) const;
 
 	void wildcardSubscriptionAvailable(bool v);
-	bool wildcardSubscriptionAvailable(void);
+	bool wildcardSubscriptionAvailable(void) const;
 
 	void subscriptionIdentifierAvailable(bool v);
-	bool subscriptionIdentifierAvailable(void);
+	bool subscriptionIdentifierAvailable(void) const;
 
 	void sharedSubscriptionAvailable(bool v);
-	bool sharedSubscriptionAvailable(void);
+	bool sharedSubscriptionAvailable(void) const;
 
 	uint32_t wireSize(void) const { return _wireSize; }
 };
