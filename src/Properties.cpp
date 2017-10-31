@@ -210,9 +210,17 @@ void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
 
 	if (isEnabled(id)) {
 		auto it = numProps.find(id);
-		(*it).second = value;
+		NumSize &numSize = (*it).second;
+
+		numSize.num = value;
+		numSize.size = wireSize;
 	} else {
-		numProps.insert(NumPropPair((uint8_t)id, value));
+		struct NumSize numSize;
+
+		numSize.num = value;
+		numSize.size = wireSize;
+
+		numProps.insert(NumPropPair((uint8_t)id, numSize));
 		this->_wireSize += propertyIdSize + wireSize;
 	}
 
@@ -240,7 +248,7 @@ uint32_t PropertiesList::valueNum(PropertyId id) const
 
 	auto it = numProps.find(id);
 
-	return (*it).second;
+	return ((*it).second).num;
 }
 
 void PropertiesList::enableProperty(PropertyId id)

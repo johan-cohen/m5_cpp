@@ -50,14 +50,16 @@
 namespace m5 {
 
 typedef std::pair<std::vector<uint8_t>, std::vector<uint8_t> > KeyValuePair;
-typedef std::pair<uint8_t, std::vector<uint8_t> > BinaryPropPair;
-typedef std::pair<uint8_t, uint32_t> NumPropPair;
 typedef std::list<KeyValuePair> UserProperty;
 
 class PropertiesList {
 private:
+	struct NumSize { uint32_t num; uint8_t size; };
+	typedef std::pair<uint8_t, std::vector<uint8_t> > BinaryPropPair;
+	typedef std::pair<uint8_t, NumSize> NumPropPair;
+
 	std::map<uint8_t, std::vector<uint8_t> > binProps;
-	std::map<uint8_t, uint32_t> numProps;
+	std::map<uint8_t, NumSize> numProps;
 	UserProperty userProps;
 
 	enum PktType pktType = PktType::RESERVED;
