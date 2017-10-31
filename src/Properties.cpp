@@ -194,8 +194,9 @@ void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
 		item.assign(data, data + size);
 
 	} else {
-		binProps.insert(
-			BinaryPropPair(id, std::vector<uint8_t>(data, data + size)));
+		/* assume compiler will optimize this... */
+		auto item = std::vector<uint8_t>(data, data + size);
+		binProps.insert(BinaryPropPair(id, item));
 		enableProperty(id);
 
 		this->_wireSize += propertyIdSize + binaryLenSize + size;
@@ -529,7 +530,8 @@ void PropertiesList::userProperty(const uint8_t *key, uint16_t keySize,
 
 void PropertiesList::userProperty(const char *key, const char *val)
 {
-	userProperty((const uint8_t *)key, strlen(key), (const uint8_t *)val, strlen(val));
+	userProperty((const uint8_t *)key, strlen(key),
+		     (const uint8_t *)val, strlen(val));
 }
 
 const UserProperty &PropertiesList::userProperty(void) const
