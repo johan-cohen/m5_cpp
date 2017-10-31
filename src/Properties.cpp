@@ -705,6 +705,11 @@ uint32_t PropertiesList::read(AppBuf &buf)
 
 uint32_t PropertiesList::write(AppBuf &buf)
 {
+	auto fullLen = this->wireSize() + VBIWireSize(this->wireSize());
+	if (fullLen > buf.bytesToWrite()) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
 	buf.writeVBI(this->wireSize());
 
 	auto itNum = numProps.begin();
