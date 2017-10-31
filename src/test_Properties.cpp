@@ -69,7 +69,7 @@ static key_val KeyVal[] = {
 
 static const std::vector<uint8_t> msg(MSG, MSG + MSG_LEN);
 
-int test_PropertiesList()
+int test_Properties(void)
 {
 	m5::PropertiesList *propList;
 	uint32_t wireSize = 0;
@@ -299,8 +299,8 @@ int main(void)
 {
 	int rc;
 
-	rc = test_PropertiesList();
-	test_rc(rc, "PropertiesList");
+	rc = test_Properties();
+	test_rc(rc, "Properties");
 
 	return 0;
 }
