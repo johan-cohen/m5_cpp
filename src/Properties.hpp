@@ -42,6 +42,7 @@
 #define __PROPERTIES_HPP__
 
 #include "Common.hpp"
+#include "AppBuf.hpp"
 
 #include <vector>
 #include <list>
@@ -186,6 +187,9 @@ public:
 	bool sharedSubscriptionAvailable(void) const;
 
 	uint32_t wireSize(void) const { return _wireSize; }
+
+	/* check AppBuf bounds before */
+	uint32_t write(AppBuf &buf);
 };
 
 }

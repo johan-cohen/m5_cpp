@@ -577,5 +577,57 @@ bool PropertiesList::sharedSubscriptionAvailable(void) const
 	return valueNum(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 }
 
+uint32_t PropertiesList::write(AppBuf &buf)
+{
+	buf.writeVBI(this->wireSize());
+
+	auto itNum = numProps.begin();
+	while (itNum != numProps.end()) {
+		auto id = (*itNum).first;
+		auto num = (*itNum).second;
+
+		buf.writeNum8(id);
+		switch (num.size) {
+		case 1:
+			buf.writeNum8(num.num);
+			break;
+		case 2:
+			buf.writeNum16(num.num);
+			break;
+		case 4:
+			buf.writeNum32(num.num);
+			break;
+		default:
+			throw std::invalid_argument("Invalid integer size");
+		}
+
+		itNum++;
+	}
+
+	auto itBin = binProps.begin();
+	while (itBin != binProps.end()) {
+		auto id = (*itBin).first;
+		auto &item = (*itBin).second;
+
+		buf.writeNum8(id);
+		buf.writeBinary(&item[0], item.size());
+
+		itBin++;
+	}
+
+	auto itUser = userProps.begin();
+	while (itUser != userProps.end()) {
+		auto &key = (*itUser).first;
+		auto &value = (*itUser).second;
+
+		buf.writeNum8(PropertyId::USER_PROPERTY);
+		buf.writeBinary(&key[0], key.size());
+		buf.writeBinary(&value[0], value.size());
+
+		itUser++;
+	}
+
+	return this->_wireSize;
 }
 
+}
