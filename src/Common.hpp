@@ -46,6 +46,7 @@
 
 namespace m5 {
 
+static const uint32_t propertyIdSize = 1;
 static const uint32_t binaryLenSize = 2;
 static const uint32_t stringLenSize = binaryLenSize;
 static const uint32_t integerLenSize = 2;

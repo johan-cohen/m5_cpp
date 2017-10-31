@@ -170,6 +170,10 @@ void PropertiesList::append(const uint8_t *key, uint16_t key_size,
 	userProps.push_back(KeyValuePair(_key, _val));
 
 	enableProperty(PropertyId::USER_PROPERTY);
+
+	this->_wireSize += propertyIdSize +
+			   binaryLenSize + key_size +
+			   binaryLenSize + value_size;
 }
 
 void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
@@ -185,16 +189,20 @@ void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
 		}
 
 		std::vector<uint8_t> &item = (*it).second;
+		this->_wireSize += -item.size() + size;
+
 		item.assign(data, data + size);
 
 	} else {
 		binProps.insert(
 			BinaryPropPair(id, std::vector<uint8_t>(data, data + size)));
 		enableProperty(id);
+
+		this->_wireSize += propertyIdSize + binaryLenSize + size;
 	}
 }
 
-void PropertiesList::append(PropertyId id, uint32_t value)
+void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
 {
 	if (!isAllowed(id)) {
 		return;
@@ -205,6 +213,7 @@ void PropertiesList::append(PropertyId id, uint32_t value)
 		(*it).second = value;
 	} else {
 		numProps.insert(NumPropPair((uint8_t)id, value));
+		this->_wireSize += propertyIdSize + wireSize;
 	}
 
 	enableProperty(id);
@@ -241,7 +250,7 @@ void PropertiesList::enableProperty(PropertyId id)
 
 void PropertiesList::payloadFormatIndicator(uint8_t v)
 {
-	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v);
+	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v, 1);
 }
 
 uint8_t PropertiesList::payloadFormatIndicator(void)
@@ -251,7 +260,7 @@ uint8_t PropertiesList::payloadFormatIndicator(void)
 
 void PropertiesList::publicationExpiryInterval(uint32_t v)
 {
-	append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v);
+	append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v, 4);
 }
 
 uint32_t PropertiesList::publicationExpiryInterval(void)
@@ -291,7 +300,8 @@ const std::vector<uint8_t> &PropertiesList::responseTopic(void)
 
 void PropertiesList::subscriptionIdentifier(uint32_t v)
 {
-	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v);
+	auto ws = VBIWireSize(v);
+	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v, ws);
 }
 
 uint32_t PropertiesList::subscriptionIdentifier(void)
@@ -311,7 +321,7 @@ const std::vector<uint8_t> &PropertiesList::correlationData(void)
 
 void PropertiesList::sessionExpiryInterval(uint32_t v)
 {
-	append(PropertyId::SESSION_EXPIRY_INTERVAL, v);
+	append(PropertyId::SESSION_EXPIRY_INTERVAL, v, 4);
 }
 
 uint32_t PropertiesList::sessionExpiryInterval(void)
@@ -336,7 +346,7 @@ const std::vector<uint8_t> &PropertiesList::assignedClientIdentifier(void)
 
 void PropertiesList::serverKeepAlive(uint16_t v)
 {
-	append(PropertyId::SERVER_KEEP_ALIVE, v);
+	append(PropertyId::SERVER_KEEP_ALIVE, v, 2);
 }
 
 uint16_t PropertiesList::serverKeepAlive(void)
@@ -371,7 +381,7 @@ const std::vector<uint8_t> &PropertiesList::authenticationData(void)
 
 void PropertiesList::requestProblemInformation(bool v)
 {
-	append(PropertyId::REQUEST_PROBLEM_INFORMATION, v);
+	append(PropertyId::REQUEST_PROBLEM_INFORMATION, v, 1);
 }
 
 bool PropertiesList::requestProblemInformation(void)
@@ -381,7 +391,7 @@ bool PropertiesList::requestProblemInformation(void)
 
 void PropertiesList::willDelayInterval(uint32_t v)
 {
-	append(PropertyId::WILL_DELAY_INTERVAL, v);
+	append(PropertyId::WILL_DELAY_INTERVAL, v, 4);
 }
 
 uint32_t PropertiesList::willDelayInterval(void)
@@ -391,7 +401,7 @@ uint32_t PropertiesList::willDelayInterval(void)
 
 void PropertiesList::requestResponseInformation(bool v)
 {
-	append(PropertyId::REQUEST_RESPONSE_INFORMATION, v);
+	append(PropertyId::REQUEST_RESPONSE_INFORMATION, v, 1);
 }
 
 bool PropertiesList::requestResponseInformation(void)
@@ -446,7 +456,7 @@ const std::vector<uint8_t> &PropertiesList::reasonString(void)
 
 void PropertiesList::receiveMaximum(uint16_t v)
 {
-	append(PropertyId::RECEIVE_MAXIMUM, v);
+	append(PropertyId::RECEIVE_MAXIMUM, v, 2);
 }
 
 uint16_t PropertiesList::receiveMaximum(void)
@@ -456,7 +466,7 @@ uint16_t PropertiesList::receiveMaximum(void)
 
 void PropertiesList::topicAliasMaximum(uint16_t v)
 {
-	append(PropertyId::TOPIC_ALIAS_MAXIMUM, v);
+	append(PropertyId::TOPIC_ALIAS_MAXIMUM, v, 2);
 }
 
 uint16_t PropertiesList::topicAliasMaximum(void)
@@ -466,7 +476,7 @@ uint16_t PropertiesList::topicAliasMaximum(void)
 
 void PropertiesList::topicAlias(uint16_t v)
 {
-	append(PropertyId::TOPIC_ALIAS, v);
+	append(PropertyId::TOPIC_ALIAS, v, 2);
 }
 
 uint16_t PropertiesList::topicAlias(void)
@@ -485,7 +495,7 @@ void PropertiesList::maximumQoS(PktQoS qos)
 		throw std::invalid_argument("Invalid QoS value");
 	}
 
-	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos);
+	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
 }
 
 PktQoS PropertiesList::maximumQoS(void)
@@ -495,7 +505,7 @@ PktQoS PropertiesList::maximumQoS(void)
 
 void PropertiesList::retainAvailable(bool v)
 {
-	append(PropertyId::RETAIN_AVAILABLE, v);
+	append(PropertyId::RETAIN_AVAILABLE, v, 1);
 }
 
 bool PropertiesList::retainAvailable(void)
@@ -521,7 +531,7 @@ const UserProperty &PropertiesList::userProperty(void)
 
 void PropertiesList::maximumPacketSize(uint32_t v)
 {
-	append(PropertyId::MAXIMUM_PACKET_SIZE, v);
+	append(PropertyId::MAXIMUM_PACKET_SIZE, v, 4);
 }
 
 uint32_t PropertiesList::maximumPacketSize(void)
@@ -531,7 +541,7 @@ uint32_t PropertiesList::maximumPacketSize(void)
 
 void PropertiesList::wildcardSubscriptionAvailable(bool v)
 {
-	append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v);
+	append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
 bool PropertiesList::wildcardSubscriptionAvailable(void)
@@ -541,7 +551,7 @@ bool PropertiesList::wildcardSubscriptionAvailable(void)
 
 void PropertiesList::subscriptionIdentifierAvailable(bool v)
 {
-	append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v);
+	append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v, 1);
 }
 
 bool PropertiesList::subscriptionIdentifierAvailable(void)
@@ -551,7 +561,7 @@ bool PropertiesList::subscriptionIdentifierAvailable(void)
 
 void PropertiesList::sharedSubscriptionAvailable(bool v)
 {
-	append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v);
+	append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
 bool PropertiesList::sharedSubscriptionAvailable(void)

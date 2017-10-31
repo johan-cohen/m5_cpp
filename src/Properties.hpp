@@ -63,11 +63,12 @@ private:
 	enum PktType pktType = PktType::RESERVED;
 	uint64_t enabledProperties = 0;
 	uint64_t properties = 0;
+	uint32_t _wireSize = 0;
 
 	void computePktFlags(void);
 
 	void append(PropertyId id, const uint8_t *data, uint16_t size);
-	void append(PropertyId id, uint32_t v);
+	void append(PropertyId id, uint32_t v, uint32_t wireSize);
 	void append(const uint8_t *key, uint16_t key_size,
 		    const uint8_t *value, uint16_t value_size);
 
@@ -181,6 +182,8 @@ public:
 
 	void sharedSubscriptionAvailable(bool v);
 	bool sharedSubscriptionAvailable(void);
+
+	uint32_t wireSize(void) const { return _wireSize; }
 };
 
 }
