@@ -39,6 +39,7 @@
  */
 
 #include "PktConnect.hpp"
+
 #include <stdexcept>
 #include <cstring>
 
@@ -137,12 +138,6 @@ uint32_t PktConnect::payloadWireSize(void) const
 	return wireSize;
 }
 
-uint32_t PktConnect::propertiesWireSize(void) const
-{
-	/* xxx */
-	return 0;
-}
-
 void PktConnect::writePayload(AppBuf &buf)
 {
 	buf.writeBinary(clientId->rawData(), clientId->length());
@@ -161,31 +156,25 @@ void PktConnect::writePayload(AppBuf &buf)
 	}
 }
 
-void PktConnect::writeProperties(AppBuf &buf, uint32_t propWireSize)
-{
-	(void)propWireSize;
-
-	/* xxx So far, propWS is zero */
-	buf.writeVBI(0);
-}
-
 void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 {
 	this->setClientId(clientId, len);
 	this->setCleanStart(cleanStart);
 }
 
-PktConnect::PktConnect(AppBuf &buf)
+PktConnect::PktConnect(AppBuf &buf) : properties(PktType::CONNECT)
 {
 	this->readFrom(buf);
 }
 
-PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart)
+PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
+		       properties(PktType::CONNECT)
 {
 	init(clientId, len, cleanStart);
 }
 
-PktConnect::PktConnect(const char *clientId, bool cleanStart)
+PktConnect::PktConnect(const char *clientId, bool cleanStart) :
+		       properties(PktType::CONNECT)
 {
 	init((const uint8_t *)clientId, strlen(clientId), cleanStart);
 }
@@ -209,7 +198,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	uint32_t remLen;
 
 	payloadWS = payloadWireSize();
-	propWS = propertiesWireSize();
+	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
 
 	remLen = 1 + 2 + 4 + 1 + 2 + propWSWS + propWS + payloadWS;
@@ -226,8 +215,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	buf.writeNum8(protocolVersion5);
 	buf.writeNum8(packConnectFlags());
 	buf.writeNum16(this->keepAlive);
-
-	writeProperties(buf, propWS);
+	properties.write(buf);
 	writePayload(buf);
 
 	return fullPktSize;
@@ -238,7 +226,6 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint8_t connectFlags;
 	uint8_t remLenWS;
-	uint32_t propLen;
 	uint32_t remLen;
 	uint8_t first;
 
@@ -278,10 +265,8 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	keepAlive = buf.readNum16();
 
-	propLen = buf.readVBI();
-	/* xxx Implement properties reading */
-	buf.readSkip(propLen);
-
+	properties.read(buf);
+	
 	this->clientId = AppBuf::createFrom(buf, buf.readNum16());
 
 	if (flagWillMsg(connectFlags) == true) {

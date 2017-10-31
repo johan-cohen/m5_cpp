@@ -42,6 +42,7 @@
 #define __PKT_CONNECT_HPP__
 
 #include "ProtoEntity.hpp"
+#include "Properties.hpp"
 #include "Common.hpp"
 
 #include <cstdint>
@@ -58,10 +59,8 @@ private:
 
 	uint8_t packConnectFlags(void);
 	uint32_t payloadWireSize(void) const;
-	uint32_t propertiesWireSize(void) const;
 
 	void writePayload(AppBuf &buf);
-	void writeProperties(AppBuf &buf, uint32_t propWireSize);
 
 	void init(const uint8_t *clientId, uint16_t len, bool cleanStart);
 
@@ -73,11 +72,13 @@ private:
 	bool flagUserName(uint8_t flags);
 
 public:
-	PktConnect() {};
+	PktConnect() : properties(PktType::CONNECT) {};
 	PktConnect(AppBuf &buf);
 	PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart = true);
 	PktConnect(const char *clientId, bool cleanStart = true);
 	~PktConnect();
+
+	PropertiesList properties;
 
 	AppBuf *clientId = nullptr;
 	AppBuf *willTopic = nullptr;
