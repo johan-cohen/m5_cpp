@@ -157,23 +157,23 @@ bool PropertiesList::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
-void PropertiesList::append(const uint8_t *key, uint16_t key_size,
-			    const uint8_t *value, uint16_t value_size)
+void PropertiesList::append(const uint8_t *key, uint16_t keySize,
+			    const uint8_t *value, uint16_t valueSize)
 {
 	if (!isAllowed(PropertyId::USER_PROPERTY)) {
 		return;
 	}
 
-	std::vector<uint8_t> _key(key, key + key_size);
-	std::vector<uint8_t> _val(value, value + value_size);
+	std::vector<uint8_t> _key(key, key + keySize);
+	std::vector<uint8_t> _val(value, value + valueSize);
 
 	userProps.push_back(KeyValuePair(_key, _val));
 
 	enableProperty(PropertyId::USER_PROPERTY);
 
 	this->_wireSize += propertyIdSize +
-			   binaryLenSize + key_size +
-			   binaryLenSize + value_size;
+			   binaryLenSize + keySize +
+			   binaryLenSize + valueSize;
 }
 
 void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
@@ -521,10 +521,10 @@ bool PropertiesList::retainAvailable(void) const
 	return valueNum(PropertyId::RETAIN_AVAILABLE);
 }
 
-void PropertiesList::userProperty(const uint8_t *key, uint16_t key_len,
-				  const uint8_t *value, uint16_t value_len)
+void PropertiesList::userProperty(const uint8_t *key, uint16_t keySize,
+				  const uint8_t *value, uint16_t valueSize)
 {
-	append(key, key_len, value, value_len);
+	append(key, keySize, value, valueSize);
 }
 
 void PropertiesList::userProperty(const char *key, const char *val)

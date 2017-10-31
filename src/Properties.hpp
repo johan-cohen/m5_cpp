@@ -72,8 +72,8 @@ private:
 
 	void append(PropertyId id, const uint8_t *data, uint16_t size);
 	void append(PropertyId id, uint32_t v, uint32_t wireSize);
-	void append(const uint8_t *key, uint16_t key_size,
-		    const uint8_t *value, uint16_t value_size);
+	void append(const uint8_t *key, uint16_t keySize,
+		    const uint8_t *value, uint16_t valueSize);
 
 	const std::vector<uint8_t> &valueBinary(PropertyId id) const;
 	uint32_t valueNum(PropertyId id) const;
@@ -169,8 +169,8 @@ public:
 	void retainAvailable(bool v);
 	bool retainAvailable(void) const;
 
-	void userProperty(const uint8_t *key, uint16_t key_size,
-			  const uint8_t *value, uint16_t value_size);
+	void userProperty(const uint8_t *key, uint16_t keySize,
+			  const uint8_t *value, uint16_t valueSize);
 	void userProperty(const char *key, const char *val);
 	const UserProperty &userProperty(void) const;
 
