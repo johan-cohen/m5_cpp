@@ -577,6 +577,130 @@ bool PropertiesList::sharedSubscriptionAvailable(void) const
 	return valueNum(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 }
 
+uint32_t PropertiesList::read(AppBuf &buf)
+{
+	uint32_t propWireSize;
+	uint32_t fieldLen;
+	uint32_t number;
+
+	propWireSize = buf.readVBI();
+	if (this->wireSize() >  buf.bytesToRead()) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	const uint32_t bytesAtBeginning = buf.bytesToRead();
+	while (bytesAtBeginning - buf.bytesToRead() < propWireSize) {
+		auto id = buf.readNum8();
+
+		switch (id) {
+		case PAYLOAD_FORMAT_INDICATOR:
+		case REQUEST_PROBLEM_INFORMATION:
+		case REQUEST_RESPONSE_INFORMATION:
+		case MAXIMUM_QOS:
+		case RETAIN_AVAILABLE:
+		case WILDCARD_SUBSCRIPTION_AVAILABLE:
+		case SUBSCRIPTION_IDENTIFIER_AVAILABLE:
+		case SHARED_SUBSCRIPTION_AVAILABLE:
+			if (buf.bytesToRead() < 1) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+
+			number = buf.readNum8();
+			fieldLen = 1;
+			this->append((PropertyId)id, number, fieldLen);
+			break;
+
+		case SERVER_KEEP_ALIVE:
+		case RECEIVE_MAXIMUM:
+		case TOPIC_ALIAS_MAXIMUM:
+		case TOPIC_ALIAS:
+			if (buf.bytesToRead() < 2) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+
+			number = buf.readNum16();
+			fieldLen = 2;
+			this->append((PropertyId)id, number, fieldLen);
+			break;
+
+		case PUBLICATION_EXPIRY_INTERVAL:
+		case SESSION_EXPIRY_INTERVAL:
+		case WILL_DELAY_INTERVAL:
+		case MAXIMUM_PACKET_SIZE:
+			if (buf.bytesToRead() < 4) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+
+			number = buf.readNum32();
+			fieldLen = 4;
+			this->append((PropertyId)id, number, fieldLen);
+			break;
+
+		case CONTENT_TYPE:
+		case RESPONSE_TOPIC:
+		case CORRELATION_DATA:
+		case ASSIGNED_CLIENT_IDENTIFIER:
+		case AUTH_METHOD:
+		case AUTH_DATA:
+		case RESPONSE_INFORMATION:
+		case SERVER_REFERENCE:
+		case REASON_STR:
+			if (buf.bytesToRead() < 2) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+			fieldLen = buf.readNum16();
+			if (buf.bytesToRead() < fieldLen) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+			this->append((PropertyId)id, buf.current(), fieldLen);
+			buf.readSkip(fieldLen);
+			break;
+
+		case SUBSCRIPTION_IDENTIFIER:
+			this->append((PropertyId)id, buf.readVBI(), VBIWireSize(number));
+			break;
+
+		case USER_PROPERTY:
+		{
+			const uint8_t *value;
+			const uint8_t *key;
+			uint16_t valueLen;
+			uint16_t keyLen;
+
+			if (buf.bytesToRead() < 2) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+
+			keyLen = buf.readNum16();
+			if (buf.bytesToRead() < keyLen) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+			key = buf.current();
+			buf.readSkip(keyLen);
+
+			valueLen = buf.readNum16();
+			if (buf.bytesToRead() < valueLen) {
+				throw std::invalid_argument("Invalid input buffer");
+			}
+			value = buf.current();
+			buf.readSkip(valueLen);
+
+			this->append(key, keyLen, value, valueLen);
+			break;
+		}
+		default:
+			throw std::invalid_argument("Invalid Property Id");
+		}
+	}
+
+	/* bytes read is different to wire size */
+	if (propWireSize != this->wireSize()) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	return this->wireSize();
+}
+
 uint32_t PropertiesList::write(AppBuf &buf)
 {
 	buf.writeVBI(this->wireSize());
