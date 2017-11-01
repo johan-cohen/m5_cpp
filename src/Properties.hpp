@@ -55,10 +55,10 @@ typedef std::list<KeyValuePair> UserProperty;
 class PropertiesList {
 private:
 	struct NumSize { uint32_t num; uint8_t size; };
-	typedef std::pair<uint8_t, ByteArray > BinaryPropPair;
+	typedef std::pair<uint8_t, ByteArray> BinaryPropPair;
 	typedef std::pair<uint8_t, NumSize> NumPropPair;
 
-	std::map<uint8_t, ByteArray > binProps;
+	std::map<uint8_t, ByteArray> binProps;
 	std::map<uint8_t, NumSize> numProps;
 	UserProperty userProps;
 
