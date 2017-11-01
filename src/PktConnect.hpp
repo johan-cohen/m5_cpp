@@ -46,16 +46,23 @@
 #include "Common.hpp"
 
 #include <cstdint>
+#include <vector>
 
 namespace m5 {
 
 class PktConnect : public ProtoEntity {
 private:
-	uint16_t keepAlive = 0;
+	uint16_t _keepAlive = 0;
 
-	uint8_t willRetain = 0;
-	uint8_t willQoS = 0;
-	uint8_t cleanStart = 1;
+	uint8_t _willRetain = 0;
+	uint8_t _willQoS = 0;
+	uint8_t _cleanStart = 1;
+
+	std::vector<uint8_t> _clientId;
+	std::vector<uint8_t> _willTopic;
+	std::vector<uint8_t> _willMsg;
+	std::vector<uint8_t> _userName;
+	std::vector<uint8_t> _password;
 
 	uint8_t packConnectFlags(void);
 	uint32_t payloadWireSize(void) const;
@@ -66,13 +73,13 @@ private:
 
 	bool flagCleanStart(uint8_t flags);
 	bool flagWillMsg(uint8_t flags);
-	uint8_t flagWillQoS(uint8_t flags);
+	PktQoS flagWillQoS(uint8_t flags);
 	bool flagWillRetain(uint8_t flags);
 	bool flagPassword(uint8_t flags);
 	bool flagUserName(uint8_t flags);
 
 public:
-	PktConnect() : properties(PktType::CONNECT) {};
+	PktConnect() : properties(PktType::CONNECT) {}
 	PktConnect(AppBuf &buf);
 	PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart = true);
 	PktConnect(const char *clientId, bool cleanStart = true);
@@ -80,44 +87,40 @@ public:
 
 	PropertiesList properties;
 
-	AppBuf *clientId = nullptr;
-	AppBuf *willTopic = nullptr;
-	AppBuf *willMsg = nullptr;
-	AppBuf *userName = nullptr;
-	AppBuf *password = nullptr;
-
-	uint16_t getKeepAlive(void) const { return this->keepAlive; }
-
-	bool getWillRetain(void) const { return this->willRetain; }
-
-	PktQoS getWillQoS(void) const { return (PktQoS)this->willQoS; }
-
-	bool getCleanStart(void) const { return this->cleanStart; }
-
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
 	uint32_t getId(void) const override;
 
-	void setClientId(const uint8_t *data, uint16_t size);
-	void setClientId(const char *str);
+	uint16_t keepAlive(void) const { return this->_keepAlive; }
+	void keepAlive(uint16_t keepAlive);
 
-	void setWill(const uint8_t *topic, uint16_t topic_size,
+	bool cleanStart(void) const { return this->_cleanStart; }
+	void cleanStart(bool cleanStart);
+
+	const std::vector<uint8_t> &clientId(void) const { return _clientId; }
+	void clientId(const uint8_t *data, uint16_t size);
+	void clientId(const char *str);
+
+	const std::vector<uint8_t> &willTopic(void) const { return _willTopic; }
+	const std::vector<uint8_t> &willMsg(void) const { return _willMsg; }
+
+	void will(const uint8_t *topic, uint16_t topic_size,
 		     const uint8_t *msg, uint16_t msg_size);
-	void setWill(const char *topic, const char *msg);
+	void will(const char *topic, const char *msg);
 
-	void setUserName(const uint8_t *data, uint16_t size);
-	void setUserName(const char *str);
+	bool willRetain(void) const { return this->_willRetain; }
+	void willRetain(bool willRetain);
 
-	void setPassword(const uint8_t *data, uint16_t size);
-	void setPassword(const char *str);
+	PktQoS willQoS(void) const { return (PktQoS)this->_willQoS; }
+	void willQoS(enum PktQoS qos);
 
-	void setKeyAlive(uint16_t keepAlive);
+	const std::vector<uint8_t> &userName(void) const { return _userName; }
+	void userName(const uint8_t *data, uint16_t size);
+	void userName(const char *str);
 
-	void setWillRetain(bool willRetain);
-
-	void setWillQoS(enum PktQoS qos);
-
-	void setCleanStart(bool cleanStart);
+	const std::vector<uint8_t> &password(void) const { return _password; }
+	void password(const uint8_t *data, uint16_t size);
+	void password(const char *str);
 };
 
 }

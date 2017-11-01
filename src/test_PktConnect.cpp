@@ -45,56 +45,40 @@
 #include <cstring>
 
 namespace m5 {
-	bool operator==(const AppBuf &a, const AppBuf &b) {
-		if (a.length() != b.length()) {
-			return false;
-		}
-
-		if (memcmp(a.rawData(), b.rawData(), a.length()) != 0) {
-			return false;
-		}
-
-		return true;
-	}
-
-	bool operator!=(const AppBuf &a, const AppBuf &b) {
-		return !(a == b);
-	}
-
 	bool operator==(const PktConnect &a, const PktConnect &b) {
-		if (a.getKeepAlive() != b.getKeepAlive()) {
+		if (a.keepAlive() != b.keepAlive()) {
 			return false;
 		}
 
-		if (a.getWillRetain() != b.getWillRetain()) {
+		if (a.willRetain() != b.willRetain()) {
 			return false;
 		}
 
-		if (a.getWillQoS() != b.getWillQoS()) {
+		if (a.willQoS() != b.willQoS()) {
 			return false;
 		}
 
-		if (a.getCleanStart() != b.getCleanStart()) {
+		if (a.cleanStart() != b.cleanStart()) {
 			return false;
 		}
 
-		if (*a.clientId != *b.clientId) {
+		if (a.clientId() != b.clientId()) {
 			return false;
 		}
 
-		if (*a.willTopic != *b.willTopic) {
+		if (a.willTopic() != b.willTopic()) {
 			return false;
 		}
 
-		if (*a.willMsg != *b.willMsg) {
+		if (a.willMsg() != b.willMsg()) {
 			return false;
 		}
 
-		if (*a.userName != *b.userName) {
+		if (a.userName() != b.userName()) {
 			return false;
 		}
 
-		if (*a.password != *b.password) {
+		if (a.password() != b.password()) {
 			return false;
 		}
 
@@ -127,15 +111,14 @@ int test(void)
 	buf = new m5::AppBuf(128);
 	connect = new m5::PktConnect("m5_client");
 
-	connect->setCleanStart(true);
-	/* this must call the clientId destructor and create a new obj */
-	connect->setClientId(clientId);
-	connect->setKeyAlive(keepAlive);
-	connect->setUserName(userName);
-	connect->setPassword(password);
-	connect->setWill(willTopic, willMsg);
-	connect->setWillQoS(m5::PktQoS::QoS2);
-	connect->setWillRetain(true);
+	connect->cleanStart(true);
+	connect->clientId(clientId);
+	connect->keepAlive(keepAlive);
+	connect->userName(userName);
+	connect->password(password);
+	connect->will(willTopic, willMsg);
+	connect->willQoS(m5::PktQoS::QoS2);
+	connect->willRetain(true);
 
 	/* RemLen: Variable Header min size: 10 + 1, plus the payload */
 	remLen = 10 + 1 +
@@ -173,7 +156,7 @@ int test(void)
 	}
 
 	if (buf->readNum16() != keepAlive) {
-		throw std::logic_error("writeTo: Control Flags");
+		throw std::logic_error("writeTo: Keep Alive");
 	}
 
 	if (buf->readVBI() != 0) {
@@ -208,11 +191,9 @@ int test(void)
 	buf->rewind();
 
 	m5::PktConnect *connectRead = new m5::PktConnect(*buf);
-
 	if (*connect != *connectRead) {
 		throw std::logic_error("PktConnect constructor");
 	}
-
 	delete connectRead;
 
 	delete connect;
@@ -220,8 +201,6 @@ int test(void)
 
 	return 0;
 }
-
-#include <iomanip>
 
 int testProperties(void)
 {
@@ -284,26 +263,6 @@ int testProperties(void)
 	if (connectRead->properties.maximumPacketSize() != u32) {
 		throw std::logic_error("properties: maximumPacketSize");
 	}
-
-	std::cout << "Prop Wire Size: " << std::hex
-		  << connect->properties.wireSize() << "\n";
-
-
-
-	for (uint32_t i = 0; i < buf.length(); i++) {
-		std::cout << std::setw(2) << std::setfill('0') << std::hex
-			  << (int)buf.rawData()[i];
-
-		if ((i + 1) % 8 == 0) {
-			std::cout << "\n";
-		} else {
-			std::cout << " ";
-		}
-	}
-	std::cout << "\n";
-
-
-
 
 	delete connectRead;
 	delete connect;

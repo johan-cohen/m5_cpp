@@ -62,20 +62,12 @@ uint8_t PktConnect::packConnectFlags(void)
 {
 	uint8_t flags;
 
-	flags = (cleanStart << 0x01);
-	flags += ((willQoS & 0x03) << 3) + (willRetain == 1 ? (1 << 5) : 0);
-
-	if (willMsg != nullptr) {
-		flags += (willMsg->length() > 0 ? (0x01 << 2) : 0);
-	}
-
-	if (password != nullptr) {
-		flags += (password->length() > 0 ? (0x01 << 6) : 0);
-	}
-
-	if (userName != nullptr) {
-		flags += (userName->length() > 0 ? (0x01 << 7) : 0);
-	}
+	flags = (cleanStart() << 0x01);
+	flags += (willMsg().size() > 0 ? (0x01 << 2) : 0);
+	flags += ((_willQoS & 0x03) << 3);
+	flags += (willRetain() == 1 ? (1 << 5) : 0);
+	flags += (password().size() > 0 ? (0x01 << 6) : 0);
+	flags += (userName().size() > 0 ? (0x01 << 7) : 0);
 
 	return flags;
 }
@@ -90,49 +82,44 @@ bool PktConnect::flagWillMsg(uint8_t flags)
 	return flags & (1 << 2);
 }
 
-uint8_t PktConnect::flagWillQoS(uint8_t flags)
+PktQoS PktConnect::flagWillQoS(uint8_t flags)
 {
-	return (flags & (3 << 3)) >> 3;
+	return (PktQoS)((flags & (3 << 3)) >> 3);
 }
 
 bool PktConnect::flagWillRetain(uint8_t flags)
 {
-	return flags & (1 << 4);
+	return flags & (1 << 5);
 }
 
 bool PktConnect::flagPassword(uint8_t flags)
 {
-	return flags & (1 << 5);
+	return flags & (1 << 6);
 }
 
 bool PktConnect::flagUserName(uint8_t flags)
 {
-	return flags & (1 << 6);
+	return flags & (1 << 7);
 }
 
 uint32_t PktConnect::payloadWireSize(void) const
 {
 	uint32_t wireSize;
 
-	if (clientId == nullptr) {
-		throw std::invalid_argument("Invalid ClientId");
-	}
+	wireSize = stringLenSize  + clientId().size();
 
-	wireSize = stringLenSize  + clientId->length();
-
-	if (willMsg != nullptr && willMsg->length() > 0 &&
-	    willTopic != nullptr && willTopic->length() > 0) {
-		wireSize += stringLenSize + willTopic->length();
-		wireSize += binaryLenSize + willMsg->length();
+	if (willMsg().size() > 0 && willTopic().size() > 0) {
+		wireSize += stringLenSize + willTopic().size();
+		wireSize += binaryLenSize + willMsg().size();
 	}
 
 
-	if (userName != nullptr && userName->length() > 0) {
-		wireSize += stringLenSize + userName->length();
+	if (userName().size() > 0) {
+		wireSize += stringLenSize + userName().size();
 	}
 
-	if (password != nullptr && password->length() > 0) {
-		wireSize += binaryLenSize + password->length();
+	if (password().size() > 0) {
+		wireSize += binaryLenSize + password().size();
 	}
 
 	return wireSize;
@@ -140,26 +127,26 @@ uint32_t PktConnect::payloadWireSize(void) const
 
 void PktConnect::writePayload(AppBuf &buf)
 {
-	buf.writeBinary(clientId->rawData(), clientId->length());
+	buf.writeBinary(&clientId()[0], clientId().size());
 
-	if (willMsg != nullptr && willMsg->length() > 0) {
-		buf.writeBinary(willTopic->rawData(), willTopic->length());
-		buf.writeBinary(willMsg->rawData(), willMsg->length());
+	if (willMsg().size() > 0) {
+		buf.writeBinary(&willTopic()[0], willTopic().size());
+		buf.writeBinary(&willMsg()[0], willMsg().size());
 	}
 
-	if (userName != nullptr && userName->length() > 0) {
-		buf.writeBinary(userName->rawData(), userName->length());
+	if (userName().size() > 0) {
+		buf.writeBinary(&userName()[0], userName().size());
 	}
 
-	if (password != nullptr && password->length() > 0) {
-		buf.writeBinary(password->rawData(), password->length());
+	if (password().size() > 0) {
+		buf.writeBinary(&password()[0], password().size());
 	}
 }
 
 void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 {
-	this->setClientId(clientId, len);
-	this->setCleanStart(cleanStart);
+	this->clientId(clientId, len);
+	this->cleanStart(cleanStart);
 }
 
 PktConnect::PktConnect(AppBuf &buf) : properties(PktType::CONNECT)
@@ -181,11 +168,6 @@ PktConnect::PktConnect(const char *clientId, bool cleanStart) :
 
 PktConnect::~PktConnect()
 {
-	delete clientId;
-	delete willTopic;
-	delete willMsg;
-	delete userName;
-	delete password;
 }
 
 uint32_t PktConnect::writeTo(AppBuf &buf)
@@ -214,11 +196,27 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	buf.writeString(protocolStr);
 	buf.writeNum8(protocolVersion5);
 	buf.writeNum8(packConnectFlags());
-	buf.writeNum16(this->keepAlive);
+	buf.writeNum16(keepAlive());
 	properties.write(buf);
 	writePayload(buf);
 
 	return fullPktSize;
+}
+
+/* xxx remove this later */
+void setVector(std::vector<uint8_t> &v, AppBuf &buf)
+{
+	if (buf.bytesToRead() < 2) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	auto itemLen = buf.readNum16();
+	if (buf.bytesToRead() < itemLen) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	v.assign(buf.current(), buf.current() + itemLen);
+	buf.readSkip(itemLen);
 }
 
 uint32_t PktConnect::readFrom(AppBuf &buf)
@@ -259,27 +257,26 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	}
 
 	connectFlags = buf.readNum8();
-	this->cleanStart = flagCleanStart(connectFlags);
-	this->willRetain = flagWillRetain(connectFlags);
-	this->willQoS = flagWillQoS(connectFlags);
+	this->cleanStart(flagCleanStart(connectFlags));
+	this->willRetain(flagWillRetain(connectFlags));
+	this->willQoS(flagWillQoS(connectFlags));
 
-	keepAlive = buf.readNum16();
+	keepAlive(buf.readNum16());
 
 	properties.read(buf);
-	
-	this->clientId = AppBuf::createFrom(buf, buf.readNum16());
 
+	setVector(this->_clientId, buf);
 	if (flagWillMsg(connectFlags) == true) {
-		this->willTopic = AppBuf::createFrom(buf, buf.readNum16());
-		this->willMsg = AppBuf::createFrom(buf, buf.readNum16());
+		setVector(this->_willTopic, buf);
+		setVector(this->_willMsg, buf);
 	}
 
 	if (flagUserName(connectFlags) == true) {
-		this->userName = AppBuf::createFrom(buf, buf.readNum16());
+		setVector(this->_userName, buf);
 	}
 
 	if (flagPassword(connectFlags) == true) {
-		this->password = AppBuf::createFrom(buf, buf.readNum16());
+		setVector(this->_password, buf);
 	}
 
 	if (buf.traversed() - alreadyTraversed != 1 + remLenWS + remLen) {
@@ -294,79 +291,75 @@ uint32_t PktConnect::getId(void) const
 	return (uint32_t)PktType::CONNECT;
 }
 
-void PktConnect::setClientId(const uint8_t *data, uint16_t size)
+void PktConnect::clientId(const uint8_t *data, uint16_t size)
 {
-	if (this->clientId != nullptr) {
-		delete this->clientId;
-	}
-
 	if (size < clientIdMinLen || size > clientIdMaxLen) {
 			throw std::invalid_argument("Invalid ClientId length");
 	}
 
-	this->clientId = new AppBuf(data, size);
+	this->_clientId.assign(data, data + size);
 }
 
-void PktConnect::setClientId(const char *str)
+void PktConnect::clientId(const char *str)
 {
-	this->setClientId((const uint8_t *)str, strlen(str));
+	this->clientId((const uint8_t *)str, strlen(str));
 }
 
-void PktConnect::setWill(const uint8_t *topic, uint16_t topic_size,
-			 const uint8_t *msg, uint16_t msg_size)
+void PktConnect::will(const uint8_t *topic, uint16_t topic_size,
+		      const uint8_t *msg, uint16_t msg_size)
 {
-	if (topic_size == 0 || msg_size == 0) {
+	if (topic == nullptr || topic_size == 0 || msg == nullptr || msg_size == 0) {
 		throw std::invalid_argument("Invalid Will Topic or Msg length");
 	}
 
-	this->willTopic = new AppBuf(topic, topic_size);
-	this->willMsg = new AppBuf(msg, msg_size);
+	this->_willTopic.assign(topic, topic + topic_size);
+	this->_willMsg.assign(msg, msg + msg_size);
 }
 
-void PktConnect::setWill(const char *topic, const char *msg)
+void PktConnect::will(const char *topic, const char *msg)
 {
-	this->setWill((const uint8_t *)topic, strlen(topic),
-		      (const uint8_t *)msg, strlen(msg));
+	this->will((const uint8_t *)topic, strlen(topic),
+		   (const uint8_t *)msg, strlen(msg));
 }
 
-void PktConnect::setUserName(const uint8_t *data, uint16_t size)
+void PktConnect::userName(const uint8_t *data, uint16_t size)
 {
-	this->userName = new AppBuf(data, size);
+	this->_userName.assign(data, data + size);
 }
 
-void PktConnect::setUserName(const char *str)
+void PktConnect::userName(const char *str)
 {
-	this->setUserName((const uint8_t *)str, strlen(str));
+	this->userName((const uint8_t *)str, strlen(str));
 }
 
-void PktConnect::setPassword(const uint8_t *data, uint16_t size)
+void PktConnect::password(const uint8_t *data, uint16_t size)
 {
-	this->password = new AppBuf(data, size);
+	this->_password.assign(data, data + size);
 }
 
-void PktConnect::setPassword(const char *str)
+void PktConnect::password(const char *str)
 {
-	this->setPassword((const uint8_t *)str, strlen(str));
+	this->password((const uint8_t *)str, strlen(str));
 }
 
-void PktConnect::setKeyAlive(uint16_t keepAlive)
+void PktConnect::keepAlive(uint16_t keepAlive)
 {
-	this->keepAlive = keepAlive;
+	this->_keepAlive = keepAlive;
 }
 
-void PktConnect::setWillRetain(bool willRetain)
+void PktConnect::willRetain(bool willRetain)
 {
-	this->willRetain = (willRetain ? 1 : 0);
+	this->_willRetain = (willRetain ? 1 : 0);
 }
 
-void PktConnect::setWillQoS(enum PktQoS qos)
+void PktConnect::willQoS(enum PktQoS qos)
 {
-	this->willQoS = (uint8_t)qos;
+	this->_willQoS = (uint8_t)qos;
 }
 
-void PktConnect::setCleanStart(bool cleanStart)
+void PktConnect::cleanStart(bool cleanStart)
 {
-	this->cleanStart = (cleanStart ? 1 : 0);
+	this->_cleanStart = (cleanStart ? 1 : 0);
 }
 
 }
