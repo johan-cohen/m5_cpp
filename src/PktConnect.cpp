@@ -215,7 +215,7 @@ void setVector(std::vector<uint8_t> &v, AppBuf &buf)
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	v.assign(buf.current(), buf.current() + itemLen);
+	v.assign(buf.currentRead(), buf.currentRead() + itemLen);
 	buf.readSkip(itemLen);
 }
 
@@ -246,7 +246,7 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	const uint8_t *ptr = buf.rawData() + buf.traversed();
+	const uint8_t *ptr = buf.data() + buf.traversed();
 	if (memcmp(ptr, m5::protocolNameStr, m5::protocolNameStrLen) != 0) {
 		throw std::invalid_argument("Invalid protocol name string");
 	}

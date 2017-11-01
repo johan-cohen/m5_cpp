@@ -106,7 +106,6 @@ int test(void)
 	uint32_t fullPktSize;
 	uint32_t remLen;
 	m5::AppBuf *buf;
-	uint16_t len;
 
 	buf = new m5::AppBuf(128);
 	connect = new m5::PktConnect("m5_client");
@@ -163,28 +162,29 @@ int test(void)
 		throw std::logic_error("writeTo: Properties Length");
 	}
 
-	buf->readBinary(bigString, len, strlen(clientId));
-	if (memcmp(bigString, clientId, strlen(clientId)) != 0) {
+	std::vector<uint8_t> str;
+	buf->readBinary(str);
+	if (str.size() != strlen(clientId) || memcmp(str.data(), clientId, strlen(clientId)) != 0) {
 		throw std::logic_error("writeTo: clientId");
 	}
 
-	buf->readBinary(bigString, len, strlen(willTopic));
-	if (memcmp(bigString, willTopic, strlen(willTopic)) != 0) {
+	buf->readBinary(str);
+	if (str.size() != strlen(willTopic) || memcmp(str.data(), willTopic, strlen(willTopic)) != 0) {
 		throw std::logic_error("writeTo: willTopic");
 	}
 
-	buf->readBinary(bigString, len, strlen(willMsg));
-	if (memcmp(bigString, willMsg, strlen(willMsg)) != 0) {
+	buf->readBinary(str);
+	if (str.size() != strlen(willMsg) || memcmp(str.data(), willMsg, strlen(willMsg)) != 0) {
 		throw std::logic_error("writeTo: willMsg");
 	}
 
-	buf->readBinary(bigString, len, strlen(userName));
-	if (memcmp(bigString, userName, strlen(userName)) != 0) {
+	buf->readBinary(str);
+	if (str.size() != strlen(userName) || memcmp(str.data(), userName, strlen(userName)) != 0) {
 		throw std::logic_error("writeTo: userName");
 	}
 
-	buf->readBinary(bigString, len, strlen(password));
-	if (memcmp(bigString, password, strlen(password)) != 0) {
+	buf->readBinary(str);
+	if (str.size() != strlen(password) || memcmp(str.data(), password, strlen(password)) != 0) {
 		throw std::logic_error("writeTo: password");
 	}
 

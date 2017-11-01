@@ -43,29 +43,32 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <vector>
 
 namespace m5 {
 
 class AppBuf {
 private:
-	std::size_t offset;
-	std::size_t maxSize;
-	std::size_t len;
-	uint8_t *data;
+	std::vector<uint8_t> _data;
+
+	std::size_t _offset = 0;
+	std::size_t _length = 0;
+	std::size_t _size = 0;
 
 	void init(std::size_t size);
 public:
-	const uint8_t *rawData() const { return data; }
+	const uint8_t *data() const { return _data.data(); }
 
-	const uint8_t *current(void) const { return data + offset; }
+	uint8_t *currentWrite(void) { return _data.data() + _length; }
+	uint8_t *currentRead(void) { return _data.data() + _offset; }
 
 	AppBuf(const uint8_t *data, std::size_t size);
 	AppBuf(std::size_t size = 0);
 	~AppBuf();
 
-	std::size_t size(void) const { return maxSize; }
-	std::size_t length(void) const { return len; }
-	std::size_t traversed(void) const { return offset; }
+	std::size_t size(void) const { return _size; }
+	std::size_t length(void) const { return _length; }
+	std::size_t traversed(void) const { return _offset; }
 	void rewind();
 	void reset(void);
 
@@ -88,7 +91,7 @@ public:
 	/* readNum32 does not do bound checking, use bytesToRead */
 	uint32_t readNum32(void);
 
-	void readBinary(uint8_t *data, uint16_t &len, uint16_t size);
+	void readBinary(std::vector<uint8_t> &dst);
 
 	void readVBI(uint32_t &v, uint8_t &wireSize);
 	uint32_t readVBI(void);
@@ -113,6 +116,7 @@ public:
 	void writeNum32(uint32_t v);
 
 	void writeBinary(const uint8_t *data, uint16_t size);
+	void writeBinary(const std::vector<uint8_t> &src);
 	void writeString(const char *str);
 
 	void writeVBI(uint32_t v);

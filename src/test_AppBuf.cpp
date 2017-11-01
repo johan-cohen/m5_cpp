@@ -46,15 +46,13 @@
 int test(void)
 {
 	const char str[] = "Hello, World!";
-	char str2[sizeof(str)];
 	m5::AppBuf *buf;
-	uint16_t len;
 
 	buf = new m5::AppBuf(64);
 
 	for (std::size_t i = 0; i < buf->size(); i++) {
 		if (buf->bytesToWrite() != (buf->size() - i)) {
-			error_exit(": bytesToWrite error");
+			error_exit("bytesToWrite");
 		}
 
 		buf->writeNum8((uint8_t)i);
@@ -112,9 +110,14 @@ int test(void)
 	}
 
 	buf->writeString(str);
-	buf->readBinary((uint8_t *)str2, len, sizeof(str2));
-	if (memcmp(str, str2, strlen(str)) != 0) {
-		error_exit("readBinary");
+
+	std::vector<uint8_t> v;
+	buf->readBinary(v);
+	if (v.size() != strlen(str)) {
+		error_exit("readBinary len");
+	}
+	if (memcmp(v.data(), str, strlen(str)) != 0) {
+		error_exit("readBinary data");
 	}
 
 	delete buf;
@@ -124,7 +127,7 @@ int test(void)
 	if (buf->size() != strlen(str) || buf->length() != buf->size()) {
 		error_exit("size or length");
 	}
-	if (memcmp(buf->rawData(), str, buf->length()) != 0) {
+	if (memcmp(buf->data(), str, buf->length()) != 0) {
 		error_exit("rawData");
 	}
 	if (buf->bytesToRead() != buf->length() || buf->bytesToWrite() != 0) {
@@ -139,12 +142,12 @@ int test(void)
 	}
 
 	buf->readSkip(5);
-	if (buf->rawData()[5] != buf->readNum8()) {
+	if (buf->data()[5] != buf->readNum8()) {
 		error_exit("readSkip forward");
 	}
 
 	buf->readSkip(6, false);
-	if (buf->rawData()[0] != buf->readNum8()) {
+	if (buf->data()[0] != buf->readNum8()) {
 		error_exit("readSkip");
 	}
 

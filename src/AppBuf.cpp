@@ -48,22 +48,20 @@ namespace m5 {
 void AppBuf::init(std::size_t size)
 {
 	if (size > 0) {
-		this->data = new uint8_t[size];
-	} else {
-		this->data = nullptr;
+		this->_data.reserve(size);
 	}
 
-	this->maxSize = size;
-	this->len = 0;
-	this->offset = 0;
+	this->_size = size;
+	this->_length = 0;
+	this->_offset = 0;
 }
 
 AppBuf::AppBuf(const uint8_t *data, std::size_t size)
 {
 	init(size);
 
-	memcpy(this->data, data, size);
-	this->len = size;
+	this->_data.assign(data, data + size);
+	this->_length = size;
 }
 
 AppBuf::AppBuf(std::size_t size)
@@ -71,46 +69,30 @@ AppBuf::AppBuf(std::size_t size)
 	init(size);
 }
 
-AppBuf *AppBuf::createFrom(AppBuf &src, std::size_t bytesToRead)
-{
-	if (src.bytesToRead() < bytesToRead) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	AppBuf *buf = new AppBuf(bytesToRead);
-	src.read(buf->data, bytesToRead);
-	buf->len = bytesToRead;
-
-	return buf;
-}
-
 AppBuf::~AppBuf()
 {
-	if (this->data != nullptr) {
-		delete[] this->data;
-	}
 }
 
 void AppBuf::rewind(void)
 {
-	this->offset = 0;
+	this->_offset = 0;
 }
 
 void AppBuf::reset(void)
 {
-	this->offset = 0;
-	this->len = 0;
+	this->_offset = 0;
+	this->_length = 0;
 }
 
 std::size_t AppBuf::bytesToRead(void) const
 {
-	return this->len - this->offset;
+	return this->_length - this->_offset;
 }
 
 void AppBuf::read(uint8_t *d, std::size_t size)
 {
-	memcpy(d, this->data + this->offset, size);
-	this->offset += size;
+	memcpy(d, currentRead(), size);
+	this->_offset += size;
 }
 
 template <typename T> T AppBuf::readNum(void)
@@ -148,14 +130,14 @@ uint32_t AppBuf::readNum32(void)
 	return readNum<uint32_t>();
 }
 
-void AppBuf::readBinary(uint8_t *data, uint16_t &len, uint16_t size)
+void AppBuf::readBinary(std::vector<uint8_t> &dst)
 {
 	/* two bytes for the length, length could be 0... */
 	if (bytesToRead() < 2) {
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	len = this->readNum16();
+	auto len = this->readNum16();
 	if (len == 0) {
 		return;
 	}
@@ -164,12 +146,12 @@ void AppBuf::readBinary(uint8_t *data, uint16_t &len, uint16_t size)
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	if (len > size) {
+	if (len > _size) {
 		throw std::out_of_range("No enough space in output buffer");
 	}
 
-	memcpy(data, this->data + this->offset, len);
-	this->offset += len;
+	dst.assign(currentRead(), currentRead() + len);
+	this->_offset += len;
 }
 
 void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
@@ -209,13 +191,13 @@ uint32_t AppBuf::readVBI(void)
 
 void AppBuf::readSkip(std::size_t n, bool forward)
 {
-	this->offset += (forward ? 1 : -1) * n;
+	this->_offset += (forward ? 1 : -1) * n;
 }
 
 void AppBuf::write(const uint8_t *d, std::size_t size)
 {
-	memcpy(this->data + this->len, d, size);
-	this->len += size;
+	memcpy(currentWrite(), d, size);
+	this->_length += size;
 }
 
 template <typename T> T host2net(T v)
@@ -224,6 +206,7 @@ template <typename T> T host2net(T v)
 	case 1: return v;
 	case 2: return htobe16(v);
 	case 4: return htobe32(v);
+	case 8: return htobe64(v);
 	}
 
 	return 0;
@@ -231,7 +214,7 @@ template <typename T> T host2net(T v)
 
 std::size_t AppBuf::bytesToWrite(void) const
 {
-	return this->maxSize - this->len;
+	return this->_size - this->_length;
 }
 
 template <typename T> void AppBuf::writeNum(const T &v)
@@ -264,6 +247,11 @@ void AppBuf::writeBinary(const uint8_t *data, uint16_t size)
 {
 	this->writeNum16(size);
 	this->write(data, size);
+}
+
+void AppBuf::writeBinary(const std::vector<uint8_t> &src)
+{
+	this->writeBinary(src.data(), src.size());
 }
 
 void AppBuf::writeString(const char *str)

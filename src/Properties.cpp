@@ -654,7 +654,7 @@ uint32_t PropertiesList::read(AppBuf &buf)
 			if (buf.bytesToRead() < fieldLen) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
-			this->append((PropertyId)id, buf.current(), fieldLen);
+			this->append((PropertyId)id, buf.currentRead(), fieldLen);
 			buf.readSkip(fieldLen);
 			break;
 
@@ -669,6 +669,7 @@ uint32_t PropertiesList::read(AppBuf &buf)
 			uint16_t valueLen;
 			uint16_t keyLen;
 
+			/* xxx */
 			if (buf.bytesToRead() < 2) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
@@ -677,15 +678,16 @@ uint32_t PropertiesList::read(AppBuf &buf)
 			if (buf.bytesToRead() < keyLen) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
-			key = buf.current();
+			key = buf.currentRead();
 			buf.readSkip(keyLen);
 
 			valueLen = buf.readNum16();
 			if (buf.bytesToRead() < valueLen) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
-			value = buf.current();
+			value = buf.currentRead();
 			buf.readSkip(valueLen);
+			/* xxx */
 
 			this->append(key, keyLen, value, valueLen);
 			break;
