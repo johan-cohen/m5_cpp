@@ -41,15 +41,16 @@
 #ifndef __APPBUF_HPP__
 #define __APPBUF_HPP__
 
+#include "Common.hpp"
+
 #include <cstdint>
 #include <cstddef>
-#include <vector>
 
 namespace m5 {
 
 class AppBuf {
 private:
-	std::vector<uint8_t> _data;
+	ByteArray _data;
 
 	std::size_t _offset = 0;
 	std::size_t _length = 0;
@@ -91,7 +92,7 @@ public:
 	/* readNum32 does not do bound checking, use bytesToRead */
 	uint32_t readNum32(void);
 
-	void readBinary(std::vector<uint8_t> &dst);
+	void readBinary(ByteArray &dst);
 
 	void readVBI(uint32_t &v, uint8_t &wireSize);
 	uint32_t readVBI(void);
@@ -116,7 +117,7 @@ public:
 	void writeNum32(uint32_t v);
 
 	void writeBinary(const uint8_t *data, uint16_t size);
-	void writeBinary(const std::vector<uint8_t> &src);
+	void writeBinary(const ByteArray &src);
 	void writeString(const char *str);
 
 	void writeVBI(uint32_t v);

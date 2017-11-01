@@ -43,8 +43,11 @@
 #define __COMMON_HPP__
 
 #include <cstdint>
+#include <vector>
 
 namespace m5 {
+
+typedef std::vector<uint8_t> ByteArray;
 
 static const uint32_t propertyIdSize = 1;
 static const uint32_t binaryLenSize = 2;

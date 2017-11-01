@@ -164,8 +164,8 @@ void PropertiesList::append(const uint8_t *key, uint16_t keySize,
 		return;
 	}
 
-	std::vector<uint8_t> _key(key, key + keySize);
-	std::vector<uint8_t> _val(value, value + valueSize);
+	ByteArray _key(key, key + keySize);
+	ByteArray _val(value, value + valueSize);
 
 	userProps.push_back(KeyValuePair(_key, _val));
 
@@ -188,14 +188,14 @@ void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
 			throw std::out_of_range("Property enabled but not found");
 		}
 
-		std::vector<uint8_t> &item = (*it).second;
+		ByteArray &item = (*it).second;
 		this->_wireSize += -item.size() + size;
 
 		item.assign(data, data + size);
 
 	} else {
 		/* assume compiler will optimize this... */
-		auto item = std::vector<uint8_t>(data, data + size);
+		auto item = ByteArray(data, data + size);
 		binProps.insert(BinaryPropPair(id, item));
 		enableProperty(id);
 
@@ -228,10 +228,10 @@ void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
 	enableProperty(id);
 }
 
-const std::vector<uint8_t> &PropertiesList::valueBinary(PropertyId id) const
+const ByteArray &PropertiesList::valueBinary(PropertyId id) const
 {
 	if (!isEnabled(id)) {
-		static auto none = std::vector<uint8_t>();
+		static auto none = ByteArray();
 
 		return none;
 	}
@@ -287,7 +287,7 @@ void PropertiesList::contentType(const char *str)
 	contentType((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::contentType(void) const
+const ByteArray &PropertiesList::contentType(void) const
 {
 	return valueBinary(PropertyId::CONTENT_TYPE);
 }
@@ -302,7 +302,7 @@ void PropertiesList::responseTopic(const char *str)
 	responseTopic((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::responseTopic(void) const
+const ByteArray &PropertiesList::responseTopic(void) const
 {
 	return valueBinary(PropertyId::RESPONSE_TOPIC);
 }
@@ -323,7 +323,7 @@ void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
 	append(PropertyId::CORRELATION_DATA, data, size);
 }
 
-const std::vector<uint8_t> &PropertiesList::correlationData(void) const
+const ByteArray &PropertiesList::correlationData(void) const
 {
 	return valueBinary(PropertyId::CORRELATION_DATA);
 }
@@ -348,7 +348,7 @@ void PropertiesList::assignedClientIdentifier(const char *str)
 	assignedClientIdentifier((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::assignedClientIdentifier(void) const
+const ByteArray &PropertiesList::assignedClientIdentifier(void) const
 {
 	return valueBinary(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
@@ -373,7 +373,7 @@ void PropertiesList::authenticationMethod(const char *str)
 	authenticationMethod((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::authenticationMethod(void) const
+const ByteArray &PropertiesList::authenticationMethod(void) const
 {
 	return valueBinary(PropertyId::AUTH_METHOD);
 }
@@ -383,7 +383,7 @@ void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
 	append(PropertyId::AUTH_DATA, data, size);
 }
 
-const std::vector<uint8_t> &PropertiesList::authenticationData(void) const
+const ByteArray &PropertiesList::authenticationData(void) const
 {
 	return valueBinary(PropertyId::AUTH_DATA);
 }
@@ -428,7 +428,7 @@ void PropertiesList::responseInformation(const char *str)
 	responseInformation((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::responseInformation(void) const
+const ByteArray &PropertiesList::responseInformation(void) const
 {
 	return valueBinary(PropertyId::RESPONSE_INFORMATION);
 }
@@ -443,7 +443,7 @@ void PropertiesList::serverReference(const char *str)
 	serverReference((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::serverReference(void) const
+const ByteArray &PropertiesList::serverReference(void) const
 {
 	return valueBinary(PropertyId::SERVER_REFERENCE);
 }
@@ -458,7 +458,7 @@ void PropertiesList::reasonString(const char *str)
 	reasonString((const uint8_t *)str, strlen(str));
 }
 
-const std::vector<uint8_t> &PropertiesList::reasonString(void) const
+const ByteArray &PropertiesList::reasonString(void) const
 {
 	return valueBinary(PropertyId::REASON_STR);
 }

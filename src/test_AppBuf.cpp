@@ -111,7 +111,7 @@ int test(void)
 
 	buf->writeString(str);
 
-	std::vector<uint8_t> v;
+	m5::ByteArray v;
 	buf->readBinary(v);
 	if (v.size() != strlen(str)) {
 		error_exit("readBinary len");

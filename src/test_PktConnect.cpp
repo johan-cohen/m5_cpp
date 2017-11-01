@@ -162,7 +162,7 @@ int test(void)
 		throw std::logic_error("writeTo: Properties Length");
 	}
 
-	std::vector<uint8_t> str;
+	m5::ByteArray str;
 	buf->readBinary(str);
 	if (str.size() != strlen(clientId) || memcmp(str.data(), clientId, strlen(clientId)) != 0) {
 		throw std::logic_error("writeTo: clientId");
@@ -249,7 +249,7 @@ int testProperties(void)
 	}
 
 	if (connectRead->properties.requestResponseInformation() != true) {
-		throw std::logic_error("properties: requestResponseInformation");
+		throw std::logic_error("properties: ByteArray");
 	}
 
 	if (connectRead->properties.receiveMaximum() != u16) {

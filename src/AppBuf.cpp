@@ -130,7 +130,7 @@ uint32_t AppBuf::readNum32(void)
 	return readNum<uint32_t>();
 }
 
-void AppBuf::readBinary(std::vector<uint8_t> &dst)
+void AppBuf::readBinary(ByteArray &dst)
 {
 	/* two bytes for the length, length could be 0... */
 	if (bytesToRead() < 2) {
@@ -249,7 +249,7 @@ void AppBuf::writeBinary(const uint8_t *data, uint16_t size)
 	this->write(data, size);
 }
 
-void AppBuf::writeBinary(const std::vector<uint8_t> &src)
+void AppBuf::writeBinary(const ByteArray &src)
 {
 	this->writeBinary(src.data(), src.size());
 }

@@ -46,7 +46,6 @@
 #include "Common.hpp"
 
 #include <cstdint>
-#include <vector>
 
 namespace m5 {
 
@@ -58,11 +57,11 @@ private:
 	uint8_t _willQoS = 0;
 	uint8_t _cleanStart = 1;
 
-	std::vector<uint8_t> _clientId;
-	std::vector<uint8_t> _willTopic;
-	std::vector<uint8_t> _willMsg;
-	std::vector<uint8_t> _userName;
-	std::vector<uint8_t> _password;
+	ByteArray _clientId;
+	ByteArray _willTopic;
+	ByteArray _willMsg;
+	ByteArray _userName;
+	ByteArray _password;
 
 	uint8_t packConnectFlags(void);
 	uint32_t payloadWireSize(void) const;
@@ -97,12 +96,12 @@ public:
 	bool cleanStart(void) const { return this->_cleanStart; }
 	void cleanStart(bool cleanStart);
 
-	const std::vector<uint8_t> &clientId(void) const { return _clientId; }
+	const ByteArray &clientId(void) const { return _clientId; }
 	void clientId(const uint8_t *data, uint16_t size);
 	void clientId(const char *str);
 
-	const std::vector<uint8_t> &willTopic(void) const { return _willTopic; }
-	const std::vector<uint8_t> &willMsg(void) const { return _willMsg; }
+	const ByteArray &willTopic(void) const { return _willTopic; }
+	const ByteArray &willMsg(void) const { return _willMsg; }
 
 	void will(const uint8_t *topic, uint16_t topic_size,
 		     const uint8_t *msg, uint16_t msg_size);
@@ -114,11 +113,11 @@ public:
 	PktQoS willQoS(void) const { return (PktQoS)this->_willQoS; }
 	void willQoS(enum PktQoS qos);
 
-	const std::vector<uint8_t> &userName(void) const { return _userName; }
+	const ByteArray &userName(void) const { return _userName; }
 	void userName(const uint8_t *data, uint16_t size);
 	void userName(const char *str);
 
-	const std::vector<uint8_t> &password(void) const { return _password; }
+	const ByteArray &password(void) const { return _password; }
 	void password(const uint8_t *data, uint16_t size);
 	void password(const char *str);
 };

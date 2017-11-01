@@ -204,7 +204,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 }
 
 /* xxx remove this later */
-void setVector(std::vector<uint8_t> &v, AppBuf &buf)
+void setVector(ByteArray &v, AppBuf &buf)
 {
 	if (buf.bytesToRead() < 2) {
 		throw std::out_of_range("No enough space in input buffer");

@@ -44,22 +44,21 @@
 #include "Common.hpp"
 #include "AppBuf.hpp"
 
-#include <vector>
 #include <list>
 #include <map>
 
 namespace m5 {
 
-typedef std::pair<std::vector<uint8_t>, std::vector<uint8_t> > KeyValuePair;
+typedef std::pair<ByteArray, ByteArray > KeyValuePair;
 typedef std::list<KeyValuePair> UserProperty;
 
 class PropertiesList {
 private:
 	struct NumSize { uint32_t num; uint8_t size; };
-	typedef std::pair<uint8_t, std::vector<uint8_t> > BinaryPropPair;
+	typedef std::pair<uint8_t, ByteArray > BinaryPropPair;
 	typedef std::pair<uint8_t, NumSize> NumPropPair;
 
-	std::map<uint8_t, std::vector<uint8_t> > binProps;
+	std::map<uint8_t, ByteArray > binProps;
 	std::map<uint8_t, NumSize> numProps;
 	UserProperty userProps;
 
@@ -75,7 +74,7 @@ private:
 	void append(const uint8_t *key, uint16_t keySize,
 		    const uint8_t *value, uint16_t valueSize);
 
-	const std::vector<uint8_t> &valueBinary(PropertyId id) const;
+	const ByteArray &valueBinary(PropertyId id) const;
 	uint32_t valueNum(PropertyId id) const;
 
 	void resetPacketType(const enum PktType type);
@@ -104,34 +103,34 @@ public:
 
 	void contentType(const uint8_t *data, uint16_t size);
 	void contentType(const char *str);
-	const std::vector<uint8_t> &contentType(void) const;
+	const ByteArray &contentType(void) const;
 
 	void responseTopic(const uint8_t *data, uint16_t size);
 	void responseTopic(const char *str);
-	const std::vector<uint8_t> &responseTopic(void) const;
+	const ByteArray &responseTopic(void) const;
 
 	void subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void) const;
 
 	void correlationData(const uint8_t *data, uint16_t size);
-	const std::vector<uint8_t> &correlationData(void) const;
+	const ByteArray &correlationData(void) const;
 
 	void sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void) const;
 
 	void assignedClientIdentifier(const uint8_t *data, uint16_t size);
 	void assignedClientIdentifier(const char *str);
-	const std::vector<uint8_t> &assignedClientIdentifier(void) const;
+	const ByteArray &assignedClientIdentifier(void) const;
 
 	void serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void) const;
 
 	void authenticationMethod(const uint8_t *data, uint16_t size);
 	void authenticationMethod(const char *str);
-	const std::vector<uint8_t> &authenticationMethod(void) const;
+	const ByteArray &authenticationMethod(void) const;
 
 	void authenticationData(const uint8_t *data, uint16_t size);
-	const std::vector<uint8_t> &authenticationData(void) const;
+	const ByteArray &authenticationData(void) const;
 
 	void requestProblemInformation(bool v);
 	bool requestProblemInformation(void) const;
@@ -144,15 +143,15 @@ public:
 
 	void responseInformation(const uint8_t *data, uint16_t size);
 	void responseInformation(const char *str);
-	const std::vector<uint8_t> &responseInformation(void) const;
+	const ByteArray &responseInformation(void) const;
 
 	void serverReference(const uint8_t *data, uint16_t size);
 	void serverReference(const char *str);
-	const std::vector<uint8_t> &serverReference(void) const;
+	const ByteArray &serverReference(void) const;
 
 	void reasonString(const uint8_t *data, uint16_t size);
 	void reasonString(const char *str);
-	const std::vector<uint8_t> &reasonString(void) const;
+	const ByteArray &reasonString(void) const;
 
 	void receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void) const;
