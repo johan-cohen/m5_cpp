@@ -130,16 +130,16 @@ void PktConnect::writePayload(AppBuf &buf)
 	buf.writeBinary(&clientId()[0], clientId().size());
 
 	if (willMsg().size() > 0) {
-		buf.writeBinary(&willTopic()[0], willTopic().size());
-		buf.writeBinary(&willMsg()[0], willMsg().size());
+		buf.writeBinary(willTopic().data(), willTopic().size());
+		buf.writeBinary(willMsg().data(), willMsg().size());
 	}
 
 	if (userName().size() > 0) {
-		buf.writeBinary(&userName()[0], userName().size());
+		buf.writeBinary(userName().data(), userName().size());
 	}
 
 	if (password().size() > 0) {
-		buf.writeBinary(&password()[0], password().size());
+		buf.writeBinary(password().data(), password().size());
 	}
 }
 
