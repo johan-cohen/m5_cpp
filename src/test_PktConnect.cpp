@@ -221,10 +221,105 @@ int test(void)
 	return 0;
 }
 
+#include <iomanip>
+
+int testProperties(void)
+{
+	const char clientId[] = "m5_client";
+	const char str[] = "World!";
+	uint32_t u32 = 0xABCDEF01;
+	uint16_t u16 = 0xABCD;
+	m5::AppBuf buf(256);
+
+	m5::PktConnect *connectRead;
+	m5::PktConnect *connect;
+
+	connect = new m5::PktConnect(clientId);
+
+	connect->properties.sessionExpiryInterval(u32);
+	connect->properties.authenticationMethod(str);
+	connect->properties.authenticationData((const uint8_t *)str, strlen(str));
+	connect->properties.requestProblemInformation(true);
+	connect->properties.willDelayInterval(u32);
+	connect->properties.requestResponseInformation(true);
+	connect->properties.receiveMaximum(u16);
+	connect->properties.topicAliasMaximum(u16);
+	connect->properties.userProperty(str, str);
+	connect->properties.userProperty(str, str);
+	connect->properties.userProperty(str, str);
+	connect->properties.maximumPacketSize(u32);
+
+	connect->writeTo(buf);
+
+	connectRead = new m5::PktConnect(buf);
+
+	if (connect->properties.wireSize() != connectRead->properties.wireSize()) {
+		throw std::logic_error("properties: wireSize");
+	}
+
+	if (connectRead->properties.sessionExpiryInterval() != u32) {
+		throw std::logic_error("properties: sessionExpiryInterval");
+	}
+
+	if (connectRead->properties.requestProblemInformation() != true) {
+		throw std::logic_error("properties: requestProblemInformation");
+	}
+
+	if (connectRead->properties.willDelayInterval() != u32) {
+		throw std::logic_error("properties: willDelayInterval");
+	}
+
+	if (connectRead->properties.requestResponseInformation() != true) {
+		throw std::logic_error("properties: requestResponseInformation");
+	}
+
+	if (connectRead->properties.receiveMaximum() != u16) {
+		throw std::logic_error("properties: receiveMaximum");
+	}
+
+	if (connectRead->properties.topicAliasMaximum() != u16) {
+		throw std::logic_error("properties: topicAliasMaximum");
+	}
+
+	if (connectRead->properties.maximumPacketSize() != u32) {
+		throw std::logic_error("properties: maximumPacketSize");
+	}
+
+	std::cout << "Prop Wire Size: " << std::hex
+		  << connect->properties.wireSize() << "\n";
+
+
+
+	for (uint32_t i = 0; i < buf.length(); i++) {
+		std::cout << std::setw(2) << std::setfill('0') << std::hex
+			  << (int)buf.rawData()[i];
+
+		if ((i + 1) % 8 == 0) {
+			std::cout << "\n";
+		} else {
+			std::cout << " ";
+		}
+	}
+	std::cout << "\n";
+
+
+
+
+	delete connectRead;
+	delete connect;
+
+	return 0;
+}
+
 int main(void)
 {
-	int rc = test();
+	int rc;
+
+	rc = test();
 	test_rc(rc, "PktConnect");
+
+	rc = testProperties();
+	test_rc(rc, "PktConnect Properties");
 
 	return 0;
 }
