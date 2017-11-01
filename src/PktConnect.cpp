@@ -279,11 +279,12 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 		setVector(this->_password, buf);
 	}
 
-	if (buf.traversed() - alreadyTraversed != 1 + remLenWS + remLen) {
+	uint32_t fullPktSize = 1 + remLenWS + remLen;
+	if (buf.traversed() - alreadyTraversed != fullPktSize) {
 		throw std::invalid_argument("Corrupted input buffer");
 	}
 
-	return 0;
+	return fullPktSize;
 }
 
 uint32_t PktConnect::getId(void) const
