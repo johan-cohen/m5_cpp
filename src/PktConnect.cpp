@@ -203,22 +203,6 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	return fullPktSize;
 }
 
-/* xxx remove this later */
-void setVector(ByteArray &v, AppBuf &buf)
-{
-	if (buf.bytesToRead() < 2) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	auto itemLen = buf.readNum16();
-	if (buf.bytesToRead() < itemLen) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	v.assign(buf.currentRead(), buf.currentRead() + itemLen);
-	buf.readSkip(itemLen);
-}
-
 uint32_t PktConnect::readFrom(AppBuf &buf)
 {
 	std::size_t alreadyTraversed = buf.traversed();
@@ -265,18 +249,19 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	properties.read(buf);
 
-	setVector(this->_clientId, buf);
+	buf.readBinary(_clientId);
+
 	if (flagWillMsg(connectFlags) == true) {
-		setVector(this->_willTopic, buf);
-		setVector(this->_willMsg, buf);
+		buf.readBinary(_willTopic);
+		buf.readBinary(_willMsg);
 	}
 
 	if (flagUserName(connectFlags) == true) {
-		setVector(this->_userName, buf);
+		buf.readBinary(_userName);
 	}
 
 	if (flagPassword(connectFlags) == true) {
-		setVector(this->_password, buf);
+		buf.readBinary(_password);
 	}
 
 	uint32_t fullPktSize = 1 + remLenWS + remLen;
