@@ -154,6 +154,12 @@ void AppBuf::readBinary(ByteArray &dst)
 	this->_offset += len;
 }
 
+void AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
+{
+	readBinary(key);
+	readBinary(value);
+}
+
 void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 {
 	uint32_t multiplier = 1;

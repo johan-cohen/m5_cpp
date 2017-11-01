@@ -157,26 +157,30 @@ bool PropertiesList::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
-void PropertiesList::append(const uint8_t *key, uint16_t keySize,
-			    const uint8_t *value, uint16_t valueSize)
+void PropertiesList::append(const ByteArray &key, const ByteArray &value)
 {
 	if (!isAllowed(PropertyId::USER_PROPERTY)) {
 		return;
 	}
 
-	ByteArray _key(key, key + keySize);
-	ByteArray _val(value, value + valueSize);
-
-	userProps.push_back(KeyValuePair(_key, _val));
-
+	userProps.push_back(KeyValuePair(key, value));
 	enableProperty(PropertyId::USER_PROPERTY);
-
 	this->_wireSize += propertyIdSize +
-			   binaryLenSize + keySize +
-			   binaryLenSize + valueSize;
+			   binaryLenSize + key.size() +
+			   binaryLenSize + value.size();
 }
 
-void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
+
+void PropertiesList::append(const uint8_t *key, uint16_t keySize,
+			    const uint8_t *value, uint16_t valueSize)
+{
+	ByteArray _key(key, key + keySize);
+	ByteArray _value(value, value + valueSize);
+
+	append(_key, _value);
+}
+
+void PropertiesList::append(PropertyId id, const ByteArray &src)
 {
 	if (!isAllowed(id)) {
 		return;
@@ -189,18 +193,23 @@ void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
 		}
 
 		ByteArray &item = (*it).second;
-		this->_wireSize += -item.size() + size;
+		this->_wireSize += -item.size() + src.size();
 
-		item.assign(data, data + size);
+		item = src;
 
 	} else {
 		/* assume compiler will optimize this... */
-		auto item = ByteArray(data, data + size);
-		binProps.insert(BinaryPropPair(id, item));
+		binProps.insert(BinaryPropPair(id, src));
 		enableProperty(id);
 
-		this->_wireSize += propertyIdSize + binaryLenSize + size;
+		this->_wireSize += propertyIdSize + binaryLenSize + src.size();
 	}
+}
+
+void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
+{
+	ByteArray src(data, data + size);
+	append(id, src);
 }
 
 void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
@@ -584,6 +593,8 @@ uint32_t PropertiesList::read(AppBuf &buf)
 	uint32_t propWireSize;
 	uint32_t fieldLen;
 	uint32_t number;
+	ByteArray value;
+	ByteArray key;
 
 	propWireSize = buf.readVBI();
 	if (this->wireSize() >  buf.bytesToRead()) {
@@ -647,15 +658,8 @@ uint32_t PropertiesList::read(AppBuf &buf)
 		case RESPONSE_INFORMATION:
 		case SERVER_REFERENCE:
 		case REASON_STR:
-			if (buf.bytesToRead() < 2) {
-				throw std::invalid_argument("Invalid input buffer");
-			}
-			fieldLen = buf.readNum16();
-			if (buf.bytesToRead() < fieldLen) {
-				throw std::invalid_argument("Invalid input buffer");
-			}
-			this->append((PropertyId)id, buf.currentRead(), fieldLen);
-			buf.readSkip(fieldLen);
+			buf.readBinary(value);
+			this->append((PropertyId)id, value);
 			break;
 
 		case SUBSCRIPTION_IDENTIFIER:
@@ -663,35 +667,10 @@ uint32_t PropertiesList::read(AppBuf &buf)
 			break;
 
 		case USER_PROPERTY:
-		{
-			const uint8_t *value;
-			const uint8_t *key;
-			uint16_t valueLen;
-			uint16_t keyLen;
-
-			/* xxx */
-			if (buf.bytesToRead() < 2) {
-				throw std::invalid_argument("Invalid input buffer");
-			}
-
-			keyLen = buf.readNum16();
-			if (buf.bytesToRead() < keyLen) {
-				throw std::invalid_argument("Invalid input buffer");
-			}
-			key = buf.currentRead();
-			buf.readSkip(keyLen);
-
-			valueLen = buf.readNum16();
-			if (buf.bytesToRead() < valueLen) {
-				throw std::invalid_argument("Invalid input buffer");
-			}
-			value = buf.currentRead();
-			buf.readSkip(valueLen);
-			/* xxx */
-
-			this->append(key, keyLen, value, valueLen);
+			/* very inefficient way to solve this... */
+			buf.readKeyValue(key, value);
+			this->append(key, value);
 			break;
-		}
 		default:
 			throw std::invalid_argument("Invalid Property Id");
 		}

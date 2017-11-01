@@ -92,7 +92,11 @@ public:
 	/* readNum32 does not do bound checking, use bytesToRead */
 	uint32_t readNum32(void);
 
+	/* this routine does bound checking */
 	void readBinary(ByteArray &dst);
+
+	/* this routine does bound checking */
+	void readKeyValue(ByteArray &key, ByteArray &value);
 
 	void readVBI(uint32_t &v, uint8_t &wireSize);
 	uint32_t readVBI(void);
