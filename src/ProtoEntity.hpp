@@ -47,7 +47,7 @@ namespace m5 {
 
 class ProtoEntity {
 public:
-	virtual ~ProtoEntity() {};
+	virtual ~ProtoEntity() {}
 	virtual uint32_t writeTo(AppBuf &buf) = 0;
 	virtual uint32_t readFrom(AppBuf &buf) = 0;
 	virtual uint32_t getId(void) const = 0;
