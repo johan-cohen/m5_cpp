@@ -1,6 +1,6 @@
 CPPFLAGS = -std=c++11 -Wall -Wextra -Werror -O0 -g -Isrc
 
-CXX = g++
+CXX ?= g++
 
 SRC_DIR = src
 
