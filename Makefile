@@ -21,11 +21,11 @@ dirs:
 $(OBJS_DIR)/test_%.o: $(SRC_DIR)/test_%.cpp $(SRC_DIR)/%.cpp $(SRC_DIR)/AppBuf.hpp $(SRC_DIR)/test_Common.hpp $(SRC_DIR)/Properties.hpp $(SRC_DIR)/Common.hpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
-$(BINS_DIR)/test_%: $(OBJS_DIR)/test_%.o $(OBJS_DIR)/%.o $(OBJS_DIR)/Properties.o $(OBJS_DIR)/AppBuf.o
-	$(CXX) $(CPPFLAGS) -o $@ $^
-
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
+
+$(BINS_DIR)/test_%: $(OBJS_DIR)/test_%.o $(OBJS_DIR)/%.o $(OBJS_DIR)/Properties.o $(OBJS_DIR)/AppBuf.o
+	$(CXX) $(CPPFLAGS) -o $@ $^
 
 tests: $(TESTS)
 	@$(foreach test_case, $(TESTS), ./$(test_case) || exit 1;)
