@@ -42,6 +42,13 @@
 
 namespace m5 {
 
+PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
+	properties(PktType::CONNACK)
+{
+	this->_sessionPresent = sessionPresent;
+	this->_reasonCode = (uint8_t)reasonCode;
+}
+
 uint32_t PktConnAck::writeTo(AppBuf &buf)
 {
 	(void)buf;

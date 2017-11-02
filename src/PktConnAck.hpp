@@ -42,14 +42,25 @@
 #define __PKT_CONNACK_HPP__
 
 #include "ProtoEntity.hpp"
+#include "Properties.hpp"
 #include "AppBuf.hpp"
 #include "Common.hpp"
 
 namespace m5 {
 
 class PktConnAck : public ProtoEntity {
+private:
+	bool _sessionPresent = false;
+	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
+
 public:
+	PktConnAck(bool sessionPresent = false,
+		   ReasonCode reasonCode = ReasonCode::SUCCESS);
+
 	~PktConnAck() {}
+
+	PropertiesList properties;
+
 	uint32_t writeTo(AppBuf &buf);
 	uint32_t readFrom(AppBuf &buf);
 	uint32_t getId(void) const { return (uint32_t)PktType::CONNACK; }
