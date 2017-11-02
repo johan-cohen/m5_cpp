@@ -64,7 +64,7 @@ private:
 
 	enum PktType pktType = PktType::RESERVED;
 	uint64_t enabledProperties = 0;
-	uint64_t properties = 0;
+	uint64_t allowedProperties = 0;
 	uint32_t _wireSize = 0;
 
 	void computePktFlags(void);
@@ -83,7 +83,7 @@ private:
 
 	void resetPacketType(const enum PktType type);
 
-	uint64_t allowed() const { return properties; }
+	uint64_t allowed() const { return allowedProperties; }
 	uint64_t enabled() const { return enabledProperties; }
 
 	void enableProperty(PropertyId id);

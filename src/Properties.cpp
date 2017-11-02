@@ -49,49 +49,49 @@ namespace  m5 {
 
 void Properties::computePktFlags(void)
 {
-	properties = 0;
+	allowedProperties = 0;
 	enabledProperties = 0;
 
 	switch (pktType) {
 	case PktType::CONNECT:
-		properties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
-		properties += __POW2(PropertyId::AUTH_METHOD);
-		properties += __POW2(PropertyId::AUTH_DATA);
-		properties += __POW2(PropertyId::REQUEST_PROBLEM_INFORMATION);
-		properties += __POW2(PropertyId::WILL_DELAY_INTERVAL);
-		properties += __POW2(PropertyId::REQUEST_RESPONSE_INFORMATION);
-		properties += __POW2(PropertyId::RECEIVE_MAXIMUM);
-		properties += __POW2(PropertyId::TOPIC_ALIAS_MAXIMUM);
-		properties += __POW2(PropertyId::USER_PROPERTY);
-		properties += __POW2(PropertyId::MAXIMUM_PACKET_SIZE);
+		allowedProperties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
+		allowedProperties += __POW2(PropertyId::AUTH_METHOD);
+		allowedProperties += __POW2(PropertyId::AUTH_DATA);
+		allowedProperties += __POW2(PropertyId::REQUEST_PROBLEM_INFORMATION);
+		allowedProperties += __POW2(PropertyId::WILL_DELAY_INTERVAL);
+		allowedProperties += __POW2(PropertyId::REQUEST_RESPONSE_INFORMATION);
+		allowedProperties += __POW2(PropertyId::RECEIVE_MAXIMUM);
+		allowedProperties += __POW2(PropertyId::TOPIC_ALIAS_MAXIMUM);
+		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += __POW2(PropertyId::MAXIMUM_PACKET_SIZE);
 		break;
 	case PktType::CONNACK:
-		properties += __POW2(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
-		properties += __POW2(PropertyId::SERVER_KEEP_ALIVE);
-		properties += __POW2(PropertyId::AUTH_METHOD);
-		properties += __POW2(PropertyId::AUTH_DATA);
-		properties += __POW2(PropertyId::RESPONSE_INFORMATION);
-		properties += __POW2(PropertyId::SERVER_REFERENCE);
-		properties += __POW2(PropertyId::REASON_STR);
-		properties += __POW2(PropertyId::RECEIVE_MAXIMUM);
-		properties += __POW2(PropertyId::TOPIC_ALIAS_MAXIMUM);
-		properties += __POW2(PropertyId::MAXIMUM_QOS);
-		properties += __POW2(PropertyId::RETAIN_AVAILABLE);
-		properties += __POW2(PropertyId::USER_PROPERTY);
-		properties += __POW2(PropertyId::MAXIMUM_PACKET_SIZE);
-		properties += __POW2(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
-		properties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
-		properties += __POW2(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
+		allowedProperties += __POW2(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
+		allowedProperties += __POW2(PropertyId::SERVER_KEEP_ALIVE);
+		allowedProperties += __POW2(PropertyId::AUTH_METHOD);
+		allowedProperties += __POW2(PropertyId::AUTH_DATA);
+		allowedProperties += __POW2(PropertyId::RESPONSE_INFORMATION);
+		allowedProperties += __POW2(PropertyId::SERVER_REFERENCE);
+		allowedProperties += __POW2(PropertyId::REASON_STR);
+		allowedProperties += __POW2(PropertyId::RECEIVE_MAXIMUM);
+		allowedProperties += __POW2(PropertyId::TOPIC_ALIAS_MAXIMUM);
+		allowedProperties += __POW2(PropertyId::MAXIMUM_QOS);
+		allowedProperties += __POW2(PropertyId::RETAIN_AVAILABLE);
+		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += __POW2(PropertyId::MAXIMUM_PACKET_SIZE);
+		allowedProperties += __POW2(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
+		allowedProperties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
+		allowedProperties += __POW2(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 		break;
 	case PktType::PUBLISH:
-		properties += __POW2(PropertyId::PAYLOAD_FORMAT_INDICATOR);
-		properties += __POW2(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
-		properties += __POW2(PropertyId::CONTENT_TYPE);
-		properties += __POW2(PropertyId::RESPONSE_TOPIC);
-		properties += __POW2(PropertyId::CORRELATION_DATA);
-		properties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
-		properties += __POW2(PropertyId::TOPIC_ALIAS);
-		properties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += __POW2(PropertyId::PAYLOAD_FORMAT_INDICATOR);
+		allowedProperties += __POW2(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
+		allowedProperties += __POW2(PropertyId::CONTENT_TYPE);
+		allowedProperties += __POW2(PropertyId::RESPONSE_TOPIC);
+		allowedProperties += __POW2(PropertyId::CORRELATION_DATA);
+		allowedProperties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
+		allowedProperties += __POW2(PropertyId::TOPIC_ALIAS);
+		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::PUBACK:
 	case PktType::PUBREC:
@@ -99,27 +99,27 @@ void Properties::computePktFlags(void)
 	case PktType::PUBCOMP:
 	case PktType::SUBACK:
 	case PktType::UNSUBACK:
-		properties += __POW2(PropertyId::REASON_STR);
-		properties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += __POW2(PropertyId::REASON_STR);
+		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::SUBSCRIBE:
-		properties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
+		allowedProperties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
 		break;
 	case PktType::UNSUBSCRIBE:
 	case PktType::PINGREQ:
 	case PktType::PINGRESP:
 		break;
 	case PktType::DISCONNECT:
-		properties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
-		properties += __POW2(PropertyId::SERVER_REFERENCE);
-		properties += __POW2(PropertyId::REASON_STR);
-		properties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
+		allowedProperties += __POW2(PropertyId::SERVER_REFERENCE);
+		allowedProperties += __POW2(PropertyId::REASON_STR);
+		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::AUTH:
-		properties += __POW2(PropertyId::AUTH_METHOD);
-		properties += __POW2(PropertyId::AUTH_DATA);
-		properties += __POW2(PropertyId::REASON_STR);
-		properties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += __POW2(PropertyId::AUTH_METHOD);
+		allowedProperties += __POW2(PropertyId::AUTH_DATA);
+		allowedProperties += __POW2(PropertyId::REASON_STR);
+		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::RESERVED:
 	default:
