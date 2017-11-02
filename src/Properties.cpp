@@ -684,6 +684,17 @@ uint32_t Properties::read(AppBuf &buf)
 	return this->wireSize();
 }
 
+
+static void writeNumProp(AppBuf &buf, uint32_t num, uint8_t size)
+{
+	typedef void (AppBuf::*WriteNumPtr)(uint32_t);
+	WriteNumPtr ptrs[] = { &AppBuf::writeNum8, &AppBuf::writeNum16, &AppBuf::writeNum32 };
+
+	WriteNumPtr ptr = ptrs[size / 2];
+
+	(buf.*ptr)(num);
+}
+
 uint32_t Properties::write(AppBuf &buf)
 {
 	auto fullLen = this->wireSize() + VBIWireSize(this->wireSize());
@@ -699,19 +710,7 @@ uint32_t Properties::write(AppBuf &buf)
 		auto num = (*itNum).second;
 
 		buf.writeNum8(id);
-		switch (num.size) {
-		case 1:
-			buf.writeNum8(num.num);
-			break;
-		case 2:
-			buf.writeNum16(num.num);
-			break;
-		case 4:
-			buf.writeNum32(num.num);
-			break;
-		default:
-			throw std::invalid_argument("Invalid integer size");
-		}
+		writeNumProp(buf, num.num, num.size);
 
 		itNum++;
 	}
