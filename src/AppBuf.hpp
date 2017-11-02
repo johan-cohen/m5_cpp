@@ -111,10 +111,10 @@ public:
 	void write(const uint8_t *d, std::size_t size);
 
 	/* writeNum8 does not do bound checking, use bytesToWrite */
-	void writeNum8(uint8_t v);
+	void writeNum8(uint32_t v);
 
 	/* writeNum16 does not do bound checking, use bytesToWrite */
-	void writeNum16(uint16_t v);
+	void writeNum16(uint32_t v);
 
 	/* writeNum32 does not do bound checking, use bytesToWrite */
 	void writeNum32(uint32_t v);

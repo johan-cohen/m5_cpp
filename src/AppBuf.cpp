@@ -234,12 +234,12 @@ template <typename T> void AppBuf::writeNum(const T &v)
 	this->write(data, sizeof(v));
 }
 
-void AppBuf::writeNum8(uint8_t v)
+void AppBuf::writeNum8(uint32_t v)
 {
 	this->writeNum<uint8_t>(v);
 }
 
-void AppBuf::writeNum16(uint16_t v)
+void AppBuf::writeNum16(uint32_t v)
 {
 	this->writeNum<uint16_t>(v);
 }
