@@ -51,9 +51,30 @@ PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
 
 uint32_t PktConnAck::writeTo(AppBuf &buf)
 {
-	(void)buf;
+	uint32_t fullPktSize;
+	uint32_t propWSWS;
+	uint32_t propWS;
+	uint32_t remLenWS;
+	uint32_t remLen;
 
-	return 0;
+	propWS = properties.wireSize();
+	propWSWS = VBIWireSize(propWS);
+
+	remLen = 2 + propWSWS + propWS;
+	remLenWS = VBIWireSize(remLen);
+
+	fullPktSize = 1 + remLenWS + remLen;
+	if (buf.bytesToWrite() < fullPktSize) {
+		throw std::out_of_range("No enough space in buffer");
+	}
+
+	buf.writeNum8(((uint8_t)PktType::CONNACK) << 4);
+	buf.writeVBI(remLen);
+	buf.writeNum8(this->_sessionPresent ? 0x01 : 0x00);
+	buf.writeNum8(this->_reasonCode);
+	properties.write(buf);
+
+	return fullPktSize;
 }
 
 uint32_t PktConnAck::readFrom(AppBuf &buf)
