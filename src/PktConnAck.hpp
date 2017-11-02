@@ -59,7 +59,7 @@ public:
 
 	~PktConnAck() {}
 
-	PropertiesList properties;
+	Properties properties;
 
 	uint32_t writeTo(AppBuf &buf);
 	uint32_t readFrom(AppBuf &buf);

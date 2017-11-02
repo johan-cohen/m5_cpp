@@ -71,14 +71,14 @@ static const std::vector<uint8_t> msg(MSG, MSG + MSG_LEN);
 
 int test_Properties(void)
 {
-	m5::PropertiesList *propList;
+	m5::Properties *propList;
 	uint32_t wireSize = 0;
 	uint32_t u32;
 	uint16_t u16;
 	uint8_t u8;
 	bool res;
 
-	propList = new m5::PropertiesList(m5::PktType::PUBLISH);
+	propList = new m5::Properties(m5::PktType::PUBLISH);
 
 	propList->payloadFormatIndicator(testU8);
 	u8 = propList->payloadFormatIndicator();
@@ -159,7 +159,7 @@ int test_Properties(void)
 
 	delete propList;
 
-	propList = new m5::PropertiesList(m5::PktType::CONNECT);
+	propList = new m5::Properties(m5::PktType::CONNECT);
 
 	propList->sessionExpiryInterval(testU32);
 	u32 = propList->sessionExpiryInterval();

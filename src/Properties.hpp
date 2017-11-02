@@ -52,7 +52,7 @@ namespace m5 {
 typedef std::pair<ByteArray, ByteArray > KeyValuePair;
 typedef std::list<KeyValuePair> UserProperty;
 
-class PropertiesList {
+class Properties {
 private:
 	struct NumSize { uint32_t num; uint8_t size; };
 	typedef std::pair<uint8_t, ByteArray> BinaryPropPair;
@@ -89,8 +89,8 @@ private:
 	void enableProperty(PropertyId id);
 
 public:
-	PropertiesList(const PktType type = PktType::RESERVED);
-	~PropertiesList();
+	Properties(const PktType type = PktType::RESERVED);
+	~Properties();
 
 	enum PktType packetType() const { return pktType; }
 

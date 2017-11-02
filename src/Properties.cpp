@@ -47,7 +47,7 @@
 
 namespace  m5 {
 
-void PropertiesList::computePktFlags(void)
+void Properties::computePktFlags(void)
 {
 	properties = 0;
 	enabledProperties = 0;
@@ -127,37 +127,37 @@ void PropertiesList::computePktFlags(void)
 	}
 }
 
-PropertiesList::PropertiesList(const PktType type)
+Properties::Properties(const PktType type)
 {
 	this->resetPacketType(type);
 }
 
-PropertiesList::~PropertiesList()
+Properties::~Properties()
 {
 }
 
-void PropertiesList::resetPacketType(const PktType type)
+void Properties::resetPacketType(const PktType type)
 {
 	this->pktType = type;
 	this->computePktFlags();
 }
 
-bool PropertiesList::isAllowed(uint8_t id) const
+bool Properties::isAllowed(uint8_t id) const
 {
 	return allowed() & __POW2(id);
 }
 
-bool PropertiesList::isAllowed(PropertyId id) const
+bool Properties::isAllowed(PropertyId id) const
 {
 	return isAllowed((uint8_t)id);
 }
 
-bool PropertiesList::isEnabled(PropertyId id) const
+bool Properties::isEnabled(PropertyId id) const
 {
 	return enabled() & __POW2(id);
 }
 
-void PropertiesList::append(const ByteArray &key, const ByteArray &value)
+void Properties::append(const ByteArray &key, const ByteArray &value)
 {
 	if (!isAllowed(PropertyId::USER_PROPERTY)) {
 		throw std::invalid_argument("Invalid property for this packet");
@@ -171,8 +171,8 @@ void PropertiesList::append(const ByteArray &key, const ByteArray &value)
 }
 
 
-void PropertiesList::append(const uint8_t *key, uint16_t keySize,
-			    const uint8_t *value, uint16_t valueSize)
+void Properties::append(const uint8_t *key, uint16_t keySize,
+			const uint8_t *value, uint16_t valueSize)
 {
 	ByteArray _key(key, key + keySize);
 	ByteArray _value(value, value + valueSize);
@@ -180,7 +180,7 @@ void PropertiesList::append(const uint8_t *key, uint16_t keySize,
 	append(_key, _value);
 }
 
-void PropertiesList::append(PropertyId id, const ByteArray &src)
+void Properties::append(PropertyId id, const ByteArray &src)
 {
 	if (!isAllowed(id)) {
 		throw std::invalid_argument("Invalid property for this packet");
@@ -206,13 +206,13 @@ void PropertiesList::append(PropertyId id, const ByteArray &src)
 	}
 }
 
-void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
+void Properties::append(PropertyId id, const uint8_t *data, uint16_t size)
 {
 	ByteArray src(data, data + size);
 	append(id, src);
 }
 
-void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
+void Properties::append(PropertyId id, uint32_t value, uint32_t wireSize)
 {
 	if (!isAllowed(id)) {
 		throw std::invalid_argument("Invalid property for this packet");
@@ -237,7 +237,7 @@ void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
 	enableProperty(id);
 }
 
-const ByteArray &PropertiesList::valueBinary(PropertyId id) const
+const ByteArray &Properties::valueBinary(PropertyId id) const
 {
 	if (!isEnabled(id)) {
 		static auto none = ByteArray();
@@ -250,7 +250,7 @@ const ByteArray &PropertiesList::valueBinary(PropertyId id) const
 	return (*it).second;
 }
 
-uint32_t PropertiesList::valueNum(PropertyId id) const
+uint32_t Properties::valueNum(PropertyId id) const
 {
 	if (!isEnabled(id)) {
 		return 0;
@@ -261,248 +261,248 @@ uint32_t PropertiesList::valueNum(PropertyId id) const
 	return ((*it).second).num;
 }
 
-void PropertiesList::enableProperty(PropertyId id)
+void Properties::enableProperty(PropertyId id)
 {
 	this->enabledProperties |= __POW2(id);
 }
 
-void PropertiesList::payloadFormatIndicator(uint8_t v)
+void Properties::payloadFormatIndicator(uint8_t v)
 {
 	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v, 1);
 }
 
-uint8_t PropertiesList::payloadFormatIndicator(void) const
+uint8_t Properties::payloadFormatIndicator(void) const
 {
 	return valueNum(PropertyId::PAYLOAD_FORMAT_INDICATOR);
 }
 
-void PropertiesList::publicationExpiryInterval(uint32_t v)
+void Properties::publicationExpiryInterval(uint32_t v)
 {
 	append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v, 4);
 }
 
-uint32_t PropertiesList::publicationExpiryInterval(void) const
+uint32_t Properties::publicationExpiryInterval(void) const
 {
 	return valueNum(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
 }
 
-void PropertiesList::contentType(const uint8_t *data, uint16_t size)
+void Properties::contentType(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::CONTENT_TYPE, data, size);
 }
 
-void PropertiesList::contentType(const char *str)
+void Properties::contentType(const char *str)
 {
 	contentType((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::contentType(void) const
+const ByteArray &Properties::contentType(void) const
 {
 	return valueBinary(PropertyId::CONTENT_TYPE);
 }
 
-void PropertiesList::responseTopic(const uint8_t *data, uint16_t size)
+void Properties::responseTopic(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::RESPONSE_TOPIC, data, size);
 }
 
-void PropertiesList::responseTopic(const char *str)
+void Properties::responseTopic(const char *str)
 {
 	responseTopic((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::responseTopic(void) const
+const ByteArray &Properties::responseTopic(void) const
 {
 	return valueBinary(PropertyId::RESPONSE_TOPIC);
 }
 
-void PropertiesList::subscriptionIdentifier(uint32_t v)
+void Properties::subscriptionIdentifier(uint32_t v)
 {
 	auto ws = VBIWireSize(v);
 	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v, ws);
 }
 
-uint32_t PropertiesList::subscriptionIdentifier(void) const
+uint32_t Properties::subscriptionIdentifier(void) const
 {
 	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER);
 }
 
-void PropertiesList::correlationData(const uint8_t *data, uint16_t size)
+void Properties::correlationData(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::CORRELATION_DATA, data, size);
 }
 
-const ByteArray &PropertiesList::correlationData(void) const
+const ByteArray &Properties::correlationData(void) const
 {
 	return valueBinary(PropertyId::CORRELATION_DATA);
 }
 
-void PropertiesList::sessionExpiryInterval(uint32_t v)
+void Properties::sessionExpiryInterval(uint32_t v)
 {
 	append(PropertyId::SESSION_EXPIRY_INTERVAL, v, 4);
 }
 
-uint32_t PropertiesList::sessionExpiryInterval(void) const
+uint32_t Properties::sessionExpiryInterval(void) const
 {
 	return valueNum(PropertyId::SESSION_EXPIRY_INTERVAL);
 }
 
-void PropertiesList::assignedClientIdentifier(const uint8_t *data, uint16_t size)
+void Properties::assignedClientIdentifier(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, data, size);
 }
 
-void PropertiesList::assignedClientIdentifier(const char *str)
+void Properties::assignedClientIdentifier(const char *str)
 {
 	assignedClientIdentifier((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::assignedClientIdentifier(void) const
+const ByteArray &Properties::assignedClientIdentifier(void) const
 {
 	return valueBinary(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
 
-void PropertiesList::serverKeepAlive(uint16_t v)
+void Properties::serverKeepAlive(uint16_t v)
 {
 	append(PropertyId::SERVER_KEEP_ALIVE, v, 2);
 }
 
-uint16_t PropertiesList::serverKeepAlive(void) const
+uint16_t Properties::serverKeepAlive(void) const
 {
 	return valueNum(PropertyId::SERVER_KEEP_ALIVE);
 }
 
-void PropertiesList::authenticationMethod(const uint8_t *data, uint16_t size)
+void Properties::authenticationMethod(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::AUTH_METHOD, data, size);
 }
 
-void PropertiesList::authenticationMethod(const char *str)
+void Properties::authenticationMethod(const char *str)
 {
 	authenticationMethod((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::authenticationMethod(void) const
+const ByteArray &Properties::authenticationMethod(void) const
 {
 	return valueBinary(PropertyId::AUTH_METHOD);
 }
 
-void PropertiesList::authenticationData(const uint8_t *data, uint16_t size)
+void Properties::authenticationData(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::AUTH_DATA, data, size);
 }
 
-const ByteArray &PropertiesList::authenticationData(void) const
+const ByteArray &Properties::authenticationData(void) const
 {
 	return valueBinary(PropertyId::AUTH_DATA);
 }
 
-void PropertiesList::requestProblemInformation(bool v)
+void Properties::requestProblemInformation(bool v)
 {
 	append(PropertyId::REQUEST_PROBLEM_INFORMATION, v, 1);
 }
 
-bool PropertiesList::requestProblemInformation(void) const
+bool Properties::requestProblemInformation(void) const
 {
 	return valueNum(PropertyId::REQUEST_PROBLEM_INFORMATION);
 }
 
-void PropertiesList::willDelayInterval(uint32_t v)
+void Properties::willDelayInterval(uint32_t v)
 {
 	append(PropertyId::WILL_DELAY_INTERVAL, v, 4);
 }
 
-uint32_t PropertiesList::willDelayInterval(void) const
+uint32_t Properties::willDelayInterval(void) const
 {
 	return valueNum(PropertyId::WILL_DELAY_INTERVAL);
 }
 
-void PropertiesList::requestResponseInformation(bool v)
+void Properties::requestResponseInformation(bool v)
 {
 	append(PropertyId::REQUEST_RESPONSE_INFORMATION, v, 1);
 }
 
-bool PropertiesList::requestResponseInformation(void) const
+bool Properties::requestResponseInformation(void) const
 {
 	return valueNum(PropertyId::REQUEST_RESPONSE_INFORMATION);
 }
 
-void PropertiesList::responseInformation(const uint8_t *data, uint16_t size)
+void Properties::responseInformation(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::RESPONSE_INFORMATION, data, size);
 }
 
-void PropertiesList::responseInformation(const char *str)
+void Properties::responseInformation(const char *str)
 {
 	responseInformation((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::responseInformation(void) const
+const ByteArray &Properties::responseInformation(void) const
 {
 	return valueBinary(PropertyId::RESPONSE_INFORMATION);
 }
 
-void PropertiesList::serverReference(const uint8_t *data, uint16_t size)
+void Properties::serverReference(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::SERVER_REFERENCE, data, size);
 }
 
-void PropertiesList::serverReference(const char *str)
+void Properties::serverReference(const char *str)
 {
 	serverReference((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::serverReference(void) const
+const ByteArray &Properties::serverReference(void) const
 {
 	return valueBinary(PropertyId::SERVER_REFERENCE);
 }
 
-void PropertiesList::reasonString(const uint8_t *data, uint16_t size)
+void Properties::reasonString(const uint8_t *data, uint16_t size)
 {
 	append(PropertyId::REASON_STR, data, size);
 }
 
-void PropertiesList::reasonString(const char *str)
+void Properties::reasonString(const char *str)
 {
 	reasonString((const uint8_t *)str, strlen(str));
 }
 
-const ByteArray &PropertiesList::reasonString(void) const
+const ByteArray &Properties::reasonString(void) const
 {
 	return valueBinary(PropertyId::REASON_STR);
 }
 
-void PropertiesList::receiveMaximum(uint16_t v)
+void Properties::receiveMaximum(uint16_t v)
 {
 	append(PropertyId::RECEIVE_MAXIMUM, v, 2);
 }
 
-uint16_t PropertiesList::receiveMaximum(void) const
+uint16_t Properties::receiveMaximum(void) const
 {
 	return valueNum(PropertyId::RECEIVE_MAXIMUM);
 }
 
-void PropertiesList::topicAliasMaximum(uint16_t v)
+void Properties::topicAliasMaximum(uint16_t v)
 {
 	append(PropertyId::TOPIC_ALIAS_MAXIMUM, v, 2);
 }
 
-uint16_t PropertiesList::topicAliasMaximum(void) const
+uint16_t Properties::topicAliasMaximum(void) const
 {
 	return valueNum(PropertyId::TOPIC_ALIAS_MAXIMUM);
 }
 
-void PropertiesList::topicAlias(uint16_t v)
+void Properties::topicAlias(uint16_t v)
 {
 	append(PropertyId::TOPIC_ALIAS, v, 2);
 }
 
-uint16_t PropertiesList::topicAlias(void) const
+uint16_t Properties::topicAlias(void) const
 {
 	return valueNum(PropertyId::TOPIC_ALIAS);
 }
 
-void PropertiesList::maximumQoS(PktQoS qos)
+void Properties::maximumQoS(PktQoS qos)
 {
 	switch (qos) {
 	case PktQoS::QoS0:
@@ -516,79 +516,79 @@ void PropertiesList::maximumQoS(PktQoS qos)
 	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
 }
 
-PktQoS PropertiesList::maximumQoS(void) const
+PktQoS Properties::maximumQoS(void) const
 {
 	return (PktQoS)valueNum(PropertyId::MAXIMUM_QOS);
 }
 
-void PropertiesList::retainAvailable(bool v)
+void Properties::retainAvailable(bool v)
 {
 	append(PropertyId::RETAIN_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::retainAvailable(void) const
+bool Properties::retainAvailable(void) const
 {
 	return valueNum(PropertyId::RETAIN_AVAILABLE);
 }
 
-void PropertiesList::userProperty(const uint8_t *key, uint16_t keySize,
+void Properties::userProperty(const uint8_t *key, uint16_t keySize,
 				  const uint8_t *value, uint16_t valueSize)
 {
 	append(key, keySize, value, valueSize);
 }
 
-void PropertiesList::userProperty(const char *key, const char *val)
+void Properties::userProperty(const char *key, const char *val)
 {
 	userProperty((const uint8_t *)key, strlen(key),
 		     (const uint8_t *)val, strlen(val));
 }
 
-const UserProperty &PropertiesList::userProperty(void) const
+const UserProperty &Properties::userProperty(void) const
 {
 	return userProps;
 }
 
-void PropertiesList::maximumPacketSize(uint32_t v)
+void Properties::maximumPacketSize(uint32_t v)
 {
 	append(PropertyId::MAXIMUM_PACKET_SIZE, v, 4);
 }
 
-uint32_t PropertiesList::maximumPacketSize(void) const
+uint32_t Properties::maximumPacketSize(void) const
 {
 	return valueNum(PropertyId::MAXIMUM_PACKET_SIZE);
 }
 
-void PropertiesList::wildcardSubscriptionAvailable(bool v)
+void Properties::wildcardSubscriptionAvailable(bool v)
 {
 	append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::wildcardSubscriptionAvailable(void) const
+bool Properties::wildcardSubscriptionAvailable(void) const
 {
 	return valueNum(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
 }
 
-void PropertiesList::subscriptionIdentifierAvailable(bool v)
+void Properties::subscriptionIdentifierAvailable(bool v)
 {
 	append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::subscriptionIdentifierAvailable(void) const
+bool Properties::subscriptionIdentifierAvailable(void) const
 {
 	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
 }
 
-void PropertiesList::sharedSubscriptionAvailable(bool v)
+void Properties::sharedSubscriptionAvailable(bool v)
 {
 	append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
-bool PropertiesList::sharedSubscriptionAvailable(void) const
+bool Properties::sharedSubscriptionAvailable(void) const
 {
 	return valueNum(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 }
 
-uint32_t PropertiesList::read(AppBuf &buf)
+uint32_t Properties::read(AppBuf &buf)
 {
 	uint32_t propWireSize;
 	uint32_t fieldLen;
@@ -684,7 +684,7 @@ uint32_t PropertiesList::read(AppBuf &buf)
 	return this->wireSize();
 }
 
-uint32_t PropertiesList::write(AppBuf &buf)
+uint32_t Properties::write(AppBuf &buf)
 {
 	auto fullLen = this->wireSize() + VBIWireSize(this->wireSize());
 	if (fullLen > buf.bytesToWrite()) {

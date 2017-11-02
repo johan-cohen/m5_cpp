@@ -85,7 +85,7 @@ public:
 	PktConnect(const char *clientId, bool cleanStart = true);
 	~PktConnect();
 
-	PropertiesList properties;
+	Properties properties;
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
