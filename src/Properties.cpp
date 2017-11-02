@@ -160,7 +160,7 @@ bool PropertiesList::isEnabled(PropertyId id) const
 void PropertiesList::append(const ByteArray &key, const ByteArray &value)
 {
 	if (!isAllowed(PropertyId::USER_PROPERTY)) {
-		return;
+		throw std::invalid_argument("Invalid property for this packet");
 	}
 
 	userProps.push_back(KeyValuePair(key, value));
@@ -183,7 +183,7 @@ void PropertiesList::append(const uint8_t *key, uint16_t keySize,
 void PropertiesList::append(PropertyId id, const ByteArray &src)
 {
 	if (!isAllowed(id)) {
-		return;
+		throw std::invalid_argument("Invalid property for this packet");
 	}
 
 	if (isEnabled(id)) {
@@ -215,7 +215,7 @@ void PropertiesList::append(PropertyId id, const uint8_t *data, uint16_t size)
 void PropertiesList::append(PropertyId id, uint32_t value, uint32_t wireSize)
 {
 	if (!isAllowed(id)) {
-		return;
+		throw std::invalid_argument("Invalid property for this packet");
 	}
 
 	if (isEnabled(id)) {
