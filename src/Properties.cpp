@@ -722,7 +722,7 @@ uint32_t PropertiesList::write(AppBuf &buf)
 		auto &item = (*itBin).second;
 
 		buf.writeNum8(id);
-		buf.writeBinary(&item[0], item.size());
+		buf.writeBinary(item.data(), item.size());
 
 		itBin++;
 	}
@@ -733,8 +733,8 @@ uint32_t PropertiesList::write(AppBuf &buf)
 		auto &value = (*itUser).second;
 
 		buf.writeNum8(PropertyId::USER_PROPERTY);
-		buf.writeBinary(&key[0], key.size());
-		buf.writeBinary(&value[0], value.size());
+		buf.writeBinary(key.data(), key.size());
+		buf.writeBinary(value.data(), value.size());
 
 		itUser++;
 	}
