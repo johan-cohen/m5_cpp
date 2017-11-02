@@ -91,7 +91,7 @@ std::size_t AppBuf::bytesToRead(void) const
 
 void AppBuf::read(uint8_t *d, std::size_t size)
 {
-	memcpy(d, currentRead(), size);
+	memcpy(d, ptrRead(), size);
 	this->_offset += size;
 }
 
@@ -150,7 +150,7 @@ void AppBuf::readBinary(ByteArray &dst)
 		throw std::out_of_range("No enough space in output buffer");
 	}
 
-	dst.assign(currentRead(), currentRead() + len);
+	dst.assign(ptrRead(), ptrRead() + len);
 	this->_offset += len;
 }
 
@@ -202,7 +202,7 @@ void AppBuf::readSkip(std::size_t n, bool forward)
 
 void AppBuf::write(const uint8_t *d, std::size_t size)
 {
-	memcpy(currentWrite(), d, size);
+	memcpy(ptrWrite(), d, size);
 	this->_length += size;
 }
 

@@ -63,8 +63,8 @@ public:
 	~AppBuf();
 
 	const uint8_t *data() const { return _data.data(); }
-	uint8_t *currentWrite(void) { return _data.data() + _length; }
-	uint8_t *currentRead(void) { return _data.data() + _offset; }
+	uint8_t *ptrWrite(void) { return _data.data() + _length; }
+	uint8_t *ptrRead(void) { return _data.data() + _offset; }
 
 	std::size_t size(void) const { return _size; }
 	std::size_t length(void) const { return _length; }
