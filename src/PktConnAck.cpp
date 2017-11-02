@@ -79,9 +79,39 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 
 uint32_t PktConnAck::readFrom(AppBuf &buf)
 {
-	(void)buf;
+	std::size_t alreadyTraversed = buf.traversed();
+	uint8_t remLenWS;
+	uint32_t remLen;
+	uint8_t first;
 
-	return 0;
+	if (buf.bytesToRead() < 5) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	first = buf.readNum8();
+	if (first != ((uint8_t)PktType::CONNACK << 4)) {
+		throw std::invalid_argument("CONNACK msg not found in buf");
+	}
+
+	buf.readVBI(remLen, remLenWS);
+	if (remLen < 3) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	uint8_t num8 = buf.readNum8();
+	if (num8 & 0xFD) {
+		throw std::out_of_range("Invalid CONNACK session value");
+	}
+	this->_sessionPresent = num8 ? true : false;
+	this->_reasonCode = buf.readNum8();
+	properties.read(buf);
+
+	uint32_t fullPktSize = 1 + remLenWS + remLen;
+	if (buf.traversed() - alreadyTraversed != fullPktSize) {
+		throw std::invalid_argument("Corrupted input buffer");
+	}
+
+	return fullPktSize;
 }
 
 }
