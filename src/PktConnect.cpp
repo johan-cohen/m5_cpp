@@ -102,6 +102,11 @@ bool PktConnect::flagUserName(uint8_t flags)
 	return flags & (1 << 7);
 }
 
+bool PktConnect::validClientIdSize(uint16_t size)
+{
+	return (size >= clientIdMinLen && size <= clientIdMaxLen);
+}
+
 uint32_t PktConnect::payloadWireSize(void) const
 {
 	uint32_t wireSize;
@@ -250,6 +255,9 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	properties.read(buf);
 
 	buf.readBinary(_clientId);
+	if (!validClientIdSize(clientId().size())) {
+		throw std::invalid_argument("Invalid Client Id size");
+	}
 
 	if (flagWillMsg(connectFlags) == true) {
 		buf.readBinary(_willTopic);
@@ -279,8 +287,8 @@ uint32_t PktConnect::getId(void) const
 
 void PktConnect::clientId(const uint8_t *data, uint16_t size)
 {
-	if (size < clientIdMinLen || size > clientIdMaxLen) {
-			throw std::invalid_argument("Invalid ClientId length");
+	if (!validClientIdSize(size)) {
+		throw std::invalid_argument("Invalid Client Id size");
 	}
 
 	this->_clientId.assign(data, data + size);

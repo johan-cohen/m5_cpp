@@ -77,6 +77,7 @@ private:
 	bool flagPassword(uint8_t flags);
 	bool flagUserName(uint8_t flags);
 
+	bool validClientIdSize(uint16_t size);
 public:
 	PktConnect() : properties(PktType::CONNECT) {}
 	PktConnect(AppBuf &buf);
