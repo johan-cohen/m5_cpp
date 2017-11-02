@@ -49,11 +49,25 @@ namespace m5 {
 
 class PktPublish : public ProtoEntity
 {
+private:
+	PktQoS _QoS = PktQoS::QoS0;
+	bool _retain = false;
+	bool _dup = false;
+
 public:
 	Properties properties;
 
 	PktPublish();
 	~PktPublish();
+
+	PktQoS QoS(void) { return this->_QoS; }
+	void QoS(PktQoS q) { this->_QoS = q; }
+
+	bool retain(void) { return this->_retain; }
+	void retain (bool f) { this->_retain = f; }
+
+	bool dup(void) { return this->_dup; }
+	void dup(bool f) { this->_dup = f; }
 
 	uint32_t writeTo(AppBuf &buf);
 	uint32_t readFrom(AppBuf &buf);
