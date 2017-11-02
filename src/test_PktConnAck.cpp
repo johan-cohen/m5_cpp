@@ -41,11 +41,83 @@
 #include "test_Common.hpp"
 #include "PktConnAck.hpp"
 
+#include <cstring>
+
 int test(void)
 {
-	m5::PktConnAck *connack = new m5::PktConnAck();
+	const char msg[] = "Hello, World!";
+	m5::ByteArray msgArray(msg, msg + strlen(msg));
+	uint32_t u32 = 0xABCDEF01;
+	uint16_t u16 = 0xABCD;
+	m5::PktConnAck *connAck;
+	m5::AppBuf buf(256);
 
-	delete connack;
+	connAck = new m5::PktConnAck(false, m5::ReasonCode::SUCCESS);
+	connAck->properties.receiveMaximum(u16);
+	connAck->properties.maximumQoS(m5::PktQoS::QoS2);
+	connAck->properties.retainAvailable(true);
+	connAck->properties.maximumPacketSize(u32);
+	connAck->properties.assignedClientIdentifier(msg);
+	connAck->properties.topicAliasMaximum(u16);
+	connAck->properties.reasonString(msg);
+	connAck->properties.userProperty(msg, msg);
+	connAck->properties.wildcardSubscriptionAvailable(true);
+	connAck->properties.sharedSubscriptionAvailable(true);
+	connAck->properties.serverKeepAlive(u16);
+	connAck->properties.responseInformation(msg);
+	connAck->properties.serverReference(msg);
+	connAck->properties.authenticationMethod(msg);
+	connAck->properties.authenticationData((const uint8_t *)msg, strlen(msg));
+
+	connAck->writeTo(buf);
+
+	m5::PktConnAck connAckRead;
+
+	connAckRead.readFrom(buf);
+	if (connAckRead.properties.receiveMaximum() != u16) {
+		throw std::logic_error("receiveMaximum read/write");
+	}
+	if (connAckRead.properties.maximumQoS() != m5::PktQoS::QoS2) {
+		throw std::logic_error("maximumQoS read/write");
+	}
+	if (connAckRead.properties.retainAvailable() != true) {
+		throw std::logic_error("retainAvailable read/write");
+	}
+	if (connAckRead.properties.maximumPacketSize() != u32) {
+		throw std::logic_error("maximumPacketSize read/write");
+	}
+	if (connAckRead.properties.assignedClientIdentifier() != msgArray) {
+		throw std::logic_error("assignedClientIdentifier read/write");
+	}
+	if (connAckRead.properties.topicAliasMaximum() != u16) {
+		throw std::logic_error("topicAliasMaximum read/write");
+	}
+	if (connAckRead.properties.reasonString() != msgArray) {
+		throw std::logic_error("reasonString read/write");
+	}
+	if (connAckRead.properties.wildcardSubscriptionAvailable() != true) {
+		throw std::logic_error("wildcardSubscriptionAvailable read/write");
+	}
+	if (connAckRead.properties.sharedSubscriptionAvailable() != true) {
+		throw std::logic_error("sharedSubscriptionAvailable read/write");
+	}
+	if (connAckRead.properties.serverKeepAlive() != u16) {
+		throw std::logic_error("serverKeepAlive read/write");
+	}
+	if (connAckRead.properties.responseInformation() != msgArray) {
+		throw std::logic_error("responseInformation read/write");
+	}
+	if (connAckRead.properties.serverReference() != msgArray) {
+		throw std::logic_error("serverReference read/write");
+	}
+	if (connAckRead.properties.authenticationMethod() != msgArray) {
+		throw std::logic_error("authenticationMethod read/write");
+	}
+	if (connAckRead.properties.authenticationData() != msgArray) {
+		throw std::logic_error("authenticationData read/write");
+	}
+
+	delete connAck;
 
 	return 0;
 }
