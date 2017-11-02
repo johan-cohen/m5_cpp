@@ -118,7 +118,6 @@ uint32_t PktConnect::payloadWireSize(void) const
 		wireSize += binaryLenSize + willMsg().size();
 	}
 
-
 	if (userName().size() > 0) {
 		wireSize += stringLenSize + userName().size();
 	}
