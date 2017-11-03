@@ -83,6 +83,7 @@ $(BINS_DIR)/test_PktPubMsg:		\
 	$(OBJS_DIR)/test_PktPubMsg.o	\
 	$(OBJS_DIR)/PktPubMsg.o		\
 	$(OBJS_DIR)/PktPubAck.o		\
+	$(OBJS_DIR)/PktPubRec.o		\
 	$(OBJS_DIR)/Properties.o	\
 	$(OBJS_DIR)/AppBuf.o
 	$(CXX) $(CPPFLAGS) -o $@ $^

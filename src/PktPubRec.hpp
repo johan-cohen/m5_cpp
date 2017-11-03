@@ -38,47 +38,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "test_Common.hpp"
-#include "PktPubAck.hpp"
-#include "PktPubRec.hpp"
+#ifndef __PKT_PUBREC_HPP__
+#define __PKT_PUBREC_HPP__
 
-template <typename T> int test(void)
+#include "PktPubMsg.hpp"
+#include "Properties.hpp"
+#include "Common.hpp"
+
+namespace m5 {
+
+class PktPubRec: public PktPubMsg
 {
-	uint16_t u16 = 0xABCD;
-	m5::AppBuf buf(16);
-	T *pub;
+public:
+	PktPubRec() : PktPubMsg(PktType::PUBREC, 0x00) {}
+	~PktPubRec() {}
+};
 
-	pub = new T();
-	pub->packetId(u16);
-	pub->reasonCode(m5::ReasonCode::SERVER_BUSY);
-
-	pub->writeTo(buf);
-
-	T pubRead;
-	pubRead.readFrom(buf);
-
-	if (pub->reasonCode() != pubRead.reasonCode()) {
-		throw std::logic_error("read: Reason Code");
-	}
-	if (pub->packetId() != pubRead.packetId()) {
-		throw std::logic_error("read: Packet Id");
-	}
-
-	delete pub;
-
-	return 0;
 }
 
-int main(void)
-{
-	int rc;
-
-	rc = test<m5::PktPubAck>();
-	test_rc(rc, "PktPubAck");
-
-	rc = test<m5::PktPubRec>();
-	test_rc(rc, "PktPubRec");
-
-	return 0;
-}
+#endif
 
