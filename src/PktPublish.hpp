@@ -60,13 +60,13 @@ public:
 	PktPublish();
 	~PktPublish();
 
-	PktQoS QoS(void) { return this->_QoS; }
+	PktQoS QoS(void) const { return this->_QoS; }
 	void QoS(PktQoS q) { this->_QoS = q; }
 
-	bool retain(void) { return this->_retain; }
+	bool retain(void) const { return this->_retain; }
 	void retain (bool f) { this->_retain = f; }
 
-	bool dup(void) { return this->_dup; }
+	bool dup(void) const { return this->_dup; }
 	void dup(bool f) { this->_dup = f; }
 
 	uint32_t writeTo(AppBuf &buf);
