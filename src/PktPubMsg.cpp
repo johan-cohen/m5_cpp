@@ -98,9 +98,42 @@ uint32_t PktPubMsg::writeTo(AppBuf &buf)
 
 uint32_t PktPubMsg::readFrom(AppBuf &buf)
 {
-	(void)buf;
+	std::size_t alreadyTraversed = buf.traversed();
+	uint32_t remLen;
+	uint8_t remLenWS;
+	uint8_t first;
 
-	return 0;
+	if (buf.bytesToRead() < 6) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	first = buf.readNum8();
+	if (packetType(first) != this->_type) {
+		throw std::invalid_argument("Invalid packet type");
+	}
+	if ((first & 0x0F) != this->_reserved) {
+		throw std::invalid_argument("Invalid fixed header reserved flags");
+	}
+
+	buf.readVBI(remLen, remLenWS);
+	if (remLen > buf.bytesToRead()) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	this->packetId(buf.readNum16());
+	if (this->packetId() == 0) {
+		throw std::invalid_argument("Invalid packet Id");
+	}
+
+	this->reasonCode((ReasonCode)buf.readNum8());
+	properties.read(buf);
+
+	uint32_t fullPktSize = 1 + remLenWS + remLen;
+	if (buf.traversed() - alreadyTraversed != fullPktSize) {
+		throw std::invalid_argument("Corrupted input buffer");
+	}
+
+	return fullPktSize;
 }
 
 }
