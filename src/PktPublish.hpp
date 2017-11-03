@@ -54,6 +54,11 @@ private:
 	bool _retain = false;
 	bool _dup = false;
 
+	uint16_t _packetId = 0;
+	ByteArray _topic;
+
+	ByteArray _payload;
+
 public:
 	Properties properties;
 
@@ -68,6 +73,16 @@ public:
 
 	bool dup(void) const { return this->_dup; }
 	void dup(bool f) { this->_dup = f; }
+
+	void packetId(uint16_t id) { this->_packetId = id; }
+	uint16_t packetId(void) const { return _packetId; }
+
+	void topic(const uint8_t *data, uint16_t size);
+	void topic(const char *str);
+	const ByteArray &topic(void) const { return _topic; }
+
+	void payload(const uint8_t *data, uint16_t size);
+	const ByteArray &payload(void) const { return _payload; }
 
 	uint32_t writeTo(AppBuf &buf);
 	uint32_t readFrom(AppBuf &buf);

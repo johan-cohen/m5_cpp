@@ -54,6 +54,29 @@ PktPublish::~PktPublish()
 
 }
 
+void PktPublish::topic(const uint8_t *data, uint16_t size)
+{
+	if (data == nullptr || size < 1) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	this->_topic.assign(data, data + size);
+}
+
+void PktPublish::topic(const char *str)
+{
+	topic((const uint8_t *)str, strlen(str));
+}
+
+void PktPublish::payload(const uint8_t *data, uint16_t size)
+{
+	if (data == nullptr || size < 1) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	this->_payload.assign(data, data + size);
+}
+
 uint32_t PktPublish::writeTo(AppBuf &buf)
 {
 	(void)buf;
