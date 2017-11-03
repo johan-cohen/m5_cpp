@@ -190,6 +190,11 @@ static inline uint8_t VBIWireSize(uint32_t value)
 	return 0;
 }
 
+static inline PktType packetType(uint8_t byte)
+{
+	return (PktType)((byte & 0xF0) >> 4);
+}
+
 }
 
 #endif
