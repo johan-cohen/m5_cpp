@@ -128,9 +128,56 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 
 uint32_t PktPublish::readFrom(AppBuf &buf)
 {
-	(void)buf;
+	std::size_t alreadyTraversed = buf.traversed();
+	uint32_t remLen;
+	uint8_t remLenWS;
+	uint8_t first;
 
-	return 0;
+	if (buf.bytesToRead() < 4) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	first = buf.readNum8();
+	if (packetType(first) != PktType::PUBLISH) {
+		throw std::invalid_argument("Invalid packet type");
+	}
+
+	this->retain(first & 0x01);
+	this->QoS((PktQoS)((first & 0x06) >> 1));
+	this->dup(first & 0x08);
+
+	buf.readVBI(remLen, remLenWS);
+	if (remLen > buf.bytesToRead()) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	buf.readBinary(this->_topic);
+
+	if(this->QoS() != PktQoS::QoS0) {
+		if (buf.bytesToRead() < 2) {
+			throw std::invalid_argument("Invalid input buffer");
+		}
+
+		this->packetId(buf.readNum16());
+	}
+
+	properties.read(buf);
+
+	const auto traversed = buf.traversed() - alreadyTraversed;
+	const auto payloadSize = 1 + remLenWS + remLen - traversed;
+
+	if (buf.bytesToRead() < payloadSize) {
+		throw std::invalid_argument("Invalid input buffer");
+	}
+
+	buf.read(this->_payload, payloadSize);
+
+	uint32_t fullPktSize = 1 + remLenWS + remLen;
+	if (buf.traversed() - alreadyTraversed != fullPktSize) {
+		throw std::invalid_argument("Corrupted input buffer");
+	}
+
+	return fullPktSize;
 }
 
 }
