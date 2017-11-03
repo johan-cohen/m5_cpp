@@ -18,7 +18,7 @@ dirs:
 	@mkdir -p obj
 	@mkdir -p bin
 
-$(OBJS_DIR)/test_%.o: $(SRC_DIR)/test_%.cpp $(SRC_DIR)/%.cpp $(SRC_DIR)/AppBuf.hpp $(SRC_DIR)/test_Common.hpp $(SRC_DIR)/Properties.hpp $(SRC_DIR)/Common.hpp
+$(OBJS_DIR)/test_%.o: $(SRC_DIR)/test_%.cpp $(SRC_DIR)/%.cpp $(SRC_DIR)/%.hpp $(SRC_DIR)/AppBuf.hpp $(SRC_DIR)/test_Common.hpp $(SRC_DIR)/Properties.hpp $(SRC_DIR)/Common.hpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
