@@ -79,9 +79,51 @@ void PktPublish::payload(const uint8_t *data, uint16_t size)
 
 uint32_t PktPublish::writeTo(AppBuf &buf)
 {
-	(void)buf;
+	uint8_t firstByte = 0;
+	uint32_t fullPktSize;
+	uint32_t propWSWS;
+	uint32_t propWS;
+	uint32_t remLenWS;
+	uint32_t remLen;
 
-	return 0;
+	if (this->QoS() != PktQoS::QoS0 && this->packetId() == 0) {
+		throw std::out_of_range("Invalid packet Id for this QoS level");
+	}
+
+	if (this->topic().size() == 0) {
+		throw std::out_of_range("Invalid topic name");
+	}
+
+	propWS = properties.wireSize();
+	propWSWS = VBIWireSize(propWS);
+
+	remLen = stringLenSize + topic().size() +
+		 propWSWS + propWS + payload().size();
+	if (this->QoS() != PktQoS::QoS0) {
+		remLen += 2;
+	}
+	remLenWS = VBIWireSize(remLen);
+
+	fullPktSize = 1 + remLenWS + remLen;
+	if (buf.bytesToWrite() < fullPktSize) {
+		throw std::out_of_range("No enough space in buffer");
+	}
+
+	firstByte += ((int)PktType::PUBLISH) << 4;
+	firstByte += this->dup() ? 1 << 3 : 0;
+	firstByte += ((int)this->QoS() & 0x03) << 1;
+	firstByte += this->retain() ? 1 : 0;
+
+	buf.writeNum8(firstByte);
+	buf.writeVBI(remLen);
+	if (this->QoS() != PktQoS::QoS0) {
+		buf.writeBinary(this->topic());
+	}
+	buf.writeNum16(this->packetId());
+	properties.write(buf);
+	buf.write(this->payload().data(), this->payload().size());
+
+	return fullPktSize;
 }
 
 uint32_t PktPublish::readFrom(AppBuf &buf)
