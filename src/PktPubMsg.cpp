@@ -42,7 +42,7 @@
 
 namespace m5 {
 
-PktPubMsg::PktPubMsg(PktType type, uint8_t reserved)
+PktPubMsg::PktPubMsg(PktType type, uint8_t reserved) : properties(type)
 {
 	this->_type = type;
 	this->_reserved = reserved;
