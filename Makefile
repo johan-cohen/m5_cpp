@@ -74,7 +74,9 @@ $(OBJS_DIR)/test_%.o:			\
 	$(SRC_DIR)/Common.hpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
-$(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJS_DIR)/%.o:			\
+	$(SRC_DIR)/%.cpp		\
+	$(SRC_DIR)/%.hpp
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
 $(BINS_DIR)/test_PktPubMsg:		\
