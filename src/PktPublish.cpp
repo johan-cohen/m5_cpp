@@ -146,12 +146,19 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 	this->QoS((PktQoS)((first & 0x06) >> 1));
 	this->dup(first & 0x08);
 
+	if ((int)this->QoS() >= 0x03) {
+		throw std::invalid_argument("Invalid QoS");
+	}
+
 	buf.readVBI(remLen, remLenWS);
 	if (remLen > buf.bytesToRead()) {
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
 	buf.readBinary(this->_topic);
+	if (this->topic().size() == 0) {
+		throw std::invalid_argument("Invalid topic size");
+	}
 
 	if(this->QoS() != PktQoS::QoS0) {
 		if (buf.bytesToRead() < 2) {
@@ -159,6 +166,9 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 		}
 
 		this->packetId(buf.readNum16());
+		if (this->packetId() == 0) {
+			throw std::invalid_argument("Invalid packet Id");
+		}
 	}
 
 	properties.read(buf);
