@@ -38,55 +38,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "test_Common.hpp"
-#include "PktPubAck.hpp"
-#include "PktPubRec.hpp"
-#include "PktPubRel.hpp"
-#include "PktPubComp.hpp"
-
-template <typename T> int test(void)
-{
-	uint16_t u16 = 0xABCD;
-	m5::AppBuf buf(16);
-	T *pub;
-
-	pub = new T();
-	pub->packetId(u16);
-	pub->reasonCode(m5::ReasonCode::SERVER_BUSY);
-
-	pub->writeTo(buf);
-
-	T pubRead;
-	pubRead.readFrom(buf);
-
-	if (pub->reasonCode() != pubRead.reasonCode()) {
-		throw std::logic_error("read: Reason Code");
-	}
-	if (pub->packetId() != pubRead.packetId()) {
-		throw std::logic_error("read: Packet Id");
-	}
-
-	delete pub;
-
-	return 0;
-}
-
-int main(void)
-{
-	int rc;
-
-	rc = test<m5::PktPubAck>();
-	test_rc(rc, "PktPubAck");
-
-	rc = test<m5::PktPubRec>();
-	test_rc(rc, "PktPubRec");
-
-	rc = test<m5::PktPubRel>();
-	test_rc(rc, "PktPubRel");
-
-	rc = test<m5::PktPubComp>();
-	test_rc(rc, "PktPubComp");
-
-	return 0;
-}
+/* empty file */
 
