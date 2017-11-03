@@ -64,9 +64,36 @@ void PktPubMsg::reasonCode(ReasonCode rc)
 
 uint32_t PktPubMsg::writeTo(AppBuf &buf)
 {
-	(void)buf;
+	uint8_t firstByte = 0;
+	uint32_t fullPktSize;
+	uint32_t propWSWS;
+	uint32_t propWS;
+	uint32_t remLenWS;
+	uint32_t remLen;
 
-	return 0;
+	if (this->packetId() == 0) {
+		throw std::invalid_argument("Invalid packet Id");
+	}
+
+	propWS = properties.wireSize();
+	propWSWS = VBIWireSize(propWS);
+
+	remLen = 2 + 1 + propWSWS + propWS;
+	remLenWS = VBIWireSize(remLen);
+
+	fullPktSize = 1 + remLenWS + remLen;
+	if (buf.bytesToWrite() < fullPktSize) {
+		throw std::out_of_range("No enough space in buffer");
+	}
+
+	firstByte = ((uint8_t)this->_type << 4) + (this->_reserved & 0x0F);
+	buf.writeNum8(firstByte);
+	buf.writeVBI(remLen);
+	buf.writeNum16(this->packetId());
+	buf.writeNum8((uint8_t)this->reasonCode());
+	properties.write(buf);
+
+	return fullPktSize;
 }
 
 uint32_t PktPubMsg::readFrom(AppBuf &buf)
