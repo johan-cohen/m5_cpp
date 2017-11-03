@@ -43,9 +43,26 @@
 
 template <typename T> int test(void)
 {
+	uint16_t u16 = 0xABCD;
+	m5::AppBuf buf(16);
 	T *pub;
 
 	pub = new T();
+	pub->packetId(u16);
+	pub->reasonCode(m5::ReasonCode::SERVER_BUSY);
+
+	pub->writeTo(buf);
+
+	T pubRead;
+	pubRead.readFrom(buf);
+
+	if (pub->reasonCode() != pubRead.reasonCode()) {
+		throw std::logic_error("read: Reason Code");
+	}
+	if (pub->packetId() != pubRead.packetId()) {
+		throw std::logic_error("read: Packet Id");
+	}
+
 	delete pub;
 
 	return 0;
