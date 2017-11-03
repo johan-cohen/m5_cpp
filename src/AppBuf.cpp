@@ -89,6 +89,12 @@ std::size_t AppBuf::bytesToRead(void) const
 	return this->_length - this->_offset;
 }
 
+void AppBuf::read(ByteArray &dst, std::size_t size)
+{
+	dst.insert(dst.end(), this->ptrRead(), this->ptrRead() + size);
+	this->_offset += size;
+}
+
 void AppBuf::read(uint8_t *d, std::size_t size)
 {
 	memcpy(d, ptrRead(), size);

@@ -80,6 +80,9 @@ public:
 	template <typename T> T readNum(void);
 
 	/* read does not do bound checking, use bytesToRead */
+	void read(ByteArray &dst, std::size_t size);
+
+	/* read does not do bound checking, use bytesToRead */
 	void read(uint8_t *d, std::size_t size);
 
 	/* readNum8 does not do bound checking, use bytesToRead */
