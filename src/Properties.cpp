@@ -319,6 +319,11 @@ const ByteArray &Properties::responseTopic(void) const
 void Properties::subscriptionIdentifier(uint32_t v)
 {
 	auto ws = VBIWireSize(v);
+
+	if (ws == 0) {
+		throw std::invalid_argument("Invalid argument");
+	}
+
 	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v, ws);
 }
 
@@ -710,7 +715,11 @@ uint32_t Properties::write(AppBuf &buf)
 		auto num = (*itNum).second;
 
 		buf.writeNum8(id);
-		writeNumProp(buf, num.num, num.size);
+		if (id != PropertyId::SUBSCRIPTION_IDENTIFIER) {
+			writeNumProp(buf, num.num, num.size);
+		} else {
+			buf.writeVBI(num.num);
+		}
 
 		itNum++;
 	}

@@ -48,7 +48,7 @@
 #define DATA		(uint8_t *)MSG
 #define DATA_LEN	MSG_LEN
 
-#define testU32	0xABCDEDF1U
+#define testU32	0x01ABCDEFU
 #define testU16	0xABCDU
 #define testU8	0xABU
 
