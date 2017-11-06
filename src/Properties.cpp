@@ -266,12 +266,12 @@ void Properties::enableProperty(PropertyId id)
 	this->enabledProperties |= __POW2(id);
 }
 
-void Properties::payloadFormatIndicator(uint8_t v)
+void Properties::payloadFormatIndicator(bool v)
 {
 	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v, 1);
 }
 
-uint8_t Properties::payloadFormatIndicator(void) const
+bool Properties::payloadFormatIndicator(void) const
 {
 	return valueNum(PropertyId::PAYLOAD_FORMAT_INDICATOR);
 }

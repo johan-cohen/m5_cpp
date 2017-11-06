@@ -75,14 +75,13 @@ int test_Properties(void)
 	uint32_t wireSize = 0;
 	uint32_t u32;
 	uint16_t u16;
-	uint8_t u8;
 	bool res;
 
 	propList = new m5::Properties(m5::PktType::PUBLISH);
 
-	propList->payloadFormatIndicator(testU8);
-	u8 = propList->payloadFormatIndicator();
-	if (u8 != testU8) {
+	propList->payloadFormatIndicator(true);
+	res = propList->payloadFormatIndicator();
+	if (res != true) {
 		throw std::logic_error("payloadFormatIndicator");
 	}
 	wireSize += m5::propertyIdSize + 1;

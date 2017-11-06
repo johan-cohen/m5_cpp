@@ -99,8 +99,8 @@ public:
 
 	bool isEnabled(PropertyId id) const;
 
-	void payloadFormatIndicator(uint8_t v);
-	uint8_t payloadFormatIndicator(void) const;
+	void payloadFormatIndicator(bool v);
+	bool payloadFormatIndicator(void) const;
 
 	void publicationExpiryInterval(uint32_t v);
 	uint32_t publicationExpiryInterval(void) const;
