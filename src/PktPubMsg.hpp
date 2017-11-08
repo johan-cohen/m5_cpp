@@ -67,9 +67,9 @@ public:
 	void reasonCode(ReasonCode rc);
 	ReasonCode reasonCode(void) { return (ReasonCode)this->_reasonCode; }
 
-	uint32_t writeTo(AppBuf &buf);
-	uint32_t readFrom(AppBuf &buf);
-	uint32_t getId(void) const { return (uint32_t)_type; }
+	uint32_t writeTo(AppBuf &buf) override;
+	uint32_t readFrom(AppBuf &buf) override;
+	uint32_t getId(void) const override { return (uint32_t)_type; }
 };
 
 }
