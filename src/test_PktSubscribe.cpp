@@ -45,11 +45,18 @@ int test(void)
 {
 	const char *msg = "Hello, World!";
 	m5::PktSubscribe *subs;
+	m5::AppBuf buf(256);
 
 	subs = new m5::PktSubscribe();
 	subs->append(msg, 0x01);
 	subs->append(msg, 0x02);
 	subs->append(msg, 0x03);
+	subs->packetId(0xABCD);
+	subs->writeTo(buf);
+
+	std::cout << "Subscribe\n";
+	m5::printArray(buf.data(), buf.length());
+
 	delete subs;
 
 	return 0;

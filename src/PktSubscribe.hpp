@@ -60,8 +60,10 @@ public:
 class PktSubscribe : public ProtoEntity {
 private:
 	std::list<TopicOptions *> _topics;
+	uint32_t payloadWS = 0;
 	uint16_t _packetId = 0;
 
+	void writePayload(AppBuf &buf);
 public:
 	Properties properties;
 

@@ -68,14 +68,62 @@ PktSubscribe::~PktSubscribe()
 
 void PktSubscribe::append(const char *topic, uint8_t options)
 {
-	this->_topics.push_back(new TopicOptions(topic, options));
+	TopicOptions *item;
+
+	item = new TopicOptions(topic, options);
+	payloadWS += stringLenSize + item->topic.size() + 1;
+
+	this->_topics.push_back(item);
+}
+
+void PktSubscribe::writePayload(AppBuf &buf)
+{
+	auto it = _topics.begin();
+
+	while (it != _topics.end()) {
+		auto item = *it;
+
+		buf.writeBinary(item->topic);
+		buf.writeNum8(item->options);
+
+		it++;
+	}
 }
 
 uint32_t PktSubscribe::writeTo(AppBuf &buf)
 {
-	(void)buf;
+	uint32_t fullPktSize;
+	uint32_t propWSWS;
+	uint32_t propWS;
+	uint32_t remLenWS;
+	uint32_t remLen;
 
-	return 0;
+	if (payloadWS == 0) {
+		throw std::invalid_argument("No topics in SUBSCRIBE msg");
+	}
+
+	if (packetId() == 0) {
+		throw std::invalid_argument("Invalid Packet ID");
+	}
+
+	propWS = properties.wireSize();
+	propWSWS = VBIWireSize(propWS);
+
+	remLen = 2 + propWSWS + propWS + payloadWS;
+	remLenWS = VBIWireSize(remLen);
+
+	fullPktSize = 1 + remLenWS + remLen;
+	if (buf.bytesToWrite() < fullPktSize) {
+		throw std::out_of_range("No enough space in buffer");
+	}
+
+	buf.writeNum8((uint8_t)PktType::SUBSCRIBE << 4 | 0x02);
+	buf.writeVBI(remLen);
+	buf.writeNum16(packetId());
+	properties.write(buf);
+	writePayload(buf);
+
+	return fullPktSize;
 }
 
 uint32_t PktSubscribe::readFrom(AppBuf &buf)
