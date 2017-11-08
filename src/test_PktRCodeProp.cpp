@@ -39,6 +39,8 @@
  */
 
 #include "test_Common.hpp"
+
+#include "PktDisconnect.hpp"
 #include "PktAuth.hpp"
 
 #include <cstring>
@@ -70,12 +72,44 @@ int test(void)
 	return 0;
 }
 
+int testDisconnect(void)
+{
+	m5::ReasonCode rc = m5::ReasonCode::SERVER_MOVED;
+	const char str[] = "Hello, World!";
+	uint32_t u32 = 0x01ABCDEF;
+	m5::AppBuf buf(128);
+	m5::PktDisconnect *disconnect;
+
+	disconnect = new m5::PktDisconnect();
+	disconnect->reasonCode(rc);
+	disconnect->properties.sessionExpiryInterval(u32);
+	disconnect->properties.reasonString(str);
+	disconnect->properties.serverReference(str);
+	disconnect->properties.userProperty(str, str);
+
+	disconnect->writeTo(buf);
+
+	m5::PktDisconnect disconnectRead;
+	disconnectRead.readFrom(buf);
+
+	if (disconnect->reasonCode() != disconnectRead.reasonCode()) {
+		throw std::logic_error("read: Reason Code");
+	}
+
+	delete disconnect;
+
+	return 0;
+}
+
 int main(void)
 {
 	int rc;
 
 	rc = test();
 	test_rc(rc, "PktAuth");
+
+	rc = testDisconnect();
+	test_rc(rc, "PktDisconnect");
 
 	return 0;
 }

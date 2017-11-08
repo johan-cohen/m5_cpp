@@ -93,6 +93,7 @@ $(BINS_DIR)/test_PktRCodeProp:		\
 	$(OBJS_DIR)/test_PktRCodeProp.o	\
 	$(OBJS_DIR)/PktRCodeProp.o	\
 	$(OBJS_DIR)/PktAuth.o		\
+	$(OBJS_DIR)/PktDisconnect.o	\
 	$(OBJS_DIR)/Properties.o	\
 	$(OBJS_DIR)/AppBuf.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
