@@ -59,6 +59,18 @@ public:
 	uint32_t getId(void) const override { return (uint32_t)_type; }
 };
 
+class PktPingReq : public PktPing {
+public:
+	PktPingReq() : PktPing(PktType::PINGREQ) {}
+	~PktPingReq() {}
+};
+
+class PktPingResp : public PktPing {
+public:
+	PktPingResp() : PktPing(PktType::PINGRESP) {}
+	~PktPingResp() {}
+};
+
 }
 
 #endif
