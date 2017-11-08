@@ -54,7 +54,8 @@ TESTS =					\
 	$(BINS_DIR)/test_PktConnect	\
 	$(BINS_DIR)/test_PktConnAck	\
 	$(BINS_DIR)/test_PktPublish	\
-	$(BINS_DIR)/test_PktPubMsg
+	$(BINS_DIR)/test_PktPubMsg	\
+	$(BINS_DIR)/test_PktRCodeProp
 
 VALGRIND = valgrind -q --leak-check=full --error-exitcode=1
 
@@ -84,6 +85,14 @@ $(BINS_DIR)/test_PktPubMsg:		\
 	$(OBJS_DIR)/PktPubMsg.o		\
 	$(OBJS_DIR)/PktPubAck.o		\
 	$(OBJS_DIR)/PktPubRec.o		\
+	$(OBJS_DIR)/Properties.o	\
+	$(OBJS_DIR)/AppBuf.o
+	$(CXX) $(CPPFLAGS) -o $@ $^
+
+$(BINS_DIR)/test_PktRCodeProp:		\
+	$(OBJS_DIR)/test_PktRCodeProp.o	\
+	$(OBJS_DIR)/PktRCodeProp.o	\
+	$(OBJS_DIR)/PktAuth.o		\
 	$(OBJS_DIR)/Properties.o	\
 	$(OBJS_DIR)/AppBuf.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
