@@ -57,7 +57,8 @@ TESTS =					\
 	$(BINS_DIR)/test_PktPubMsg	\
 	$(BINS_DIR)/test_PktRCodeProp	\
 	$(BINS_DIR)/test_PktPing	\
-	$(BINS_DIR)/test_PktSubscribe
+	$(BINS_DIR)/test_PktSubscribe	\
+	$(BINS_DIR)/test_PktSubAck
 
 VALGRIND = valgrind -q --leak-check=full --error-exitcode=1
 
