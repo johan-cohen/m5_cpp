@@ -41,6 +41,30 @@
 #include "PktSubscribe.hpp"
 #include "test_Common.hpp"
 
+bool cmp(const std::list<m5::TopicOptions *> &a, const std::list<m5::TopicOptions *> &b)
+{
+	if (a.size() != b.size()) {
+		return false;
+	}
+
+	auto a_it = a.begin();
+	auto b_it = b.begin();
+
+	do {
+		const m5::TopicOptions *a_topic = *a_it;
+		const m5::TopicOptions *b_topic = *b_it;
+
+		if (a_topic->topic != b_topic->topic || a_topic->options != b_topic->options) {
+			return false;
+		}
+
+		a_it++;
+		b_it++;
+	} while (a_it != a.end() && b_it != b.end());
+
+	return true;
+}
+
 int test(void)
 {
 	const char *msg = "Hello, World!";
@@ -54,10 +78,11 @@ int test(void)
 	subs->packetId(0xABCD);
 	subs->writeTo(buf);
 
-	std::cout << "Subscribe\n";
-	m5::printArray(buf.data(), buf.length());
-
 	m5::PktSubscribe subsRead(buf);
+
+	if (cmp(subs->topics(), subsRead.topics()) == false) {
+		throw std::logic_error("read/write: Subscribe");
+	}
 
 	delete subs;
 
