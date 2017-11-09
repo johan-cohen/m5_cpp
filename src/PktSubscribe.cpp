@@ -44,15 +44,25 @@
 
 namespace m5 {
 
-TopicOptions::TopicOptions(const char *topic, uint8_t options) :
-			   topic(topic, topic + strlen(topic)),
+TopicOptions::TopicOptions(const uint8_t *topic, uint16_t size, uint8_t options) :
+	                   topic(topic, topic + size),
 			   options(options)
 {
+}
 
+TopicOptions::TopicOptions(const char *topic, uint8_t options) :
+	                   topic(topic, topic + strlen(topic)),
+			   options(options)
+{
 }
 
 PktSubscribe::PktSubscribe() : properties(PktType::SUBSCRIBE)
 {
+}
+
+PktSubscribe::PktSubscribe(AppBuf &buf)
+{
+	this->readFrom(buf);
 }
 
 PktSubscribe::~PktSubscribe()
@@ -66,14 +76,20 @@ PktSubscribe::~PktSubscribe()
 	}
 }
 
-void PktSubscribe::append(const char *topic, uint8_t options)
+void PktSubscribe::append(const uint8_t *topic, uint16_t size, uint8_t options)
 {
 	TopicOptions *item;
 
-	item = new TopicOptions(topic, options);
+	item = new TopicOptions(topic, size, options);
 	payloadWS += stringLenSize + item->topic.size() + 1;
 
 	this->_topics.push_back(item);
+}
+
+
+void PktSubscribe::append(const char *topic, uint8_t options)
+{
+	append((const uint8_t *)topic, strlen(topic), options);
 }
 
 void PktSubscribe::writePayload(AppBuf &buf)
@@ -126,12 +142,61 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 	return fullPktSize;
 }
 
+void PktSubscribe::readPayload(AppBuf &buf)
+{
+	do {
+		if (buf.bytesToRead() < 2) {
+			throw std::out_of_range("No enough space in input buffer");
+		}
+
+		auto len = buf.readNum16();
+
+		if (buf.bytesToRead() < (uint16_t)(len + 1)) {
+			throw std::out_of_range("No enough space in input buffer");
+		}
+
+		auto ptr = buf.ptrRead();
+		buf.readSkip(len);
+		auto options = buf.readNum8();
+
+		this->append(ptr, len, options);
+	} while (buf.bytesToRead() > 1);
+}
+
 uint32_t PktSubscribe::readFrom(AppBuf &buf)
 {
-	(void)buf;
+	std::size_t alreadyTraversed = buf.traversed();
+	uint8_t remLenWS;
+	uint32_t remLen;
+	uint8_t first;
 
-	return 0;
+	if (buf.bytesToRead() < 8) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
 
+	first = buf.readNum8();
+	if (first != ((uint8_t)PktType::SUBSCRIBE << 4 | 0x02)) {
+		throw std::invalid_argument("Invalid fixed header");
+	}
+
+	buf.readVBI(remLen, remLenWS);
+	if (remLen < 6) {
+		throw std::out_of_range("No enough space in input buffer");
+	}
+
+	this->packetId(buf.readNum16());
+	properties.read(buf);
+
+	this->payloadWS = buf.bytesToRead();
+	readPayload(buf);
+	this->payloadWS -= buf.bytesToRead();
+
+	uint32_t fullPktSize = 1 + remLenWS + remLen;
+	if (buf.traversed() - alreadyTraversed != fullPktSize) {
+		throw std::invalid_argument("Corrupted input buffer");
+	}
+
+	return fullPktSize;
 }
 
 }

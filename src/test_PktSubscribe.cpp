@@ -57,6 +57,8 @@ int test(void)
 	std::cout << "Subscribe\n";
 	m5::printArray(buf.data(), buf.length());
 
+	m5::PktSubscribe subsRead(buf);
+
 	delete subs;
 
 	return 0;

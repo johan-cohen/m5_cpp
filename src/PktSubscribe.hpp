@@ -54,6 +54,7 @@ public:
 	ByteArray topic;
 	uint8_t options;
 
+	TopicOptions(const uint8_t *topic, uint16_t size, uint8_t options);
 	TopicOptions(const char *topic, uint8_t options);
 };
 
@@ -64,13 +65,18 @@ private:
 	uint16_t _packetId = 0;
 
 	void writePayload(AppBuf &buf);
+	void readPayload(AppBuf &buf);
 public:
 	Properties properties;
 
 	PktSubscribe();
+	PktSubscribe(AppBuf &buf);
 	~PktSubscribe();
 
+	void append(const uint8_t *topic, uint16_t size, uint8_t options);
 	void append(const char *topic, uint8_t options);
+
+	const std::list<TopicOptions *> topics(void) const { return _topics; }
 
 	void packetId(uint16_t packetId) { this->_packetId = packetId; }
 	uint16_t packetId(void) const { return _packetId; }
