@@ -134,6 +134,27 @@ Properties::Properties(const PktType type)
 
 Properties::~Properties()
 {
+	auto itBin = binProps.begin();
+	while (itBin != binProps.end())
+	{
+		auto pair = *itBin;
+		ByteArray *value = pair.second;
+
+		delete value;
+
+		itBin++;
+	}
+
+	auto itUser = userProps.begin();
+	while (itUser != userProps.end()) {
+		ByteArray *key = (*itUser).first;
+		ByteArray *value = (*itUser).second;
+
+		delete key;
+		delete value;
+
+		itUser++;
+	}
 }
 
 void Properties::resetPacketType(const PktType type)
@@ -157,7 +178,7 @@ bool Properties::isEnabled(PropertyId id) const
 	return enabled() & __POW2(id);
 }
 
-void Properties::append(const ByteArray &key, const ByteArray &value)
+void Properties::append(ByteArray *key, ByteArray *value)
 {
 	if (!isAllowed(PropertyId::USER_PROPERTY)) {
 		throw std::invalid_argument("Invalid property for this packet");
@@ -166,21 +187,20 @@ void Properties::append(const ByteArray &key, const ByteArray &value)
 	userProps.push_back(KeyValuePair(key, value));
 	enableProperty(PropertyId::USER_PROPERTY);
 	this->_wireSize += propertyIdSize +
-			   binaryLenSize + key.size() +
-			   binaryLenSize + value.size();
+			   binaryLenSize + key->size() +
+			   binaryLenSize + value->size();
 }
-
 
 void Properties::append(const uint8_t *key, uint16_t keySize,
 			const uint8_t *value, uint16_t valueSize)
 {
-	ByteArray _key(key, key + keySize);
-	ByteArray _value(value, value + valueSize);
+	ByteArray *_key = new ByteArray(key, key + keySize);
+	ByteArray *_value = new ByteArray(value, value + valueSize);
 
 	append(_key, _value);
 }
 
-void Properties::append(PropertyId id, const ByteArray &src)
+void Properties::append(PropertyId id, ByteArray *src)
 {
 	if (!isAllowed(id)) {
 		throw std::invalid_argument("Invalid property for this packet");
@@ -192,23 +212,24 @@ void Properties::append(PropertyId id, const ByteArray &src)
 			throw std::out_of_range("Property enabled but not found");
 		}
 
-		ByteArray &item = (*it).second;
-		this->_wireSize += -item.size() + src.size();
+		ByteArray *item = (*it).second;
+		this->_wireSize += -item->size() + src->size();
 
-		item = src;
-
+		delete item;
+		binProps.erase(it);
+		binProps.insert(BinaryPropPair(id, src));
 	} else {
 		/* assume compiler will optimize this... */
 		binProps.insert(BinaryPropPair(id, src));
 		enableProperty(id);
 
-		this->_wireSize += propertyIdSize + binaryLenSize + src.size();
+		this->_wireSize += propertyIdSize + binaryLenSize + src->size();
 	}
 }
 
 void Properties::append(PropertyId id, const uint8_t *data, uint16_t size)
 {
-	ByteArray src(data, data + size);
+	ByteArray *src = new ByteArray(data, data + size);
 	append(id, src);
 }
 
@@ -247,7 +268,7 @@ const ByteArray &Properties::valueBinary(PropertyId id) const
 
 	auto it = binProps.find(id);
 
-	return (*it).second;
+	return *((*it).second);
 }
 
 uint32_t Properties::valueNum(PropertyId id) const
@@ -537,7 +558,7 @@ bool Properties::retainAvailable(void) const
 }
 
 void Properties::userProperty(const uint8_t *key, uint16_t keySize,
-				  const uint8_t *value, uint16_t valueSize)
+			      const uint8_t *value, uint16_t valueSize)
 {
 	append(key, keySize, value, valueSize);
 }
@@ -598,8 +619,8 @@ uint32_t Properties::read(AppBuf &buf)
 	uint32_t propWireSize;
 	uint32_t fieldLen;
 	uint32_t number;
-	ByteArray value;
-	ByteArray key;
+	ByteArray *value;
+	ByteArray *key;
 
 	propWireSize = buf.readVBI();
 	if (this->wireSize() >  buf.bytesToRead()) {
@@ -663,7 +684,8 @@ uint32_t Properties::read(AppBuf &buf)
 		case RESPONSE_INFORMATION:
 		case SERVER_REFERENCE:
 		case REASON_STR:
-			buf.readBinary(value);
+			value = new ByteArray();
+			buf.readBinary(*value);
 			this->append((PropertyId)id, value);
 			break;
 
@@ -672,8 +694,10 @@ uint32_t Properties::read(AppBuf &buf)
 			break;
 
 		case USER_PROPERTY:
-			/* very inefficient way to solve this... */
-			buf.readKeyValue(key, value);
+			key = new ByteArray();
+			value = new ByteArray();
+
+			buf.readKeyValue(*key, *value);
 			this->append(key, value);
 			break;
 		default:
@@ -727,22 +751,22 @@ uint32_t Properties::write(AppBuf &buf)
 	auto itBin = binProps.begin();
 	while (itBin != binProps.end()) {
 		auto id = (*itBin).first;
-		auto &item = (*itBin).second;
+		auto item = (*itBin).second;
 
 		buf.writeNum8(id);
-		buf.writeBinary(item.data(), item.size());
+		buf.writeBinary(item->data(), item->size());
 
 		itBin++;
 	}
 
 	auto itUser = userProps.begin();
 	while (itUser != userProps.end()) {
-		auto &key = (*itUser).first;
-		auto &value = (*itUser).second;
+		auto key = (*itUser).first;
+		auto value = (*itUser).second;
 
 		buf.writeNum8(PropertyId::USER_PROPERTY);
-		buf.writeBinary(key.data(), key.size());
-		buf.writeBinary(value.data(), value.size());
+		buf.writeBinary(key->data(), key->size());
+		buf.writeBinary(value->data(), value->size());
 
 		itUser++;
 	}
@@ -751,3 +775,4 @@ uint32_t Properties::write(AppBuf &buf)
 }
 
 }
+

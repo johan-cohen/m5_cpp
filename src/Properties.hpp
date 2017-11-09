@@ -49,16 +49,16 @@
 
 namespace m5 {
 
-typedef std::pair<ByteArray, ByteArray > KeyValuePair;
+typedef std::pair<ByteArray *, ByteArray *> KeyValuePair;
 typedef std::list<KeyValuePair> UserProperty;
 
 class Properties {
 private:
 	struct NumSize { uint32_t num; uint8_t size; };
-	typedef std::pair<uint8_t, ByteArray> BinaryPropPair;
+	typedef std::pair<uint8_t, ByteArray *> BinaryPropPair;
 	typedef std::pair<uint8_t, NumSize> NumPropPair;
 
-	std::map<uint8_t, ByteArray> binProps;
+	std::map<uint8_t, ByteArray *> binProps;
 	std::map<uint8_t, NumSize> numProps;
 	UserProperty userProps;
 
@@ -70,11 +70,11 @@ private:
 	void computePktFlags(void);
 
 	void append(PropertyId id, const uint8_t *data, uint16_t size);
-	void append(PropertyId id, const ByteArray &src);
+	void append(PropertyId id, ByteArray *src);
 
 	void append(PropertyId id, uint32_t v, uint32_t wireSize);
 
-	void append(const ByteArray &key, const ByteArray &value);
+	void append(ByteArray *key, ByteArray *value);
 	void append(const uint8_t *key, uint16_t keySize,
 		    const uint8_t *value, uint16_t valueSize);
 

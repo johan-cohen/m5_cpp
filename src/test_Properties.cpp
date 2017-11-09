@@ -266,19 +266,19 @@ int test_Properties(void)
 
 	int j = 0;
 	for (auto it = userProps.begin(); it != userProps.end(); it++) {
-		auto pair = (*it);
-
-		if (strlen(KeyVal[j].key) != pair.first.size()) {
+		const m5::ByteArray *key = (*it).first;
+		if (strlen(KeyVal[j].key) != key->size()) {
 			throw std::logic_error("userProperty key len");
 		}
-		if (memcmp(&pair.first[0], KeyVal[j].key, pair.first.size()) != 0) {
+		if (memcmp(key->data(), KeyVal[j].key, key->size()) != 0) {
 			throw std::logic_error("userProperty key");
 		}
 
-		if (strlen(KeyVal[j].val) != pair.second.size()) {
+		const m5::ByteArray *value = (*it).second;
+		if (strlen(KeyVal[j].val) != value->size()) {
 			throw std::logic_error("userProperty val len");
 		}
-		if (memcmp(&pair.second[0], KeyVal[j].val, pair.second.size()) != 0) {
+		if (memcmp(value->data(), KeyVal[j].val, value->size()) != 0) {
 			throw std::logic_error("userProperty val");
 		}
 
