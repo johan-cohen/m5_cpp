@@ -690,7 +690,8 @@ uint32_t Properties::read(AppBuf &buf)
 			break;
 
 		case SUBSCRIPTION_IDENTIFIER:
-			this->append((PropertyId)id, buf.readVBI(), VBIWireSize(number));
+			number = buf.readVBI();
+			this->append((PropertyId)id, number, VBIWireSize(number));
 			break;
 
 		case USER_PROPERTY:
