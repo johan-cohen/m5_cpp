@@ -48,12 +48,13 @@
 #include "PktPubComp.hpp"
 #include "PktPubRec.hpp"
 #include "PktPubRel.hpp"
-#include "PktAuth.hpp"
-#include "PktDisconnect.hpp"
-#include "PktPing.hpp"
 #include "PktSubscribe.hpp"
 #include "PktSubAck.hpp"
 #include "PktUnsubscribe.hpp"
+#include "PktUnsubAck.hpp"
+#include "PktPing.hpp"
+#include "PktDisconnect.hpp"
+#include "PktAuth.hpp"
 
 #endif
 
