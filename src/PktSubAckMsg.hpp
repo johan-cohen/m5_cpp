@@ -38,21 +38,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PKT_SUBACK_HPP__
-#define __PKT_SUBACK_HPP__
+#ifndef __PKT_SUBACKMSG_HPP__
+#define __PKT_SUBACKMSG_HPP__
 
-#include"PktSubAckMsg.hpp"
+#include "ProtoEntity.hpp"
+#include "Properties.hpp"
+#include "Common.hpp"
+
+#include <list>
 
 namespace m5 {
 
-class PktSubAck : public PktSubAckMsg {
+class PktSubAckMsg : public ProtoEntity
+{
+private:
+	std::list<uint8_t> _reasonCodes;
+	uint16_t _packetId = 0;
+	uint8_t _packetType;
+
 public:
-	PktSubAck() : PktSubAckMsg(PktType::SUBACK) {}
-	PktSubAck(AppBuf &buf) : PktSubAckMsg(PktType::SUBACK)
-	{
-		this->readFrom(buf);
-	}
-	virtual ~PktSubAck() {}
+	Properties properties;
+
+	PktSubAckMsg(PktType type);
+	PktSubAckMsg(AppBuf &buf);
+	virtual ~PktSubAckMsg() {}
+
+	void packetId(uint16_t id) { this->_packetId = id; }
+	uint16_t packetId(void) { return this->_packetId; }
+
+	void append(ReasonCode rc) { this->_reasonCodes.push_back((uint8_t)rc); }
+	const std::list<uint8_t> &reasonCodes() const { return _reasonCodes; }
+
+	uint32_t writeTo(AppBuf &buf) override;
+	uint32_t readFrom(AppBuf &buf) override;
+	uint32_t getId(void) const override { return (uint32_t)_packetType; }
 };
 
 }
