@@ -1,5 +1,6 @@
 
 #include "test_Common.hpp"
+#include "PktUnsubAck.hpp"
 #include "PktSubAck.hpp"
 
 template <typename T>
@@ -48,10 +49,21 @@ int main(void)
 		m5::ReasonCode::QUOTA_EXCEEDED,
 		m5::ReasonCode::SHARED_SUBSCRIPTION_NOT_SUPPORTED,
 		m5::ReasonCode::SUBSCRIPTION_IDENTIFIERS_NOT_SUPPORTED };
+	m5::ReasonCode codes_unsuback[] = {
+		m5::ReasonCode::SUCCESS,
+		m5::ReasonCode::NO_SUBSCRIPTION_EXISTED,
+		m5::ReasonCode::UNSPECIFIED_ERROR,
+		m5::ReasonCode::IMPLEMENTATION_SPECIFIC_ERROR,
+		m5::ReasonCode::NOT_AUTHORIZED,
+		m5::ReasonCode::TOPIC_FILTER_INVALID,
+		m5::ReasonCode::PACKET_IDENTIFIER_IN_USE };
 	int rc;
 
 	rc = test<m5::PktSubAck>(codes_suback, sizeof(codes_suback) / sizeof(codes_suback[0]));
 	test_rc(rc, "PktSubAck");
+
+	rc = test<m5::PktUnsubAck>(codes_unsuback, sizeof(codes_unsuback) / sizeof(codes_unsuback[0]));
+	test_rc(rc, "PktUnsubAck");
 
 	return 0;
 }
