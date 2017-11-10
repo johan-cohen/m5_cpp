@@ -53,6 +53,7 @@
 #include "PktPing.hpp"
 #include "PktSubscribe.hpp"
 #include "PktSubAck.hpp"
+#include "PktUnsubscribe.hpp"
 
 #endif
 
