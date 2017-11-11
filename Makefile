@@ -38,11 +38,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-CPPFLAGS = -std=c++11 -Wall -Wextra -Werror -O0 -g -Isrc
+CPPFLAGS =					\
+	-std=c++11 -Wall -Wextra -Werror
+
+INC = -Isrc
+
+EXTRAFLAGS = -O0 -g
 
 CXX ?= g++
 
-SRC_DIR = src
+SRCS_DIR = src
 
 OBJS_DIR = obj
 
@@ -70,19 +75,19 @@ dirs:
 	@mkdir -p bin
 
 $(OBJS_DIR)/test_%.o:			\
-	$(SRC_DIR)/test_%.cpp		\
-	$(SRC_DIR)/%.cpp		\
-	$(SRC_DIR)/%.hpp		\
-	$(SRC_DIR)/AppBuf.hpp		\
-	$(SRC_DIR)/test_Common.hpp	\
-	$(SRC_DIR)/Properties.hpp	\
-	$(SRC_DIR)/Common.hpp
-	$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(SRCS_DIR)/test_%.cpp		\
+	$(SRCS_DIR)/%.cpp		\
+	$(SRCS_DIR)/%.hpp		\
+	$(SRCS_DIR)/AppBuf.hpp		\
+	$(SRCS_DIR)/test_Common.hpp	\
+	$(SRCS_DIR)/Properties.hpp	\
+	$(SRCS_DIR)/Common.hpp
+	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) $(INC) -c -o $@ $<
 
 $(OBJS_DIR)/%.o:			\
-	$(SRC_DIR)/%.cpp		\
-	$(SRC_DIR)/%.hpp
-	$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(SRCS_DIR)/%.cpp		\
+	$(SRCS_DIR)/%.hpp
+	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) $(INC) -c -o $@ $<
 
 $(BINS_DIR)/test_PktPubMsg:		\
 	$(OBJS_DIR)/test_PktPubMsg.o	\
@@ -91,7 +96,7 @@ $(BINS_DIR)/test_PktPubMsg:		\
 	$(OBJS_DIR)/PktPubRec.o		\
 	$(OBJS_DIR)/Properties.o	\
 	$(OBJS_DIR)/AppBuf.o
-	$(CXX) $(CPPFLAGS) -o $@ $^
+	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) -o $@ $^
 
 $(BINS_DIR)/test_PktRCodeProp:		\
 	$(OBJS_DIR)/test_PktRCodeProp.o	\
@@ -100,14 +105,14 @@ $(BINS_DIR)/test_PktRCodeProp:		\
 	$(OBJS_DIR)/PktDisconnect.o	\
 	$(OBJS_DIR)/Properties.o	\
 	$(OBJS_DIR)/AppBuf.o
-	$(CXX) $(CPPFLAGS) -o $@ $^
+	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) -o $@ $^
 
 $(BINS_DIR)/test_%:			\
 	$(OBJS_DIR)/test_%.o		\
 	$(OBJS_DIR)/%.o			\
 	$(OBJS_DIR)/Properties.o	\
 	$(OBJS_DIR)/AppBuf.o
-	$(CXX) $(CPPFLAGS) -o $@ $^
+	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) -o $@ $^
 
 tests: $(TESTS)
 	@$(foreach test, $(TESTS), ./$(test) || exit 1;)
