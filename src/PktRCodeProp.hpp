@@ -49,6 +49,10 @@
 namespace m5 {
 
 class PktRCodeProp : public ProtoEntity {
+protected:
+	PktRCodeProp(PktType type = PktType::RESERVED) :
+		     _packetType((uint8_t)type), properties(type) {}
+
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
 	uint8_t _packetType = (uint8_t)PktType::RESERVED;
@@ -56,8 +60,6 @@ private:
 public:
 	Properties properties;
 
-	PktRCodeProp(PktType type = PktType::RESERVED) :
-		     _packetType((uint8_t)type), properties(type) {}
 	virtual ~PktRCodeProp() {}
 
 	ReasonCode reasonCode(void) const { return (ReasonCode)_reasonCode; }
