@@ -71,7 +71,7 @@ void PktPublish::topic(const char *str)
 void PktPublish::payload(const uint8_t *data, uint16_t size)
 {
 	if (data == nullptr || size < 1) {
-		throw std::invalid_argument("Invalid input buffer");
+		return;
 	}
 
 	this->_payload.assign(data, data + size);
@@ -126,7 +126,10 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 	}
 	buf.writeNum16(this->packetId());
 	properties.write(buf);
-	buf.write(this->payload().data(), this->payload().size());
+
+	if (this->payload().size() > 0) {
+		buf.write(this->payload().data(), this->payload().size());
+	}
 
 	return fullPktSize;
 }
