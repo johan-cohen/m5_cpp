@@ -51,6 +51,10 @@ namespace m5 {
 
 class PktSubAckMsg : public ProtoEntity
 {
+protected:
+	PktSubAckMsg(PktType type);
+	PktSubAckMsg(AppBuf &buf);
+
 private:
 	std::list<uint8_t> _reasonCodes;
 	uint16_t _packetId = 0;
@@ -59,8 +63,6 @@ private:
 public:
 	Properties properties;
 
-	PktSubAckMsg(PktType type);
-	PktSubAckMsg(AppBuf &buf);
 	virtual ~PktSubAckMsg() {}
 
 	void packetId(uint16_t id) { this->_packetId = id; }
