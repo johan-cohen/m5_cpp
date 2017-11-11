@@ -95,6 +95,7 @@ public:
 
 	/* this routine does bound checking */
 	void readBinary(ByteArray &dst);
+	ByteArray *readBinary(void);
 
 	/* this routine does bound checking */
 	void readKeyValue(ByteArray &key, ByteArray &value);

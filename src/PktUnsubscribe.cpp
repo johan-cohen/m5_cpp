@@ -126,11 +126,10 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 
 	uint32_t minRemLen = 2;
 	while (minRemLen < remLen) {
-		ByteArray *item = new ByteArray();
-		buf.readBinary(*item);
+		ByteArray *item;
 
+		item =  buf.readBinary();
 		this->_topics.push_back(item);
-
 		minRemLen += 2 + item->size();
 	}
 

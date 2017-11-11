@@ -147,6 +147,14 @@ void AppBuf::readBinary(ByteArray &dst)
 	this->_offset += len;
 }
 
+ByteArray *AppBuf::readBinary(void)
+{
+	ByteArray *data = new ByteArray();
+
+	readBinary(*data);
+	return data;
+}
+
 void AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
 {
 	readBinary(key);

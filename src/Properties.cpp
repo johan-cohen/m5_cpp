@@ -684,8 +684,7 @@ uint32_t Properties::read(AppBuf &buf)
 		case RESPONSE_INFORMATION:
 		case SERVER_REFERENCE:
 		case REASON_STR:
-			value = new ByteArray();
-			buf.readBinary(*value);
+			value = buf.readBinary();
 			this->append((PropertyId)id, value);
 			break;
 
@@ -695,10 +694,8 @@ uint32_t Properties::read(AppBuf &buf)
 			break;
 
 		case USER_PROPERTY:
-			key = new ByteArray();
-			value = new ByteArray();
-
-			buf.readKeyValue(*key, *value);
+			key = buf.readBinary();
+			value = buf.readBinary();
 			this->append(key, value);
 			break;
 		default:
