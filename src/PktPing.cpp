@@ -50,7 +50,7 @@ uint32_t PktPing::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8(((uint8_t)_type) << 4);
+	buf.writeNum8(m5::firstByte(this->_packetType));
 	buf.writeNum8(0);
 
 	return 2;
@@ -62,8 +62,7 @@ uint32_t PktPing::readFrom(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	uint8_t first = buf.readNum8();
-	if (first != (((uint8_t)_type) << 4)) {
+	if (buf.readNum8() != m5::firstByte(this->_packetType)) {
 		throw std::invalid_argument("PING msg not found in buf");
 	}
 

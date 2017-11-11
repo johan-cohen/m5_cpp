@@ -68,7 +68,7 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8(((uint8_t)PktType::CONNACK) << 4);
+	buf.writeNum8(m5::firstByte(PktType::CONNACK));
 	buf.writeVBI(remLen);
 	buf.writeNum8(this->_sessionPresent ? 0x01 : 0x00);
 	buf.writeNum8(this->_reasonCode);

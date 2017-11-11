@@ -51,11 +51,11 @@ namespace m5 {
 class PktRCodeProp : public Packet {
 protected:
 	PktRCodeProp(PktType type = PktType::RESERVED) :
-		     _packetType((uint8_t)type), properties(type) {}
+		     _packetType(type), properties(type) {}
 
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
-	uint8_t _packetType = (uint8_t)PktType::RESERVED;
+	PktType _packetType = PktType::RESERVED;
 
 public:
 	Properties properties;
@@ -65,11 +65,10 @@ public:
 	ReasonCode reasonCode(void) const { return (ReasonCode)_reasonCode; }
 	void reasonCode(ReasonCode rc);
 
-	PktType packetType(void) const { return (PktType)_packetType; }
-	void packetType(PktType type) { _packetType = (uint8_t)type; }
-
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
+	uint32_t getId(void) const override { return (uint32_t)_packetType; }
+
 };
 
 }

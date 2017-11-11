@@ -86,7 +86,7 @@ uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8(((uint8_t)PktType::UNSUBSCRIBE << 4) | 0x02);
+	buf.writeNum8(m5::firstByte(PktType::UNSUBSCRIBE, 0x02));
 	buf.writeVBI(remLen);
 	buf.writeNum16(this->packetId());
 
@@ -103,14 +103,12 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint32_t remLen;
 	uint8_t remLenWS;
-	uint8_t first;
 
 	if (buf.bytesToRead() < 7) {
 		throw std::invalid_argument("Invalid input buffer");
 	}
 
-	first = buf.readNum8();
-	if (first != (((uint8_t)PktType::UNSUBSCRIBE << 4) | 0x02)) {
+	if (buf.readNum8() != m5::firstByte(PktType::UNSUBSCRIBE, 0x02)) {
 		throw std::invalid_argument("SUBACK: Invalid packet type");
 	}
 

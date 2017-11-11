@@ -56,9 +56,9 @@ protected:
 	PktSubAckMsg(AppBuf &buf);
 
 private:
+	PktType _packetType = PktType::RESERVED;
 	std::list<uint8_t> _reasonCodes;
 	uint16_t _packetId = 0;
-	uint8_t _packetType;
 
 public:
 	Properties properties;

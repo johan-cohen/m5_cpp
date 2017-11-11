@@ -50,8 +50,6 @@ class PktAuth : public PktRCodeProp {
 public:
 	PktAuth() : PktRCodeProp(PktType::AUTH) {}
 	~PktAuth() {}
-
-	uint32_t getId(void) const override { return (uint32_t)PktType::AUTH; }
 };
 
 }

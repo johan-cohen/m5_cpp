@@ -54,9 +54,9 @@ protected:
 
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
+	PktType _packetType = PktType::RESERVED;
 	uint8_t _reserved = 0;
 	uint16_t _packetId = 0;
-	PktType _type;
 
 public:
 	Properties properties;
@@ -71,7 +71,7 @@ public:
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const override { return (uint32_t)_type; }
+	uint32_t getId(void) const override { return (uint32_t)_packetType; }
 };
 
 }

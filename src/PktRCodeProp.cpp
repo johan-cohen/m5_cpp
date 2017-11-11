@@ -66,7 +66,7 @@ uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8((uint8_t)packetType() << 4);
+	buf.writeNum8(m5::firstByte(this->_packetType, 0));
 	buf.writeVBI(remLen);
 	buf.writeNum8(this->_reasonCode);
 	properties.write(buf);
@@ -79,14 +79,12 @@ uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint8_t remLenWS;
 	uint32_t remLen;
-	uint8_t first;
 
 	if (buf.bytesToRead() < 3) {
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	first = buf.readNum8();
-	if (first != ((uint8_t)packetType() << 4)) {
+	if (buf.readNum8() != m5::firstByte(this->_packetType)) {
 		throw std::invalid_argument("Msg not found in buf");
 	}
 

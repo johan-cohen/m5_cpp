@@ -44,7 +44,7 @@ namespace m5 {
 
 PktPubMsg::PktPubMsg(PktType type, uint8_t reserved) : properties(type)
 {
-	this->_type = type;
+	this->_packetType = type;
 	this->_reserved = reserved;
 }
 
@@ -64,7 +64,6 @@ void PktPubMsg::reasonCode(ReasonCode rc)
 
 uint32_t PktPubMsg::writeTo(AppBuf &buf)
 {
-	uint8_t firstByte = 0;
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -86,8 +85,7 @@ uint32_t PktPubMsg::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	firstByte = ((uint8_t)this->_type << 4) + (this->_reserved & 0x0F);
-	buf.writeNum8(firstByte);
+	buf.writeNum8(m5::firstByte(_packetType, _reserved));
 	buf.writeVBI(remLen);
 	buf.writeNum16(this->packetId());
 	buf.writeNum8((uint8_t)this->reasonCode());
@@ -101,18 +99,13 @@ uint32_t PktPubMsg::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint32_t remLen;
 	uint8_t remLenWS;
-	uint8_t first;
 
 	if (buf.bytesToRead() < 6) {
 		throw std::invalid_argument("Invalid input buffer");
 	}
 
-	first = buf.readNum8();
-	if (packetType(first) != this->_type) {
+	if (buf.readNum8() != m5::firstByte(this->_packetType, this->_reserved)) {
 		throw std::invalid_argument("Invalid packet type");
-	}
-	if ((first & 0x0F) != this->_reserved) {
-		throw std::invalid_argument("Invalid fixed header reserved flags");
 	}
 
 	buf.readVBI(remLen, remLenWS);

@@ -50,8 +50,6 @@ class PktDisconnect : public PktRCodeProp {
 public:
 	PktDisconnect() : PktRCodeProp(PktType::DISCONNECT) {}
 	~PktDisconnect() {}
-
-	uint32_t getId(void) const override { return (uint32_t)PktType::DISCONNECT; }
 };
 
 }

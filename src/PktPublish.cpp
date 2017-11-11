@@ -79,7 +79,6 @@ void PktPublish::payload(const uint8_t *data, uint16_t size)
 
 uint32_t PktPublish::writeTo(AppBuf &buf)
 {
-	uint8_t firstByte = 0;
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -109,12 +108,12 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	firstByte += ((int)PktType::PUBLISH) << 4;
-	firstByte += this->dup() ? 1 << 3 : 0;
-	firstByte += ((int)this->QoS() & 0x03) << 1;
-	firstByte += this->retain() ? 1 : 0;
+	uint8_t reserved;
+	reserved = this->dup() ? 1 << 3 : 0;
+	reserved += ((int)this->QoS() & 0x03) << 1;
+	reserved += this->retain() ? 1 : 0;
 
-	buf.writeNum8(firstByte);
+	buf.writeNum8(m5::firstByte(PktType::PUBLISH, reserved));
 	buf.writeVBI(remLen);
 	if (this->QoS() != PktQoS::QoS0) {
 		buf.writeBinary(this->topic());
@@ -138,7 +137,7 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 	}
 
 	first = buf.readNum8();
-	if (packetType(first) != PktType::PUBLISH) {
+	if (m5::packetType(first) != PktType::PUBLISH) {
 		throw std::invalid_argument("Invalid packet type");
 	}
 

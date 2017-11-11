@@ -42,7 +42,7 @@
 
 namespace m5 {
 
-PktSubAckMsg::PktSubAckMsg(PktType type) : _packetType((uint8_t)type), properties(type)
+PktSubAckMsg::PktSubAckMsg(PktType type) : _packetType(type), properties(type)
 {
 }
 
@@ -75,7 +75,7 @@ uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8((uint8_t)this->getId() << 4);
+	buf.writeNum8(m5::firstByte(this->_packetType));
 	buf.writeVBI(remLen);
 	buf.writeNum16(this->packetId());
 	properties.write(buf);
@@ -92,14 +92,12 @@ uint32_t PktSubAckMsg::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint32_t remLen;
 	uint8_t remLenWS;
-	uint8_t first;
 
 	if (buf.bytesToRead() < 6) {
 		throw std::invalid_argument("Invalid input buffer");
 	}
 
-	first = buf.readNum8();
-	if (first != ((uint8_t)this->getId() << 4)) {
+	if (buf.readNum8() != m5::firstByte(this->_packetType)) {
 		throw std::invalid_argument("Invalid packet type");
 	}
 

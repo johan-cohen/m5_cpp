@@ -195,7 +195,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8((uint8_t)PktType::CONNECT << 4);
+	buf.writeNum8(m5::firstByte(PktType::CONNECT));
 	buf.writeVBI(remLen);
 	buf.writeString(protocolStr);
 	buf.writeNum8(protocolVersion5);
@@ -220,7 +220,7 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	}
 
 	first = buf.readNum8();
-	if (first != ((uint8_t)PktType::CONNECT << 4)) {
+	if (m5::packetType(first) != PktType::CONNECT) {
 		throw std::invalid_argument("CONNECT msg not found in buf");
 	}
 

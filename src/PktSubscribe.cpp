@@ -133,7 +133,7 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	buf.writeNum8((uint8_t)PktType::SUBSCRIBE << 4 | 0x02);
+	buf.writeNum8(m5::firstByte(PktType::SUBSCRIBE, 0x02));
 	buf.writeVBI(remLen);
 	buf.writeNum16(packetId());
 	properties.write(buf);
@@ -168,14 +168,12 @@ uint32_t PktSubscribe::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint8_t remLenWS;
 	uint32_t remLen;
-	uint8_t first;
 
 	if (buf.bytesToRead() < 8) {
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	first = buf.readNum8();
-	if (first != ((uint8_t)PktType::SUBSCRIBE << 4 | 0x02)) {
+	if (buf.readNum8() != m5::firstByte(PktType::SUBSCRIBE, 0x02)) {
 		throw std::invalid_argument("Invalid fixed header");
 	}
 
