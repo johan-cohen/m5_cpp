@@ -77,6 +77,17 @@ void PktPublish::payload(const uint8_t *data, uint16_t size)
 	this->_payload.assign(data, data + size);
 }
 
+uint8_t PktPublish::headerFlags(void)
+{
+	uint8_t flags = 0;
+
+	flags += this->dup() ? 1 << 3 : 0;
+	flags += ((uint8_t)this->QoS() & 0x03) << 1;
+	flags += this->retain() ? 1 : 0;
+
+	return flags;
+}
+
 uint32_t PktPublish::writeTo(AppBuf &buf)
 {
 	uint32_t fullPktSize;
@@ -108,12 +119,7 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 		throw std::out_of_range("No enough space in buffer");
 	}
 
-	uint8_t reserved;
-	reserved = this->dup() ? 1 << 3 : 0;
-	reserved += ((int)this->QoS() & 0x03) << 1;
-	reserved += this->retain() ? 1 : 0;
-
-	buf.writeNum8(m5::firstByte(PktType::PUBLISH, reserved));
+	buf.writeNum8(m5::firstByte(PktType::PUBLISH, headerFlags()));
 	buf.writeVBI(remLen);
 	if (this->QoS() != PktQoS::QoS0) {
 		buf.writeBinary(this->topic());

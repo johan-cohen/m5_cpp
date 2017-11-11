@@ -60,6 +60,7 @@ private:
 	ByteArray _payload;
 
 	void headerFlags(uint8_t firstByte);
+	uint8_t headerFlags(void);
 
 public:
 	Properties properties;
