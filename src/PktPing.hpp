@@ -41,13 +41,13 @@
 #ifndef __PKT_PING_HPP__
 #define __PKT_PING_HPP__
 
-#include "ProtoEntity.hpp"
+#include "Packet.hpp"
 #include "AppBuf.hpp"
 #include "Common.hpp"
 
 namespace m5 {
 
-class PktPing : public ProtoEntity {
+class PktPing : public Packet {
 protected:
 	PktPing(PktType type) : _type(type) {}
 

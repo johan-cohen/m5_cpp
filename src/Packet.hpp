@@ -38,16 +38,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PROTOENTITY_HPP__
-#define __PROTOENTITY_HPP__
+#ifndef __PACKET_HPP__
+#define __PACKET_HPP__
 
 #include "AppBuf.hpp"
 
 namespace m5 {
 
-class ProtoEntity {
+class Packet {
 public:
-	virtual ~ProtoEntity() {}
+	virtual ~Packet() {}
 	virtual uint32_t writeTo(AppBuf &buf) = 0;
 	virtual uint32_t readFrom(AppBuf &buf) = 0;
 	virtual uint32_t getId(void) const = 0;

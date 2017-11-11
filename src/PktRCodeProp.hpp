@@ -41,14 +41,14 @@
 #ifndef __PKT_RCODEPROP_HPP__
 #define __PKT_RCODEPROP_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "AppBuf.hpp"
 #include "Common.hpp"
 
 namespace m5 {
 
-class PktRCodeProp : public ProtoEntity {
+class PktRCodeProp : public Packet {
 protected:
 	PktRCodeProp(PktType type = PktType::RESERVED) :
 		     _packetType((uint8_t)type), properties(type) {}

@@ -41,15 +41,15 @@
 #ifndef __PKT_UNSUBSCRIBE_HPP__
 #define __PKT_UNSUBSCRIBE_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "Common.hpp"
 
 #include <list>
 
 namespace m5 {
 
-class PktUnsubscribe : public ProtoEntity
+class PktUnsubscribe : public Packet
 {
 private:
 	std::list<ByteArray *> _topics;

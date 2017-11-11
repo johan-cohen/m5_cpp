@@ -41,14 +41,14 @@
 #ifndef __PKT_CONNACK_HPP__
 #define __PKT_CONNACK_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "AppBuf.hpp"
 #include "Common.hpp"
 
 namespace m5 {
 
-class PktConnAck : public ProtoEntity {
+class PktConnAck : public Packet {
 private:
 	bool _sessionPresent = false;
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;

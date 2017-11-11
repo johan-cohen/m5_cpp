@@ -41,15 +41,15 @@
 #ifndef __PKT_SUBACKMSG_HPP__
 #define __PKT_SUBACKMSG_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "Common.hpp"
 
 #include <list>
 
 namespace m5 {
 
-class PktSubAckMsg : public ProtoEntity
+class PktSubAckMsg : public Packet
 {
 protected:
 	PktSubAckMsg(PktType type);

@@ -41,13 +41,13 @@
 #ifndef __PKT_PUBMSG_HPP__
 #define __PKT_PUBMSG_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "Common.hpp"
 
 namespace m5 {
 
-class PktPubMsg : public ProtoEntity
+class PktPubMsg : public Packet
 {
 protected:
 	PktPubMsg(PktType type, uint8_t reserved = 0);

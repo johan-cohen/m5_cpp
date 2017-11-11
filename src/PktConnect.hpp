@@ -41,15 +41,15 @@
 #ifndef __PKT_CONNECT_HPP__
 #define __PKT_CONNECT_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "Common.hpp"
 
 #include <cstdint>
 
 namespace m5 {
 
-class PktConnect : public ProtoEntity {
+class PktConnect : public Packet {
 private:
 	uint16_t _keepAlive = 0;
 

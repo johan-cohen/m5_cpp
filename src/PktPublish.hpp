@@ -41,13 +41,13 @@
 #ifndef __PKT_PUBLISH_HPP__
 #define __PKT_PUBLISH_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 #include "Common.hpp"
 
 namespace m5 {
 
-class PktPublish : public ProtoEntity
+class PktPublish : public Packet
 {
 private:
 	PktQoS _QoS = PktQoS::QoS0;

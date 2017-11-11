@@ -41,8 +41,8 @@
 #ifndef __PKT_SUBSCRIBE_HPP__
 #define __PKT_SUBSCRIBE_HPP__
 
-#include "ProtoEntity.hpp"
 #include "Properties.hpp"
+#include "Packet.hpp"
 
 #include <list>
 
@@ -58,7 +58,7 @@ public:
 	TopicOptions(const char *topic, uint8_t options);
 };
 
-class PktSubscribe : public ProtoEntity {
+class PktSubscribe : public Packet {
 private:
 	std::list<TopicOptions *> _topics;
 	uint32_t payloadWS = 0;
