@@ -45,28 +45,15 @@
 
 namespace m5 {
 
-void AppBuf::init(std::size_t size)
+AppBuf::AppBuf(const uint8_t *data, std::size_t size) : _data(data, data + size)
 {
-	if (size > 0) {
-		this->_data.reserve(size);
-	}
-
 	this->_size = size;
-	this->_length = 0;
-	this->_offset = 0;
-}
-
-AppBuf::AppBuf(const uint8_t *data, std::size_t size)
-{
-	init(size);
-
-	this->_data.assign(data, data + size);
 	this->_length = size;
 }
 
-AppBuf::AppBuf(std::size_t size)
+AppBuf::AppBuf(std::size_t size) : _data(size)
 {
-	init(size);
+	this->_size = size;
 }
 
 AppBuf::~AppBuf()

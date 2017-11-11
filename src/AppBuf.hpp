@@ -56,7 +56,6 @@ private:
 	std::size_t _length = 0;
 	std::size_t _size = 0;
 
-	void init(std::size_t size);
 public:
 	AppBuf(const uint8_t *data, std::size_t size);
 	AppBuf(std::size_t size = 0);
