@@ -49,6 +49,9 @@ namespace m5 {
 
 class PktPubMsg : public ProtoEntity
 {
+protected:
+	PktPubMsg(PktType type, uint8_t reserved = 0);
+
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
 	uint8_t _reserved = 0;
@@ -58,7 +61,6 @@ private:
 public:
 	Properties properties;
 
-	PktPubMsg(PktType type, uint8_t reserved = 0);
 	virtual ~PktPubMsg() {}
 
 	void packetId(uint16_t id);
