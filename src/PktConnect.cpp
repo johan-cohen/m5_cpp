@@ -52,7 +52,7 @@ static const uint8_t protocolVersion5 = 0x05;
 
 static const char protocolStr[] = "MQTT";
 static const uint8_t protocolNameStr[] = {0, 4, 'M', 'Q', 'T', 'T'};
-static const std::size_t protocolNameStrLen = sizeof(protocolNameStr);
+static const std::size_t protocolNameWireSize = sizeof(protocolNameStr);
 
 /* Protocol Name (2 + 4), Protocol Level (1), Conn Flags (1), Keep Alive (2) */
 static const uint32_t connectVarHdrMinSize = 10;
@@ -234,11 +234,10 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	const uint8_t *ptr = buf.data() + buf.traversed();
-	if (memcmp(ptr, m5::protocolNameStr, m5::protocolNameStrLen) != 0) {
+	if (memcmp(buf.ptrRead(), protocolNameStr, protocolNameWireSize) != 0) {
 		throw std::invalid_argument("Invalid protocol name string");
 	}
-	buf.readSkip(m5::protocolNameStrLen);
+	buf.readSkip(protocolNameWireSize);
 
 	if (buf.readNum8() != protocolVersion5) {
 		throw std::invalid_argument("Invalid protocol version");
