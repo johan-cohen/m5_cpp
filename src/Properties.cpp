@@ -43,7 +43,7 @@
 #include <stdexcept>
 #include <cstring>
 
-#define __POW2(n) (uint64_t)(((uint64_t)1) << (n))
+#define __POW2(n) (((uint64_t)1) << (n))
 
 namespace  m5 {
 
