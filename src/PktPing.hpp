@@ -48,10 +48,13 @@
 namespace m5 {
 
 class PktPing : public ProtoEntity {
+protected:
+	PktPing(PktType type) : _type(type) {}
+
 private:
 	PktType _type;
+
 public:
-	PktPing(PktType type) : _type(type) {}
 	virtual ~PktPing() {}
 
 	uint32_t writeTo(AppBuf &buf) override;
