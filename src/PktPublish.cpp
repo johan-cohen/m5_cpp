@@ -121,10 +121,11 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 
 	buf.writeNum8(m5::firstByte(PktType::PUBLISH, headerFlags()));
 	buf.writeVBI(remLen);
+	buf.writeBinary(this->topic());
 	if (this->QoS() != PktQoS::QoS0) {
-		buf.writeBinary(this->topic());
+		buf.writeNum16(this->packetId());
 	}
-	buf.writeNum16(this->packetId());
+
 	properties.write(buf);
 
 	if (this->payload().size() > 0) {
