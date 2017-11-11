@@ -125,6 +125,17 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 	return fullPktSize;
 }
 
+void PktPublish::headerFlags(uint8_t firstByte)
+{
+	this->retain(firstByte & 0x01);
+	this->QoS((PktQoS)((firstByte & 0x06) >> 1));
+	this->dup(firstByte & 0x08);
+
+	if ((int)this->QoS() >= 0x03) {
+		throw std::invalid_argument("Invalid QoS");
+	}
+}
+
 uint32_t PktPublish::readFrom(AppBuf &buf)
 {
 	std::size_t alreadyTraversed = buf.traversed();
@@ -141,13 +152,7 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 		throw std::invalid_argument("Invalid packet type");
 	}
 
-	this->retain(first & 0x01);
-	this->QoS((PktQoS)((first & 0x06) >> 1));
-	this->dup(first & 0x08);
-
-	if ((int)this->QoS() >= 0x03) {
-		throw std::invalid_argument("Invalid QoS");
-	}
+	headerFlags(first);
 
 	buf.readVBI(remLen, remLenWS);
 	if (remLen > buf.bytesToRead()) {
