@@ -50,7 +50,7 @@ namespace m5 {
 class PktPubRel: public PktPubMsg
 {
 public:
-	PktPubRel() : PktPubMsg(PktType::PUBREL, 0x00) {}
+	PktPubRel() : PktPubMsg(PktType::PUBREL, 0x02) {}
 	~PktPubRel() {}
 };
 
