@@ -53,6 +53,38 @@ void PktRCodeProp::reasonCode(ReasonCode rc)
 	this->_reasonCode = (uint8_t)rc;
 }
 
+
+void PktRCodeProp::reasonString(const uint8_t *data, uint16_t size)
+{
+	properties.reasonString(data, size);
+}
+
+void PktRCodeProp::reasonString(const char *str)
+{
+	properties.reasonString(str);
+}
+
+const ByteArray &PktRCodeProp::reasonString(void) const
+{
+	return properties.reasonString();
+}
+
+void PktRCodeProp::userProperty(const uint8_t *key, uint16_t keySize,
+				const uint8_t *value, uint16_t valueSize)
+{
+	properties.userProperty(key, keySize, value, valueSize);
+}
+
+void PktRCodeProp::userProperty(const char *key, const char *val)
+{
+	properties.userProperty(key, val);
+}
+
+const UserProperty &PktRCodeProp::userProperty(void) const
+{
+	return properties.userProperty();
+}
+
 uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 {
 	uint32_t fullPktSize;

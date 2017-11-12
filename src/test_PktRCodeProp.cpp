@@ -54,9 +54,9 @@ int test(void)
 
 	auth = new m5::PktAuth();
 	auth->reasonCode(rc);
-	auth->properties.authenticationMethod(str);
-	auth->properties.authenticationData((const uint8_t *)str, strlen(str));
-	auth->properties.userProperty(str, str);
+	auth->authenticationMethod(str);
+	auth->authenticationData((const uint8_t *)str, strlen(str));
+	auth->userProperty(str, str);
 
 	auth->writeTo(buf);
 
@@ -81,10 +81,10 @@ int testDisconnect(void)
 
 	disconnect = new m5::PktDisconnect();
 	disconnect->reasonCode(rc);
-	disconnect->properties.sessionExpiryInterval(u32);
-	disconnect->properties.reasonString(str);
-	disconnect->properties.serverReference(str);
-	disconnect->properties.userProperty(str, str);
+	disconnect->sessionExpiryInterval(u32);
+	disconnect->reasonString(str);
+	disconnect->serverReference(str);
+	disconnect->userProperty(str, str);
 
 	disconnect->writeTo(buf);
 

@@ -51,6 +51,13 @@ public:
 	PktDisconnect() : PktRCodeProp(PktType::DISCONNECT) {}
 	PktDisconnect(AppBuf &buf) : PktRCodeProp(PktType::DISCONNECT, buf) {}
 	~PktDisconnect() {}
+
+	void sessionExpiryInterval(uint32_t v);
+	uint32_t sessionExpiryInterval(void) const;
+
+	void serverReference(const uint8_t *data, uint16_t size);
+	void serverReference(const char *str);
+	const ByteArray &serverReference(void) const;
 };
 
 }

@@ -38,5 +38,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* empty file */
+#include "PktDisconnect.hpp"
+
+namespace m5 {
+
+void PktDisconnect::sessionExpiryInterval(uint32_t v)
+{
+	properties.sessionExpiryInterval(v);
+}
+
+uint32_t PktDisconnect::sessionExpiryInterval(void) const
+{
+	return properties.sessionExpiryInterval();
+}
+
+void PktDisconnect::serverReference(const uint8_t *data, uint16_t size)
+{
+	properties.serverReference(data, size);
+}
+
+void PktDisconnect::serverReference(const char *str)
+{
+	properties.serverReference(str);
+}
+
+const ByteArray &PktDisconnect::serverReference(void) const
+{
+	return properties.serverReference();
+}
+
+}
 

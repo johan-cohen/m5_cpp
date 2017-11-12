@@ -49,21 +49,30 @@
 namespace m5 {
 
 class PktRCodeProp : public Packet {
-protected:
-	PktRCodeProp(PktType type) : _packetType(type), properties(type) {}
-	PktRCodeProp(PktType type, AppBuf &buf);
-
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
 	PktType _packetType = PktType::RESERVED;
 
-public:
+protected:
+	PktRCodeProp(PktType type) : _packetType(type), properties(type) {}
+	PktRCodeProp(PktType type, AppBuf &buf);
+
 	Properties properties;
 
+public:
 	virtual ~PktRCodeProp() {}
 
 	ReasonCode reasonCode(void) const { return (ReasonCode)_reasonCode; }
 	void reasonCode(ReasonCode rc);
+
+	void reasonString(const uint8_t *data, uint16_t size);
+	void reasonString(const char *str);
+	const ByteArray &reasonString(void) const;
+
+	void userProperty(const uint8_t *key, uint16_t keySize,
+			  const uint8_t *value, uint16_t valueSize);
+	void userProperty(const char *key, const char *val);
+	const UserProperty &userProperty(void) const;
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
