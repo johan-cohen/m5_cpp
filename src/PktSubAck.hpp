@@ -48,10 +48,8 @@ namespace m5 {
 class PktSubAck : public PktSubAckMsg {
 public:
 	PktSubAck() : PktSubAckMsg(PktType::SUBACK) {}
-	PktSubAck(AppBuf &buf) : PktSubAckMsg(PktType::SUBACK)
-	{
-		this->readFrom(buf);
-	}
+	PktSubAck(AppBuf &buf) : PktSubAckMsg(PktType::SUBACK, buf) {}
+
 	virtual ~PktSubAck() {}
 };
 

@@ -46,7 +46,7 @@ PktSubAckMsg::PktSubAckMsg(PktType type) : _packetType(type), properties(type)
 {
 }
 
-PktSubAckMsg::PktSubAckMsg(AppBuf &buf)
+PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : _packetType(type), properties(type)
 {
 	this->readFrom(buf);
 }

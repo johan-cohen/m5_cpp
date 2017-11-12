@@ -53,7 +53,7 @@ class PktSubAckMsg : public Packet
 {
 protected:
 	PktSubAckMsg(PktType type);
-	PktSubAckMsg(AppBuf &buf);
+	PktSubAckMsg(PktType type, AppBuf &buf);
 
 private:
 	PktType _packetType = PktType::RESERVED;
