@@ -43,10 +43,201 @@
 namespace m5 {
 
 PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
-	properties(PktType::CONNACK)
+		       properties(PktType::CONNACK)
 {
 	this->_sessionPresent = sessionPresent;
 	this->_reasonCode = (uint8_t)reasonCode;
+}
+
+void PktConnAck::assignedClientIdentifier(const uint8_t *data, uint16_t size)
+{
+	properties.assignedClientIdentifier(data, size);
+}
+
+void PktConnAck::assignedClientIdentifier(const char *str)
+{
+	properties.assignedClientIdentifier(str);
+}
+
+const ByteArray &PktConnAck::assignedClientIdentifier(void) const
+{
+	return properties.assignedClientIdentifier();
+}
+
+void PktConnAck::serverKeepAlive(uint16_t v)
+{
+	properties.serverKeepAlive(v);
+}
+
+uint16_t PktConnAck::serverKeepAlive(void) const
+{
+	return properties.serverKeepAlive();
+}
+
+void PktConnAck::authenticationMethod(const uint8_t *data, uint16_t size)
+{
+	properties.authenticationMethod(data, size);
+}
+
+void PktConnAck::authenticationMethod(const char *str)
+{
+	properties.authenticationMethod(str);
+}
+
+const ByteArray &PktConnAck::authenticationMethod(void) const
+{
+	return properties.authenticationMethod();
+}
+
+void PktConnAck::authenticationData(const uint8_t *data, uint16_t size)
+{
+	properties.authenticationData(data, size);
+}
+
+const ByteArray &PktConnAck::authenticationData(void) const
+{
+	return properties.authenticationData();
+}
+
+void PktConnAck::responseInformation(const uint8_t *data, uint16_t size)
+{
+	properties.responseInformation(data, size);
+}
+
+void PktConnAck::responseInformation(const char *str)
+{
+	properties.responseInformation(str);
+}
+
+const ByteArray &PktConnAck::responseInformation(void) const
+{
+	return properties.responseInformation();
+}
+
+void PktConnAck::serverReference(const uint8_t *data, uint16_t size)
+{
+	properties.serverReference(data, size);
+}
+
+void PktConnAck::serverReference(const char *str)
+{
+	properties.serverReference(str);
+}
+
+const ByteArray &PktConnAck::serverReference(void) const
+{
+	return properties.serverReference();
+}
+
+void PktConnAck::reasonString(const uint8_t *data, uint16_t size)
+{
+	properties.reasonString(data, size);
+}
+
+void PktConnAck::reasonString(const char *str)
+{
+	properties.reasonString(str);
+}
+
+const ByteArray &PktConnAck::reasonString(void) const
+{
+	return properties.reasonString();
+}
+
+void PktConnAck::receiveMaximum(uint16_t v)
+{
+	properties.receiveMaximum(v);
+}
+
+uint16_t PktConnAck::receiveMaximum(void) const
+{
+	return properties.receiveMaximum();
+}
+
+void PktConnAck::topicAliasMaximum(uint16_t v)
+{
+	properties.topicAliasMaximum(v);
+}
+
+uint16_t PktConnAck::topicAliasMaximum(void) const
+{
+	return properties.topicAliasMaximum();
+}
+
+void PktConnAck::maximumQoS(PktQoS qos)
+{
+	properties.maximumQoS(qos);
+}
+
+PktQoS PktConnAck::maximumQoS(void) const
+{
+	return properties.maximumQoS();
+}
+
+void PktConnAck::retainAvailable(bool v)
+{
+	properties.retainAvailable(v);
+}
+
+bool PktConnAck::retainAvailable(void) const
+{
+	return properties.retainAvailable();
+}
+
+void PktConnAck::userProperty(const uint8_t *key, uint16_t keySize,
+			      const uint8_t *value, uint16_t valueSize)
+{
+	properties.userProperty(key, keySize, value, valueSize);
+}
+
+void PktConnAck::userProperty(const char *key, const char *val)
+{
+	properties.userProperty(key, val);
+}
+
+const UserProperty &PktConnAck::userProperty(void) const
+{
+	return properties.userProperty();
+}
+
+void PktConnAck::maximumPacketSize(uint32_t v)
+{
+	properties.maximumPacketSize(v);
+}
+
+uint32_t PktConnAck::maximumPacketSize(void) const
+{
+	return properties.maximumPacketSize();
+}
+
+void PktConnAck::wildcardSubscriptionAvailable(bool v)
+{
+	properties.wildcardSubscriptionAvailable(v);
+}
+
+bool PktConnAck::wildcardSubscriptionAvailable(void) const
+{
+	return properties.wildcardSubscriptionAvailable();
+}
+
+void PktConnAck::subscriptionIdentifierAvailable(bool v)
+{
+	properties.subscriptionIdentifierAvailable(v);
+}
+
+bool PktConnAck::subscriptionIdentifierAvailable(void) const
+{
+	return properties.subscriptionIdentifierAvailable();
+}
+
+void PktConnAck::sharedSubscriptionAvailable(bool v)
+{
+	properties.sharedSubscriptionAvailable(v);
+}
+
+bool PktConnAck::sharedSubscriptionAvailable(void) const
+{
+	return properties.sharedSubscriptionAvailable();
 }
 
 uint32_t PktConnAck::writeTo(AppBuf &buf)

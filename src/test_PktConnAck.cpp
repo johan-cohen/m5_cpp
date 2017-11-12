@@ -53,67 +53,67 @@ int test(void)
 	m5::AppBuf buf(256);
 
 	connAck = new m5::PktConnAck(false, m5::ReasonCode::SUCCESS);
-	connAck->properties.receiveMaximum(u16);
-	connAck->properties.maximumQoS(m5::PktQoS::QoS2);
-	connAck->properties.retainAvailable(true);
-	connAck->properties.maximumPacketSize(u32);
-	connAck->properties.assignedClientIdentifier(msg);
-	connAck->properties.topicAliasMaximum(u16);
-	connAck->properties.reasonString(msg);
-	connAck->properties.userProperty(msg, msg);
-	connAck->properties.wildcardSubscriptionAvailable(true);
-	connAck->properties.sharedSubscriptionAvailable(true);
-	connAck->properties.serverKeepAlive(u16);
-	connAck->properties.responseInformation(msg);
-	connAck->properties.serverReference(msg);
-	connAck->properties.authenticationMethod(msg);
-	connAck->properties.authenticationData((const uint8_t *)msg, strlen(msg));
+	connAck->receiveMaximum(u16);
+	connAck->maximumQoS(m5::PktQoS::QoS2);
+	connAck->retainAvailable(true);
+	connAck->maximumPacketSize(u32);
+	connAck->assignedClientIdentifier(msg);
+	connAck->topicAliasMaximum(u16);
+	connAck->reasonString(msg);
+	connAck->userProperty(msg, msg);
+	connAck->wildcardSubscriptionAvailable(true);
+	connAck->sharedSubscriptionAvailable(true);
+	connAck->serverKeepAlive(u16);
+	connAck->responseInformation(msg);
+	connAck->serverReference(msg);
+	connAck->authenticationMethod(msg);
+	connAck->authenticationData((const uint8_t *)msg, strlen(msg));
 
 	connAck->writeTo(buf);
 
 	m5::PktConnAck connAckRead;
 
 	connAckRead.readFrom(buf);
-	if (connAckRead.properties.receiveMaximum() != u16) {
+	if (connAckRead.receiveMaximum() != u16) {
 		throw std::logic_error("receiveMaximum read/write");
 	}
-	if (connAckRead.properties.maximumQoS() != m5::PktQoS::QoS2) {
+	if (connAckRead.maximumQoS() != m5::PktQoS::QoS2) {
 		throw std::logic_error("maximumQoS read/write");
 	}
-	if (connAckRead.properties.retainAvailable() != true) {
+	if (connAckRead.retainAvailable() != true) {
 		throw std::logic_error("retainAvailable read/write");
 	}
-	if (connAckRead.properties.maximumPacketSize() != u32) {
+	if (connAckRead.maximumPacketSize() != u32) {
 		throw std::logic_error("maximumPacketSize read/write");
 	}
-	if (connAckRead.properties.assignedClientIdentifier() != msgArray) {
+	if (connAckRead.assignedClientIdentifier() != msgArray) {
 		throw std::logic_error("assignedClientIdentifier read/write");
 	}
-	if (connAckRead.properties.topicAliasMaximum() != u16) {
+	if (connAckRead.topicAliasMaximum() != u16) {
 		throw std::logic_error("topicAliasMaximum read/write");
 	}
-	if (connAckRead.properties.reasonString() != msgArray) {
+	if (connAckRead.reasonString() != msgArray) {
 		throw std::logic_error("reasonString read/write");
 	}
-	if (connAckRead.properties.wildcardSubscriptionAvailable() != true) {
+	if (connAckRead.wildcardSubscriptionAvailable() != true) {
 		throw std::logic_error("wildcardSubscriptionAvailable read/write");
 	}
-	if (connAckRead.properties.sharedSubscriptionAvailable() != true) {
+	if (connAckRead.sharedSubscriptionAvailable() != true) {
 		throw std::logic_error("sharedSubscriptionAvailable read/write");
 	}
-	if (connAckRead.properties.serverKeepAlive() != u16) {
+	if (connAckRead.serverKeepAlive() != u16) {
 		throw std::logic_error("serverKeepAlive read/write");
 	}
-	if (connAckRead.properties.responseInformation() != msgArray) {
+	if (connAckRead.responseInformation() != msgArray) {
 		throw std::logic_error("responseInformation read/write");
 	}
-	if (connAckRead.properties.serverReference() != msgArray) {
+	if (connAckRead.serverReference() != msgArray) {
 		throw std::logic_error("serverReference read/write");
 	}
-	if (connAckRead.properties.authenticationMethod() != msgArray) {
+	if (connAckRead.authenticationMethod() != msgArray) {
 		throw std::logic_error("authenticationMethod read/write");
 	}
-	if (connAckRead.properties.authenticationData() != msgArray) {
+	if (connAckRead.authenticationData() != msgArray) {
 		throw std::logic_error("authenticationData read/write");
 	}
 
