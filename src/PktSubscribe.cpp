@@ -60,7 +60,7 @@ PktSubscribe::PktSubscribe() : properties(PktType::SUBSCRIBE)
 {
 }
 
-PktSubscribe::PktSubscribe(AppBuf &buf)
+PktSubscribe::PktSubscribe(AppBuf &buf) : properties(PktType::SUBSCRIBE)
 {
 	this->readFrom(buf);
 }
