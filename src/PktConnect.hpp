@@ -78,14 +78,15 @@ private:
 	bool flagUserName(uint8_t flags);
 
 	bool validClientIdSize(uint16_t size);
+
+	Properties properties;
+
 public:
 	PktConnect() : properties(PktType::CONNECT) {}
 	PktConnect(AppBuf &buf);
 	PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart = true);
 	PktConnect(const char *clientId, bool cleanStart = true);
 	~PktConnect();
-
-	Properties properties;
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
@@ -121,6 +122,39 @@ public:
 	const ByteArray &password(void) const { return _password; }
 	void password(const uint8_t *data, uint16_t size);
 	void password(const char *str);
+
+	void sessionExpiryInterval(uint32_t v);
+	uint32_t sessionExpiryInterval(void) const;
+
+	void authenticationMethod(const uint8_t *data, uint16_t size);
+	void authenticationMethod(const char *str);
+	const ByteArray &authenticationMethod(void) const;
+
+	void authenticationData(const uint8_t *data, uint16_t size);
+	const ByteArray &authenticationData(void) const;
+
+	void requestProblemInformation(bool v);
+	bool requestProblemInformation(void) const;
+
+	void willDelayInterval(uint32_t v);
+	uint32_t willDelayInterval(void) const;
+
+	void requestResponseInformation(bool v);
+	bool requestResponseInformation(void) const;
+
+	void receiveMaximum(uint16_t v);
+	uint16_t receiveMaximum(void) const;
+
+	void topicAliasMaximum(uint16_t v);
+	uint16_t topicAliasMaximum(void) const;
+
+	void userProperty(const uint8_t *key, uint16_t keySize,
+			  const uint8_t *value, uint16_t valueSize);
+	void userProperty(const char *key, const char *val);
+	const UserProperty &userProperty(void) const;
+
+	void maximumPacketSize(uint32_t v);
+	uint32_t maximumPacketSize(void) const;
 };
 
 }

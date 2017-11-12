@@ -215,52 +215,48 @@ int testProperties(void)
 
 	connect = new m5::PktConnect(clientId);
 
-	connect->properties.sessionExpiryInterval(u32);
-	connect->properties.authenticationMethod(str);
-	connect->properties.authenticationData((const uint8_t *)str, strlen(str));
-	connect->properties.requestProblemInformation(true);
-	connect->properties.willDelayInterval(u32);
-	connect->properties.requestResponseInformation(true);
-	connect->properties.receiveMaximum(u16);
-	connect->properties.topicAliasMaximum(u16);
-	connect->properties.userProperty(str, str);
-	connect->properties.userProperty(str, str);
-	connect->properties.userProperty(str, str);
-	connect->properties.maximumPacketSize(u32);
+	connect->sessionExpiryInterval(u32);
+	connect->authenticationMethod(str);
+	connect->authenticationData((const uint8_t *)str, strlen(str));
+	connect->requestProblemInformation(true);
+	connect->willDelayInterval(u32);
+	connect->requestResponseInformation(true);
+	connect->receiveMaximum(u16);
+	connect->topicAliasMaximum(u16);
+	connect->userProperty(str, str);
+	connect->userProperty(str, str);
+	connect->userProperty(str, str);
+	connect->maximumPacketSize(u32);
 
 	connect->writeTo(buf);
 
 	connectRead = new m5::PktConnect(buf);
 
-	if (connect->properties.wireSize() != connectRead->properties.wireSize()) {
-		throw std::logic_error("properties: wireSize");
-	}
-
-	if (connectRead->properties.sessionExpiryInterval() != u32) {
+	if (connectRead->sessionExpiryInterval() != u32) {
 		throw std::logic_error("properties: sessionExpiryInterval");
 	}
 
-	if (connectRead->properties.requestProblemInformation() != true) {
+	if (connectRead->requestProblemInformation() != true) {
 		throw std::logic_error("properties: requestProblemInformation");
 	}
 
-	if (connectRead->properties.willDelayInterval() != u32) {
+	if (connectRead->willDelayInterval() != u32) {
 		throw std::logic_error("properties: willDelayInterval");
 	}
 
-	if (connectRead->properties.requestResponseInformation() != true) {
+	if (connectRead->requestResponseInformation() != true) {
 		throw std::logic_error("properties: ByteArray");
 	}
 
-	if (connectRead->properties.receiveMaximum() != u16) {
+	if (connectRead->receiveMaximum() != u16) {
 		throw std::logic_error("properties: receiveMaximum");
 	}
 
-	if (connectRead->properties.topicAliasMaximum() != u16) {
+	if (connectRead->topicAliasMaximum() != u16) {
 		throw std::logic_error("properties: topicAliasMaximum");
 	}
 
-	if (connectRead->properties.maximumPacketSize() != u32) {
+	if (connectRead->maximumPacketSize() != u32) {
 		throw std::logic_error("properties: maximumPacketSize");
 	}
 
