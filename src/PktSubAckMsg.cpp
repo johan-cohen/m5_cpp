@@ -52,6 +52,37 @@ PktSubAckMsg::PktSubAckMsg(AppBuf &buf)
 }
 
 
+void PktSubAckMsg::reasonString(const uint8_t *data, uint16_t size)
+{
+	properties.reasonString(data, size);
+}
+
+void PktSubAckMsg::reasonString(const char *str)
+{
+	properties.reasonString(str);
+}
+
+const ByteArray &PktSubAckMsg::reasonString(void) const
+{
+	return properties.reasonString();
+}
+
+void PktSubAckMsg::userProperty(const uint8_t *key, uint16_t keySize,
+				const uint8_t *value, uint16_t valueSize)
+{
+	properties.userProperty(key, keySize, value, valueSize);
+}
+
+void PktSubAckMsg::userProperty(const char *key, const char *val)
+{
+	properties.userProperty(key, val);
+}
+
+const UserProperty &PktSubAckMsg::userProperty(void) const
+{
+	return properties.userProperty();
+}
+
 uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 {
 	uint32_t fullPktSize;

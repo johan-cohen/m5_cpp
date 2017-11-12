@@ -17,9 +17,9 @@ int test(m5::ReasonCode *codes, std::size_t size)
 		pkt->append(codes[i]);
 	}
 
-	pkt->properties.userProperty(msg, msg);
-	pkt->properties.reasonString(msg);
-	pkt->properties.userProperty(msg, msg);
+	pkt->userProperty(msg, msg);
+	pkt->reasonString(msg);
+	pkt->userProperty(msg, msg);
 	pkt->writeTo(buf);
 
 	T pktRead(buf);
