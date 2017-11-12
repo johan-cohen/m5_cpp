@@ -341,7 +341,7 @@ void Properties::subscriptionIdentifier(uint32_t v)
 {
 	auto ws = VBIWireSize(v);
 
-	if (ws == 0) {
+	if (v == 0 || ws == 0) {
 		throw std::invalid_argument("Invalid argument");
 	}
 
