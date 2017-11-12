@@ -60,8 +60,7 @@ int test(void)
 
 	auth->writeTo(buf);
 
-	m5::PktAuth authRead;
-	authRead.readFrom(buf);
+	m5::PktAuth authRead(buf);
 
 	if (auth->reasonCode() != authRead.reasonCode()) {
 		throw std::logic_error("read: Reason Code");
@@ -89,8 +88,7 @@ int testDisconnect(void)
 
 	disconnect->writeTo(buf);
 
-	m5::PktDisconnect disconnectRead;
-	disconnectRead.readFrom(buf);
+	m5::PktDisconnect disconnectRead(buf);
 
 	if (disconnect->reasonCode() != disconnectRead.reasonCode()) {
 		throw std::logic_error("read: Reason Code");

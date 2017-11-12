@@ -49,6 +49,7 @@ namespace m5 {
 class PktDisconnect : public PktRCodeProp {
 public:
 	PktDisconnect() : PktRCodeProp(PktType::DISCONNECT) {}
+	PktDisconnect(AppBuf &buf) : PktRCodeProp(PktType::DISCONNECT, buf) {}
 	~PktDisconnect() {}
 };
 

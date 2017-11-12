@@ -42,6 +42,12 @@
 
 namespace m5 {
 
+PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) :
+	_packetType(type), properties(type)
+{
+	this->readFrom(buf);
+}
+
 void PktRCodeProp::reasonCode(ReasonCode rc)
 {
 	this->_reasonCode = (uint8_t)rc;

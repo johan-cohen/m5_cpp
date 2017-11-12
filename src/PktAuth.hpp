@@ -49,6 +49,7 @@ namespace m5 {
 class PktAuth : public PktRCodeProp {
 public:
 	PktAuth() : PktRCodeProp(PktType::AUTH) {}
+	PktAuth(AppBuf &buf) : PktRCodeProp(PktType::AUTH, buf) {}
 	~PktAuth() {}
 };
 

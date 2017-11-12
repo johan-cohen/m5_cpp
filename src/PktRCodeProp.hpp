@@ -50,8 +50,8 @@ namespace m5 {
 
 class PktRCodeProp : public Packet {
 protected:
-	PktRCodeProp(PktType type = PktType::RESERVED) :
-		     _packetType(type), properties(type) {}
+	PktRCodeProp(PktType type) : _packetType(type), properties(type) {}
+	PktRCodeProp(PktType type, AppBuf &buf);
 
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
