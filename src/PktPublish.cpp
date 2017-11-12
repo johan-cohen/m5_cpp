@@ -77,6 +77,102 @@ void PktPublish::payload(const uint8_t *data, uint16_t size)
 	this->_payload.assign(data, data + size);
 }
 
+void PktPublish::payloadFormatIndicator(bool v)
+{
+	properties.payloadFormatIndicator(v);
+}
+
+bool PktPublish::payloadFormatIndicator(void) const
+{
+	return properties.payloadFormatIndicator();
+}
+
+void PktPublish::publicationExpiryInterval(uint32_t v)
+{
+	properties.publicationExpiryInterval(v);
+}
+
+uint32_t PktPublish::publicationExpiryInterval(void) const
+{
+	return properties.publicationExpiryInterval();
+}
+
+void PktPublish::contentType(const uint8_t *data, uint16_t size)
+{
+	properties.contentType(data, size);
+}
+
+void PktPublish::contentType(const char *str)
+{
+	properties.contentType(str);
+}
+
+const ByteArray &PktPublish::contentType(void) const
+{
+	return properties.contentType();
+}
+
+void PktPublish::responseTopic(const uint8_t *data, uint16_t size)
+{
+	properties.responseTopic(data, size);
+}
+
+void PktPublish::responseTopic(const char *str)
+{
+	properties.responseTopic(str);
+}
+
+const ByteArray &PktPublish::responseTopic(void) const
+{
+	return properties.responseTopic();
+}
+
+void PktPublish::subscriptionIdentifier(uint32_t v)
+{
+	properties.subscriptionIdentifier(v);
+}
+
+uint32_t PktPublish::subscriptionIdentifier(void) const
+{
+	return properties.subscriptionIdentifier();
+}
+
+void PktPublish::correlationData(const uint8_t *data, uint16_t size)
+{
+	properties.correlationData(data, size);
+}
+
+const ByteArray &PktPublish::correlationData(void) const
+{
+	return properties.correlationData();
+}
+
+void PktPublish::topicAlias(uint16_t v)
+{
+	properties.topicAlias(v);
+}
+
+uint16_t PktPublish::topicAlias(void) const
+{
+	return properties.topicAlias();
+}
+
+void PktPublish::userProperty(const uint8_t *key, uint16_t keySize,
+			      const uint8_t *value, uint16_t valueSize)
+{
+	properties.userProperty(key, keySize, value, valueSize);
+}
+
+void PktPublish::userProperty(const char *key, const char *val)
+{
+	properties.userProperty(key, val);
+}
+
+const UserProperty &PktPublish::userProperty(void) const
+{
+	return properties.userProperty();
+}
+
 uint8_t PktPublish::headerFlags(void)
 {
 	uint8_t flags = 0;
