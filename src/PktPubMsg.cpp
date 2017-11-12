@@ -62,6 +62,37 @@ void PktPubMsg::reasonCode(ReasonCode rc)
 	this->_reasonCode = rc;
 }
 
+void PktPubMsg::reasonString(const uint8_t *data, uint16_t size)
+{
+	properties.reasonString(data, size);
+}
+
+void PktPubMsg::reasonString(const char *str)
+{
+	properties.reasonString(str);
+}
+
+const ByteArray &PktPubMsg::reasonString(void) const
+{
+	return properties.reasonString();
+}
+
+void PktPubMsg::userProperty(const uint8_t *key, uint16_t keySize,
+			     const uint8_t *value, uint16_t valueSize)
+{
+	properties.userProperty(key, keySize, value, valueSize);
+}
+
+void PktPubMsg::userProperty(const char *key, const char *val)
+{
+	properties.userProperty(key, val);
+}
+
+const UserProperty &PktPubMsg::userProperty(void) const
+{
+	return properties.userProperty();
+}
+
 uint32_t PktPubMsg::writeTo(AppBuf &buf)
 {
 	uint32_t fullPktSize;

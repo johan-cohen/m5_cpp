@@ -58,9 +58,9 @@ private:
 	uint8_t _reserved = 0;
 	uint16_t _packetId = 0;
 
-public:
 	Properties properties;
 
+public:
 	virtual ~PktPubMsg() {}
 
 	void packetId(uint16_t id);
@@ -68,6 +68,15 @@ public:
 
 	void reasonCode(ReasonCode rc);
 	ReasonCode reasonCode(void) { return (ReasonCode)this->_reasonCode; }
+
+	void reasonString(const uint8_t *data, uint16_t size);
+	void reasonString(const char *str);
+	const ByteArray &reasonString(void) const;
+
+	void userProperty(const uint8_t *key, uint16_t keySize,
+			  const uint8_t *value, uint16_t valueSize);
+	void userProperty(const char *key, const char *val);
+	const UserProperty &userProperty(void) const;
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
