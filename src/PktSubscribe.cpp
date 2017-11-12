@@ -92,6 +92,16 @@ void PktSubscribe::append(const char *topic, uint8_t options)
 	append((const uint8_t *)topic, strlen(topic), options);
 }
 
+void PktSubscribe::subscriptionIdentifier(uint32_t v)
+{
+	properties.subscriptionIdentifier(v);
+}
+
+uint32_t PktSubscribe::subscriptionIdentifier(void) const
+{
+	return properties.subscriptionIdentifier();
+}
+
 void PktSubscribe::writePayload(AppBuf &buf)
 {
 	auto it = _topics.begin();

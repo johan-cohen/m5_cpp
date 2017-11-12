@@ -66,8 +66,9 @@ private:
 
 	void writePayload(AppBuf &buf);
 	void readPayload(AppBuf &buf);
-public:
+
 	Properties properties;
+public:
 
 	PktSubscribe();
 	PktSubscribe(AppBuf &buf);
@@ -80,6 +81,9 @@ public:
 
 	void packetId(uint16_t packetId) { this->_packetId = packetId; }
 	uint16_t packetId(void) const { return _packetId; }
+
+	void subscriptionIdentifier(uint32_t v);
+	uint32_t subscriptionIdentifier(void) const;
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
