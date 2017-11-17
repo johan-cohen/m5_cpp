@@ -44,17 +44,24 @@
 #include "PktPubRel.hpp"
 #include "PktPubComp.hpp"
 
+#include <stdexcept>
+
 template <typename T> int test(void)
 {
 	uint16_t u16 = 0xABCD;
 	m5::AppBuf buf(16);
+	uint32_t bytes;
 	T *pub;
 
 	pub = new T();
 	pub->packetId(u16);
 	pub->reasonCode(m5::ReasonCode::SERVER_BUSY);
 
-	pub->writeTo(buf);
+	bytes = pub->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
+
 
 	T pubRead;
 	pubRead.readFrom(buf);

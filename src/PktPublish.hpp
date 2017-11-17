@@ -115,7 +115,7 @@ public:
 	void userProperty(const char *key, const char *val);
 	const UserProperty &userProperty(void) const;
 
-	uint32_t writeTo(AppBuf &buf);
+	uint32_t writeTo(AppBuf &buf) WARN_UNUSED_RC;
 	uint32_t readFrom(AppBuf &buf);
 	uint32_t getId(void) const { return (uint32_t)PktType::PUBLISH; }
 };

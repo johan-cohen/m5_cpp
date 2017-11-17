@@ -118,6 +118,7 @@ void PktSubscribe::writePayload(AppBuf &buf)
 
 uint32_t PktSubscribe::writeTo(AppBuf &buf)
 {
+	const auto initialLength = buf.length();
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -134,9 +135,15 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
+	if (propWSWS == 0) {
+		return 0;
+	}
 
 	remLen = 2 + propWSWS + propWS + payloadWS;
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {
@@ -146,7 +153,9 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 	buf.writeNum8(m5::firstByte(PktType::SUBSCRIBE, 0x02));
 	buf.writeVBI(remLen);
 	buf.writeNum16(packetId());
-	properties.write(buf);
+	if (properties.write(buf) != propWSWS + propWS) {
+		return buf.length() - initialLength;
+	}
 	writePayload(buf);
 
 	return fullPktSize;

@@ -87,6 +87,7 @@ const UserProperty &PktRCodeProp::userProperty(void) const
 
 uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 {
+	const auto initialLength = buf.length();
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -95,9 +96,15 @@ uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
+	if (propWSWS == 0) {
+		return 0;
+	}
 
 	remLen = 1 + propWSWS + propWS;
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {
@@ -107,7 +114,9 @@ uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 	buf.writeNum8(m5::firstByte(this->_packetType, 0));
 	buf.writeVBI(remLen);
 	buf.writeNum8(this->_reasonCode);
-	properties.write(buf);
+	if (properties.write(buf) != propWSWS + propWS) {
+		return buf.length() - initialLength;
+	}
 
 	return fullPktSize;
 }

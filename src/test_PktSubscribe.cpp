@@ -41,6 +41,8 @@
 #include "PktSubscribe.hpp"
 #include "test_Common.hpp"
 
+#include <stdexcept>
+
 bool cmp(const std::list<m5::TopicOptions *> &a, const std::list<m5::TopicOptions *> &b)
 {
 	if (a.size() != b.size()) {
@@ -70,13 +72,17 @@ int test(void)
 	const char *msg = "Hello, World!";
 	m5::PktSubscribe *subs;
 	m5::AppBuf buf(256);
+	uint32_t bytes;
 
 	subs = new m5::PktSubscribe();
 	subs->append(msg, 0x01);
 	subs->append(msg, 0x02);
 	subs->append(msg, 0x03);
 	subs->packetId(0xABCD);
-	subs->writeTo(buf);
+	bytes = subs->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	m5::PktSubscribe subsRead(buf);
 

@@ -41,6 +41,7 @@
 #include "test_Common.hpp"
 #include "PktConnAck.hpp"
 
+#include <stdexcept>
 #include <cstring>
 
 int test(void)
@@ -51,6 +52,7 @@ int test(void)
 	uint16_t u16 = 0xABCD;
 	m5::PktConnAck *connAck;
 	m5::AppBuf buf(256);
+	uint32_t bytes;
 
 	connAck = new m5::PktConnAck(false, m5::ReasonCode::SUCCESS);
 	connAck->receiveMaximum(u16);
@@ -69,7 +71,10 @@ int test(void)
 	connAck->authenticationMethod(msg);
 	connAck->authenticationData((const uint8_t *)msg, strlen(msg));
 
-	connAck->writeTo(buf);
+	bytes = connAck->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	m5::PktConnAck connAckRead;
 

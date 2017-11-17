@@ -242,6 +242,7 @@ bool PktConnAck::sharedSubscriptionAvailable(void) const
 
 uint32_t PktConnAck::writeTo(AppBuf &buf)
 {
+	const auto initialLength = buf.length();
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -250,9 +251,15 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
+	if (propWSWS == 0) {
+		return 0;
+	}
 
 	remLen = 2 + propWSWS + propWS;
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {
@@ -263,7 +270,9 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 	buf.writeVBI(remLen);
 	buf.writeNum8(this->_sessionPresent ? 0x01 : 0x00);
 	buf.writeNum8(this->_reasonCode);
-	properties.write(buf);
+	if (properties.write(buf) != propWSWS + propWS) {
+		return buf.length() - initialLength;
+	}
 
 	return fullPktSize;
 }

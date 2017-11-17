@@ -41,6 +41,7 @@
 #include "PktPublish.hpp"
 #include "test_Common.hpp"
 
+#include <stdexcept>
 #include <cstring>
 
 int test(void)
@@ -52,6 +53,7 @@ int test(void)
 	const uint16_t payloadSize = strlen(str);
 	uint16_t u16 = 0xABCD;
 	m5::AppBuf buf(128);
+	uint32_t bytes;
 
 	publish = new m5::PktPublish();
 
@@ -85,7 +87,10 @@ int test(void)
 		throw std::logic_error("Payload");
 	}
 
-	publish->writeTo(buf);
+	bytes = publish->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	m5::PktPublish publishRead;
 	publishRead.readFrom(buf);

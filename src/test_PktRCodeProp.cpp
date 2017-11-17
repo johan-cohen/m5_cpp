@@ -43,6 +43,7 @@
 #include "PktDisconnect.hpp"
 #include "PktAuth.hpp"
 
+#include <stdexcept>
 #include <cstring>
 
 int test(void)
@@ -51,6 +52,7 @@ int test(void)
 	const char str[] = "Hello, World!";
 	m5::AppBuf buf(128);
 	m5::PktAuth *auth;
+	uint32_t bytes;
 
 	auth = new m5::PktAuth();
 	auth->reasonCode(rc);
@@ -58,7 +60,10 @@ int test(void)
 	auth->authenticationData((const uint8_t *)str, strlen(str));
 	auth->userProperty(str, str);
 
-	auth->writeTo(buf);
+	bytes = auth->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	m5::PktAuth authRead(buf);
 
@@ -78,6 +83,7 @@ int testDisconnect(void)
 	uint32_t u32 = 0x01ABCDEF;
 	m5::AppBuf buf(128);
 	m5::PktDisconnect *disconnect;
+	uint32_t bytes;
 
 	disconnect = new m5::PktDisconnect();
 	disconnect->reasonCode(rc);
@@ -86,7 +92,10 @@ int testDisconnect(void)
 	disconnect->serverReference(str);
 	disconnect->userProperty(str, str);
 
-	disconnect->writeTo(buf);
+	bytes = disconnect->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	m5::PktDisconnect disconnectRead(buf);
 

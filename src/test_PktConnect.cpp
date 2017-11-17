@@ -106,6 +106,7 @@ int test(void)
 	uint32_t fullPktSize;
 	uint32_t remLen;
 	m5::AppBuf *buf;
+	uint32_t bytes;
 
 	buf = new m5::AppBuf(128);
 	connect = new m5::PktConnect("m5_client");
@@ -127,7 +128,13 @@ int test(void)
 	remLenWireSize = m5::VBIWireSize(remLen);
 	fullPktSize = 1 + remLenWireSize + remLen;
 
-	connect->writeTo(*buf);
+	bytes = connect->writeTo(*buf);
+	if (bytes == 0) {
+
+		std::cout << "Bytes: " << bytes << "\n";
+
+		throw std::logic_error("write");
+	}
 
 	if (buf->length() != fullPktSize) {
 		throw std::logic_error("writeTo");

@@ -724,8 +724,12 @@ static void writeNumProp(AppBuf &buf, uint32_t num, uint8_t size)
 
 uint32_t Properties::write(AppBuf &buf)
 {
-	auto fullLen = this->wireSize() + VBIWireSize(this->wireSize());
-	if (fullLen > buf.bytesToWrite()) {
+	uint8_t propWSWS = VBIWireSize(this->wireSize());
+	if (propWSWS == 0) {
+		return 0;
+	}
+
+	if (propWSWS + this->wireSize() > buf.bytesToWrite()) {
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
@@ -769,7 +773,7 @@ uint32_t Properties::write(AppBuf &buf)
 		itUser++;
 	}
 
-	return this->_wireSize;
+	return propWSWS + this->wireSize();
 }
 
 }

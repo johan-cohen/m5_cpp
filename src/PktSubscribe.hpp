@@ -85,7 +85,7 @@ public:
 	void subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void) const;
 
-	uint32_t writeTo(AppBuf &buf) override;
+	uint32_t writeTo(AppBuf &buf) override WARN_UNUSED_RC;
 	uint32_t readFrom(AppBuf &buf) override;
 	uint32_t getId(void) const override { return (uint32_t)PktType::SUBSCRIBE; }
 };

@@ -74,7 +74,7 @@ public:
 	void userProperty(const char *key, const char *val);
 	const UserProperty &userProperty(void) const;
 
-	uint32_t writeTo(AppBuf &buf) override;
+	uint32_t writeTo(AppBuf &buf) override WARN_UNUSED_RC;
 	uint32_t readFrom(AppBuf &buf) override;
 	uint32_t getId(void) const override { return (uint32_t)_packetType; }
 

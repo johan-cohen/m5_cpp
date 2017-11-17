@@ -41,6 +41,7 @@
 #include "Properties.hpp"
 #include "test_Common.hpp"
 
+#include <stdexcept>
 #include <cstring>
 
 #define MSG		"Hello, World!"

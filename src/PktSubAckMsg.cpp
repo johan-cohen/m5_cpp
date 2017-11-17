@@ -85,6 +85,7 @@ const UserProperty &PktSubAckMsg::userProperty(void) const
 
 uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 {
+	const auto initialLength = buf.length();
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -97,9 +98,15 @@ uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
+	if (propWSWS == 0) {
+		return 0;
+	}
 
 	remLen = 2 + propWSWS + propWS + _reasonCodes.size();
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {
@@ -109,8 +116,9 @@ uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 	buf.writeNum8(m5::firstByte(this->_packetType));
 	buf.writeVBI(remLen);
 	buf.writeNum16(this->packetId());
-	properties.write(buf);
-
+	if (properties.write(buf) != propWSWS + propWS) {
+		return buf.length() - initialLength;
+	}
 	for (auto it = _reasonCodes.begin(); it != _reasonCodes.end(); it++) {
 		buf.writeNum8(*it);
 	}

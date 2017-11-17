@@ -269,18 +269,11 @@ void AppBuf::writeString(const char *str)
 void AppBuf::writeVBI(uint32_t v)
 {
 	do {
-		uint8_t encoded;
-
-		if (bytesToWrite() < 1) {
-			throw std::invalid_argument("Invalid input argument");
-		}
-
-		encoded = v % 128;
+		uint8_t encoded = v % 128;
 		v = v / 128;
 		if (v > 0) {
 			encoded = encoded | 128;
 		}
-
 		writeNum8(encoded);
 	} while (v > 0);
 }

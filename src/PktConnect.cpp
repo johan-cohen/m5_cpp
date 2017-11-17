@@ -176,6 +176,7 @@ PktConnect::~PktConnect()
 
 uint32_t PktConnect::writeTo(AppBuf &buf)
 {
+	const auto initialLength = buf.length();
 	uint32_t fullPktSize;
 	uint32_t payloadWS;
 	uint32_t propWSWS;
@@ -186,9 +187,15 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	payloadWS = payloadWireSize();
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
+	if (propWSWS == 0) {
+		return 0;
+	}
 
 	remLen = 1 + 2 + 4 + 1 + 2 + propWSWS + propWS + payloadWS;
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {
@@ -201,7 +208,9 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	buf.writeNum8(protocolVersion5);
 	buf.writeNum8(packConnectFlags());
 	buf.writeNum16(keepAlive());
-	properties.write(buf);
+	if (properties.write(buf) != propWSWS + propWS) {
+		return buf.length() - initialLength;
+	}
 	writePayload(buf);
 
 	return fullPktSize;

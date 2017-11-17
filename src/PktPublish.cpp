@@ -186,6 +186,7 @@ uint8_t PktPublish::headerFlags(void)
 
 uint32_t PktPublish::writeTo(AppBuf &buf)
 {
+	const auto initialLength = buf.length();
 	uint32_t fullPktSize;
 	uint32_t propWSWS;
 	uint32_t propWS;
@@ -202,13 +203,18 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
-
+	if (propWSWS == 0) {
+		return 0;
+	}
 	remLen = stringLenSize + topic().size() +
 		 propWSWS + propWS + payload().size();
 	if (this->QoS() != PktQoS::QoS0) {
 		remLen += 2;
 	}
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {
@@ -221,8 +227,9 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 	if (this->QoS() != PktQoS::QoS0) {
 		buf.writeNum16(this->packetId());
 	}
-
-	properties.write(buf);
+	if (properties.write(buf) != propWSWS + propWS) {
+		return buf.length() - initialLength;
+	}
 
 	if (this->payload().size() > 0) {
 		buf.write(this->payload().data(), this->payload().size());

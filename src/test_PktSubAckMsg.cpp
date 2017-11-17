@@ -3,12 +3,15 @@
 #include "PktUnsubAck.hpp"
 #include "PktSubAck.hpp"
 
+#include <stdexcept>
+
 template <typename T>
 int test(m5::ReasonCode *codes, std::size_t size)
 {
 	T *pkt;
 	const char msg[] = "Hello, World!";
 	m5::AppBuf buf(256);
+	uint32_t bytes;
 
 	pkt = new T();
 	pkt->packetId(0xABCD);
@@ -20,7 +23,10 @@ int test(m5::ReasonCode *codes, std::size_t size)
 	pkt->userProperty(msg, msg);
 	pkt->reasonString(msg);
 	pkt->userProperty(msg, msg);
-	pkt->writeTo(buf);
+	bytes = pkt->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	T pktRead(buf);
 

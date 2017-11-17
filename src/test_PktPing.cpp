@@ -41,13 +41,20 @@
 #include "test_Common.hpp"
 #include "PktPing.hpp"
 
+#include <stdexcept>
+
 template <typename T> int test(void)
 {
 	m5::AppBuf buf(2);
+	uint32_t bytes;
 	T pingRead;
 	T ping;
 
-	ping.writeTo(buf);
+	bytes = ping.writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
+
 	pingRead.readFrom(buf);
 
 	return 0;

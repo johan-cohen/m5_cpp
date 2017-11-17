@@ -80,6 +80,9 @@ uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
 
 	remLen = 2 + this->payloadSize;
 	remLenWS = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		return 0;
+	}
 
 	fullPktSize = 1 + remLenWS + remLen;
 	if (buf.bytesToWrite() < fullPktSize) {

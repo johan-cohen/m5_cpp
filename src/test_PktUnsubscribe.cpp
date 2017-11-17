@@ -41,6 +41,8 @@
 #include "PktUnsubscribe.hpp"
 #include "test_Common.hpp"
 
+#include <stdexcept>
+
 bool cmp(const std::list<m5::ByteArray *> &a, const std::list<m5::ByteArray *> &b)
 {
 	if (a.size() != b.size()) {
@@ -70,13 +72,18 @@ int test(void)
 	m5::PktUnsubscribe *unsubs;
 	const char msg[] = "Hello, World!";
 	m5::AppBuf buf(256);
+	uint32_t bytes;
 
 	unsubs = new m5::PktUnsubscribe();
 	unsubs->packetId(0xABCD);
 	unsubs->append(msg);
 	unsubs->append(msg);
 	unsubs->append(msg);
-	unsubs->writeTo(buf);
+
+	bytes = unsubs->writeTo(buf);
+	if (bytes == 0) {
+		throw std::logic_error("write");
+	}
 
 	m5::PktUnsubscribe unsubsRead(buf);
 
