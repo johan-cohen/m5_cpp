@@ -265,22 +265,35 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	properties.read(buf);
 
-	buf.readBinary(_clientId);
-	if (!validClientIdSize(clientId().size())) {
+	rc = buf.readBinary(_clientId);
+	if (rc != EXIT_SUCCESS || !validClientIdSize(clientId().size())) {
 		throw std::invalid_argument("Invalid Client Id size");
 	}
 
 	if (flagWillMsg(connectFlags) == true) {
-		buf.readBinary(_willTopic);
-		buf.readBinary(_willMsg);
+		rc = buf.readBinary(_willTopic);
+		if (rc != EXIT_SUCCESS) {
+			return buf.traversed() - alreadyTraversed;
+		}
+
+		rc = buf.readBinary(_willMsg);
+		if (rc != EXIT_SUCCESS) {
+			return buf.traversed() - alreadyTraversed;
+		}
 	}
 
 	if (flagUserName(connectFlags) == true) {
-		buf.readBinary(_userName);
+		rc = buf.readBinary(_userName);
+		if (rc != EXIT_SUCCESS) {
+			return buf.traversed() - alreadyTraversed;
+		}
 	}
 
 	if (flagPassword(connectFlags) == true) {
-		buf.readBinary(_password);
+		rc = buf.readBinary(_password);
+		if (rc != EXIT_SUCCESS) {
+			return buf.traversed() - alreadyTraversed;
+		}
 	}
 
 	uint32_t fullPktSize = 1 + remLenWS + remLen;

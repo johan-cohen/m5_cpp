@@ -692,7 +692,12 @@ uint32_t Properties::read(AppBuf &buf)
 		case RESPONSE_INFORMATION:
 		case SERVER_REFERENCE:
 		case REASON_STR:
-			value = buf.readBinary();
+			value = new ByteArray();
+			rc = buf.readBinary(*value);
+			if (rc != EXIT_SUCCESS) {
+				delete value;
+				goto lb_exit;
+			}
 			this->append((PropertyId)id, value);
 			break;
 
@@ -705,8 +710,14 @@ uint32_t Properties::read(AppBuf &buf)
 			break;
 
 		case USER_PROPERTY:
-			key = buf.readBinary();
-			value = buf.readBinary();
+			key = new ByteArray();
+			value = new ByteArray();
+			rc = buf.readKeyValue(*key, *value);
+			if (rc != EXIT_SUCCESS) {
+				delete key;
+				delete value;
+				goto lb_exit;
+			}
 			this->append(key, value);
 			break;
 		default:

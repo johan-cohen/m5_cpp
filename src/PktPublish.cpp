@@ -278,7 +278,11 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 		throw std::out_of_range("No enough space in input buffer");
 	}
 
-	buf.readBinary(this->_topic);
+	rc = buf.readBinary(this->_topic);
+	if (rc != EXIT_SUCCESS) {
+		return buf.traversed() - alreadyTraversed;
+	}
+
 	if (this->topic().size() == 0) {
 		throw std::invalid_argument("Invalid topic size");
 	}

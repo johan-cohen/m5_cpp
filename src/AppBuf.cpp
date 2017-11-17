@@ -40,8 +40,9 @@
 
 #include "AppBuf.hpp"
 
-#include <stdexcept>
+#include <endian.h>
 #include <cstring>
+#include <cstdlib>
 #include <cerrno>
 
 namespace m5 {
@@ -122,42 +123,55 @@ uint32_t AppBuf::readNum32(void)
 	return readNum<uint32_t>();
 }
 
-void AppBuf::readBinary(ByteArray &dst)
+int AppBuf::readBinary(ByteArray &dst)
 {
 	/* two bytes for the length, length could be 0... */
 	if (bytesToRead() < 2) {
-		throw std::out_of_range("No enough space in input buffer");
+		return -ENOMEM;
 	}
 
 	auto len = this->readNum16();
 	if (len == 0) {
-		return;
+		dst.clear();
+
+		return EXIT_SUCCESS;
 	}
 
 	if (len > bytesToRead()) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	if (len > _size) {
-		throw std::out_of_range("No enough space in output buffer");
+		return -ENOMEM;
 	}
 
 	dst.assign(ptrRead(), ptrRead() + len);
 	this->_offset += len;
+
+	return EXIT_SUCCESS;
 }
 
 ByteArray *AppBuf::readBinary(void)
 {
 	ByteArray *data = new ByteArray();
 
-	readBinary(*data);
+	int rc = readBinary(*data);
+	(void)rc;
+
 	return data;
 }
 
-void AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
+int AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
 {
-	readBinary(key);
-	readBinary(value);
+	int rc;
+
+	rc = readBinary(key);
+	if (rc != EXIT_SUCCESS) {
+		return rc;
+	}
+
+	rc = readBinary(value);
+	if (rc != EXIT_SUCCESS) {
+		return rc;
+	}
+
+	return EXIT_SUCCESS;
 }
 
 int AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)

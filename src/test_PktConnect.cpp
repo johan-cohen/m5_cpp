@@ -184,27 +184,42 @@ int test(void)
 	}
 
 	m5::ByteArray str;
-	buf->readBinary(str);
+	rc = buf->readBinary(str);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("readBinary");
+	}
 	if (str.size() != strlen(clientId) || memcmp(str.data(), clientId, strlen(clientId)) != 0) {
 		throw std::logic_error("writeTo: clientId");
 	}
 
-	buf->readBinary(str);
+	rc = buf->readBinary(str);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("readBinary");
+	}
 	if (str.size() != strlen(willTopic) || memcmp(str.data(), willTopic, strlen(willTopic)) != 0) {
 		throw std::logic_error("writeTo: willTopic");
 	}
 
-	buf->readBinary(str);
+	rc = buf->readBinary(str);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("readBinary");
+	}
 	if (str.size() != strlen(willMsg) || memcmp(str.data(), willMsg, strlen(willMsg)) != 0) {
 		throw std::logic_error("writeTo: willMsg");
 	}
 
-	buf->readBinary(str);
+	rc = buf->readBinary(str);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("readBinary");
+	}
 	if (str.size() != strlen(userName) || memcmp(str.data(), userName, strlen(userName)) != 0) {
 		throw std::logic_error("writeTo: userName");
 	}
 
-	buf->readBinary(str);
+	rc = buf->readBinary(str);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("readBinary");
+	}
 	if (str.size() != strlen(password) || memcmp(str.data(), password, strlen(password)) != 0) {
 		throw std::logic_error("writeTo: password");
 	}

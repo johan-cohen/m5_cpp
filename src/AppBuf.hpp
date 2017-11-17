@@ -94,11 +94,11 @@ public:
 	uint32_t readNum32(void);
 
 	/* this routine does bound checking */
-	void readBinary(ByteArray &dst);
+	int readBinary(ByteArray &dst) WARN_UNUSED_RC;
 	ByteArray *readBinary(void);
 
 	/* this routine does bound checking */
-	void readKeyValue(ByteArray &key, ByteArray &value);
+	int readKeyValue(ByteArray &key, ByteArray &value) WARN_UNUSED_RC;
 
 	int readVBI(uint32_t &v, uint8_t &wireSize) WARN_UNUSED_RC;
 

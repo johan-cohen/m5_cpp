@@ -122,6 +122,10 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 		return remLenWS;
 	}
 
+	if (buf.bytesToRead() < remLen) {
+		return remLenWS;
+	}
+
 	this->packetId(buf.readNum16());
 	if (this->packetId() == 0) {
 		throw std::invalid_argument("Invalid packet Id");
@@ -129,11 +133,15 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 
 	uint32_t minRemLen = 2;
 	while (minRemLen < remLen) {
-		ByteArray *item;
+		ByteArray *topic;
 
-		item =  buf.readBinary();
-		this->_topics.push_back(item);
-		minRemLen += 2 + item->size();
+		topic =  buf.readBinary();
+		if (topic->size() == 0) {
+			return buf.traversed() - alreadyTraversed;
+		}
+
+		this->_topics.push_back(topic);
+		minRemLen += 2 + topic->size();
 	}
 
 	uint32_t fullPktSize = 1 + remLenWS + remLen;
