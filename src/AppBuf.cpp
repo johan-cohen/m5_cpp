@@ -102,8 +102,6 @@ template <typename T> T AppBuf::readNum(void)
 	case 2: return be16toh(v);
 	case 4: return be32toh(v);
 	case 8: return be64toh(v);
-	default:
-		throw std::invalid_argument("Error in template argument");
 	}
 
 	return v;
