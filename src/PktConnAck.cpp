@@ -249,21 +249,28 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 	uint32_t remLenWS;
 	uint32_t remLen;
 
+	status(StatusCode::SUCCESS);
+	expectedWireSize(0);
+
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
 	if (propWSWS == 0) {
-		return 0;
+		status(StatusCode::INVALID_PROPERTY_VBI);
+		goto lb_exit;
 	}
 
 	remLen = 2 + propWSWS + propWS;
 	remLenWS = VBIWireSize(remLen);
 	if (remLenWS == 0) {
-		return 0;
+		status(StatusCode::INVALID_REMLEN_VBI);
+		goto lb_exit;
 	}
 
 	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
+	expectedWireSize(fullPktSize);
+	if (buf.bytesToWrite() < expectedWireSize()) {
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
 	}
 
 	buf.writeNum8(m5::firstByte(PktType::CONNACK));
@@ -271,52 +278,64 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 	buf.writeNum8(this->_sessionPresent ? 0x01 : 0x00);
 	buf.writeNum8(this->_reasonCode);
 	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
+		status(StatusCode::PROPERTY_WRITE_ERROR);
 	}
 
-	return fullPktSize;
+lb_exit:
+	return buf.length() - initialLength;
 }
 
 uint32_t PktConnAck::readFrom(AppBuf &buf)
 {
 	std::size_t alreadyTraversed = buf.traversed();
+	uint32_t fullPktSize;
 	uint8_t remLenWS;
 	uint32_t remLen;
-	uint8_t first;
+	uint8_t number;
 	int rc;
 
+	status(StatusCode::SUCCESS);
+	expectedWireSize(0);
+
 	if (buf.bytesToRead() < 5) {
-		throw std::out_of_range("No enough space in input buffer");
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
 	}
 
-	first = buf.readNum8();
-	if (first != ((uint8_t)PktType::CONNACK << 4)) {
-		throw std::invalid_argument("CONNACK msg not found in buf");
+	number = buf.readNum8();
+	if (number != ((uint8_t)PktType::CONNACK << 4)) {
+		status(StatusCode::INVALID_FIXED_HEADER);
+		goto lb_exit;
 	}
 
 	rc = buf.readVBI(remLen, remLenWS);
 	if (rc != EXIT_SUCCESS) {
-		return remLenWS;
+		status(StatusCode::INVALID_REMLEN_VBI);
+		goto lb_exit;
 	}
 
 	if (remLen < 3) {
-		throw std::out_of_range("No enough space in input buffer");
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
 	}
 
-	uint8_t num8 = buf.readNum8();
-	if (num8 & 0xFD) {
-		throw std::out_of_range("Invalid CONNACK session value");
+	number = buf.readNum8();
+	if (number & 0xFD) {
+		status(StatusCode::RESERVED_MUST_BE_ZERO);
+		goto lb_exit;
 	}
-	this->_sessionPresent = num8 ? true : false;
+	this->_sessionPresent = number ? true : false;
 	this->_reasonCode = buf.readNum8();
 	properties.read(buf);
 
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
+	fullPktSize = 1 + remLenWS + remLen;
+	expectedWireSize(fullPktSize);
+	if (buf.traversed() - alreadyTraversed != expectedWireSize()) {
+		status(StatusCode::FINISHED_READING_INVALID_LENGTH);
 	}
 
-	return fullPktSize;
+lb_exit:
+	return buf.traversed() - alreadyTraversed;
 }
 
 }
