@@ -303,7 +303,7 @@ uint32_t PktConnAck::readFrom(AppBuf &buf)
 	}
 
 	number = buf.readNum8();
-	if (number != ((uint8_t)PktType::CONNACK << 4)) {
+	if (number != m5::firstByte(PktType::CONNACK)) {
 		status(StatusCode::INVALID_FIXED_HEADER);
 		goto lb_exit;
 	}
@@ -339,3 +339,4 @@ lb_exit:
 }
 
 }
+
