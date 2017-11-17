@@ -41,16 +41,28 @@
 #ifndef __PACKET_HPP__
 #define __PACKET_HPP__
 
+#include "Common.hpp"
 #include "AppBuf.hpp"
 
 namespace m5 {
 
 class Packet {
+private:
+	enum StatusCode _status = StatusCode::SUCCESS;
+	uint32_t _expectedWireSize = 0;
+
+protected:
+	virtual void status(enum StatusCode ec) { _status = ec; }
+	virtual void expectedWireSize(uint32_t ws) { _expectedWireSize = ws; }
+
 public:
 	virtual ~Packet() {}
 	virtual uint32_t writeTo(AppBuf &buf) = 0;
 	virtual uint32_t readFrom(AppBuf &buf) = 0;
 	virtual uint32_t getId(void) const = 0;
+
+	virtual enum StatusCode status() const { return _status; }
+	virtual uint32_t expectedWireSize() const { return _expectedWireSize; }
 };
 
 }
