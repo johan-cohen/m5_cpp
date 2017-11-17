@@ -100,8 +100,7 @@ public:
 	/* this routine does bound checking */
 	void readKeyValue(ByteArray &key, ByteArray &value);
 
-	void readVBI(uint32_t &v, uint8_t &wireSize);
-	uint32_t readVBI(void);
+	int readVBI(uint32_t &v, uint8_t &wireSize) WARN_UNUSED_RC;
 
 	/* readSkip does not do bound checking, use bytesToRead */
 	void readSkip(std::size_t n, bool forward = true);

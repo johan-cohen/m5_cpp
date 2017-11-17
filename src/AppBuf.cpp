@@ -42,6 +42,7 @@
 
 #include <stdexcept>
 #include <cstring>
+#include <cerrno>
 
 namespace m5 {
 
@@ -161,7 +162,7 @@ void AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
 	readBinary(value);
 }
 
-void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
+int AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 {
 	uint32_t multiplier = 1;
 	uint8_t encoded;
@@ -170,11 +171,11 @@ void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 	wireSize = 0;
 	do {
 		if (bytesToRead() < 1) {
-			throw std::out_of_range("No enough space in buffer");
+			return -ENOMEM;
 		}
 
 		if (multiplier > 128 * 128 * 128) {
-			throw std::invalid_argument("Error in input bytes");
+			return -EINVAL;
 		}
 
 		encoded = readNum8();
@@ -183,17 +184,8 @@ void AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 		v += (encoded & 127) * multiplier;
 		multiplier *= 128;
 	} while ((encoded & 128) != 0);
-}
 
-uint32_t AppBuf::readVBI(void)
-{
-	uint8_t wireSize;
-	uint32_t v;
-
-	readVBI(v, wireSize);
-	(void)wireSize;
-
-	return v;
+	return EXIT_SUCCESS;
 }
 
 void AppBuf::readSkip(std::size_t n, bool forward)

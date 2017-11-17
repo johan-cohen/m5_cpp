@@ -139,6 +139,7 @@ uint32_t PktPubMsg::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint32_t remLen;
 	uint8_t remLenWS;
+	int rc;
 
 	if (buf.bytesToRead() < 6) {
 		throw std::invalid_argument("Invalid input buffer");
@@ -148,7 +149,11 @@ uint32_t PktPubMsg::readFrom(AppBuf &buf)
 		throw std::invalid_argument("Invalid packet type");
 	}
 
-	buf.readVBI(remLen, remLenWS);
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
+	}
+
 	if (remLen > buf.bytesToRead()) {
 		throw std::out_of_range("No enough space in input buffer");
 	}

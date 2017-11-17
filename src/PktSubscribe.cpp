@@ -41,6 +41,7 @@
 #include "PktSubscribe.hpp"
 
 #include <cstring>
+#include <cerrno>
 
 namespace m5 {
 
@@ -187,6 +188,7 @@ uint32_t PktSubscribe::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint8_t remLenWS;
 	uint32_t remLen;
+	int rc;
 
 	if (buf.bytesToRead() < 8) {
 		throw std::out_of_range("No enough space in input buffer");
@@ -196,7 +198,11 @@ uint32_t PktSubscribe::readFrom(AppBuf &buf)
 		throw std::invalid_argument("Invalid fixed header");
 	}
 
-	buf.readVBI(remLen, remLenWS);
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
+	}
+
 	if (remLen < 6) {
 		throw std::out_of_range("No enough space in input buffer");
 	}

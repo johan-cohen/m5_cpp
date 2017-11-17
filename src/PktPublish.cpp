@@ -41,6 +41,7 @@
 #include "PktPublish.hpp"
 
 #include <cstring>
+#include <cerrno>
 
 namespace m5 {
 
@@ -255,6 +256,7 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 	uint32_t remLen;
 	uint8_t remLenWS;
 	uint8_t first;
+	int rc;
 
 	if (buf.bytesToRead() < 4) {
 		throw std::invalid_argument("Invalid input buffer");
@@ -267,7 +269,11 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 
 	headerFlags(first);
 
-	buf.readVBI(remLen, remLenWS);
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
+	}
+
 	if (remLen > buf.bytesToRead()) {
 		throw std::out_of_range("No enough space in input buffer");
 	}

@@ -283,6 +283,7 @@ uint32_t PktConnAck::readFrom(AppBuf &buf)
 	uint8_t remLenWS;
 	uint32_t remLen;
 	uint8_t first;
+	int rc;
 
 	if (buf.bytesToRead() < 5) {
 		throw std::out_of_range("No enough space in input buffer");
@@ -293,7 +294,11 @@ uint32_t PktConnAck::readFrom(AppBuf &buf)
 		throw std::invalid_argument("CONNACK msg not found in buf");
 	}
 
-	buf.readVBI(remLen, remLenWS);
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
+	}
+
 	if (remLen < 3) {
 		throw std::out_of_range("No enough space in input buffer");
 	}

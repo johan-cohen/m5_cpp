@@ -40,6 +40,8 @@
 
 #include "PktRCodeProp.hpp"
 
+#include <cerrno>
+
 namespace m5 {
 
 PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) :
@@ -126,6 +128,7 @@ uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint8_t remLenWS;
 	uint32_t remLen;
+	int rc;
 
 	if (buf.bytesToRead() < 3) {
 		throw std::out_of_range("No enough space in input buffer");
@@ -135,7 +138,11 @@ uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 		throw std::invalid_argument("Msg not found in buf");
 	}
 
-	buf.readVBI(remLen, remLenWS);
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
+	}
+
 	if (remLen < 1) {
 		throw std::out_of_range("No enough space in input buffer");
 	}

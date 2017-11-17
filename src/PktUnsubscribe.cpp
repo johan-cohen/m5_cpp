@@ -41,6 +41,7 @@
 #include "PktUnsubscribe.hpp"
 
 #include <cstring>
+#include <cerrno>
 
 namespace m5 {
 
@@ -106,6 +107,7 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint32_t remLen;
 	uint8_t remLenWS;
+	int rc;
 
 	if (buf.bytesToRead() < 7) {
 		throw std::invalid_argument("Invalid input buffer");
@@ -115,9 +117,9 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 		throw std::invalid_argument("SUBACK: Invalid packet type");
 	}
 
-	buf.readVBI(remLen, remLenWS);
-	if (remLen > buf.bytesToRead()) {
-		throw std::out_of_range("No enough space in input buffer");
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
 	}
 
 	this->packetId(buf.readNum16());

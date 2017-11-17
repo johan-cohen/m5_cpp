@@ -43,6 +43,7 @@
 
 #include <stdexcept>
 #include <cstring>
+#include <cerrno>
 
 namespace m5 {
 	bool operator==(const PktConnect &a, const PktConnect &b) {
@@ -107,6 +108,9 @@ int test(void)
 	uint32_t remLen;
 	m5::AppBuf *buf;
 	uint32_t bytes;
+	uint8_t vbiWS;
+	uint32_t vbi;
+	int rc;
 
 	buf = new m5::AppBuf(128);
 	connect = new m5::PktConnect("m5_client");
@@ -144,7 +148,12 @@ int test(void)
 		throw std::logic_error("writeTo: PktType");
 	}
 
-	if (remLen != buf->readVBI()) {
+	rc = buf->readVBI(vbi, vbiWS);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("writeTo: Remaining Length");
+	}
+
+	if (remLen != vbi || m5::VBIWireSize(remLen) != vbiWS) {
 		throw std::logic_error("writeTo: Remaining Length");
 	}
 
@@ -165,7 +174,12 @@ int test(void)
 		throw std::logic_error("writeTo: Keep Alive");
 	}
 
-	if (buf->readVBI() != 0) {
+	rc = buf->readVBI(vbi, vbiWS);
+	if (rc != EXIT_SUCCESS) {
+		throw std::logic_error("writeTo: Properties Length");
+	}
+
+	if (vbi != 0 || vbiWS != 1) {
 		throw std::logic_error("writeTo: Properties Length");
 	}
 

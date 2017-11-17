@@ -42,6 +42,7 @@
 
 #include <stdexcept>
 #include <cstring>
+#include <cerrno>
 
 #define __POW2(n) (((uint64_t)1) << (n))
 
@@ -616,19 +617,26 @@ bool Properties::sharedSubscriptionAvailable(void) const
 
 uint32_t Properties::read(AppBuf &buf)
 {
-	uint32_t propWireSize;
 	uint32_t fieldLen;
+	uint8_t propWSWS;
+	uint32_t propWS;
+	uint8_t numberWS;
 	uint32_t number;
 	ByteArray *value;
 	ByteArray *key;
+	int rc;
 
-	propWireSize = buf.readVBI();
-	if (this->wireSize() >  buf.bytesToRead()) {
+	rc = buf.readVBI(propWS, propWSWS);
+	if (rc != EXIT_SUCCESS) {
+		return propWSWS;
+	}
+
+	if (propWS > buf.bytesToRead()) {
 		throw std::invalid_argument("Invalid input buffer");
 	}
 
 	const uint32_t bytesAtBeginning = buf.bytesToRead();
-	while (bytesAtBeginning - buf.bytesToRead() < propWireSize) {
+	while (bytesAtBeginning - buf.bytesToRead() < propWS) {
 		auto id = buf.readNum8();
 
 		switch (id) {
@@ -689,8 +697,11 @@ uint32_t Properties::read(AppBuf &buf)
 			break;
 
 		case SUBSCRIPTION_IDENTIFIER:
-			number = buf.readVBI();
-			this->append((PropertyId)id, number, VBIWireSize(number));
+			rc = buf.readVBI(number, numberWS);
+			if (rc != EXIT_SUCCESS) {
+				goto lb_exit;
+			}
+			this->append((PropertyId)id, number, numberWS);
 			break;
 
 		case USER_PROPERTY:
@@ -704,10 +715,11 @@ uint32_t Properties::read(AppBuf &buf)
 	}
 
 	/* bytes read is different to wire size */
-	if (propWireSize != this->wireSize()) {
+	if (propWS != this->wireSize()) {
 		throw std::invalid_argument("Invalid input buffer");
 	}
 
+lb_exit:
 	return this->wireSize();
 }
 

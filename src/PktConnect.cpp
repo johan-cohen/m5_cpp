@@ -223,6 +223,7 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	uint8_t remLenWS;
 	uint32_t remLen;
 	uint8_t first;
+	int rc;
 
 	if (buf.bytesToRead() < m5::connectPktMinSize) {
 		throw std::out_of_range("No enough space in input buffer");
@@ -233,7 +234,10 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 		throw std::invalid_argument("CONNECT msg not found in buf");
 	}
 
-	buf.readVBI(remLen, remLenWS);
+	rc = buf.readVBI(remLen, remLenWS);
+	if (rc != EXIT_SUCCESS) {
+		return remLenWS;
+	}
 
 	/* Add 1 to allow the min property length wire size to be 1 byte
 	 * Add the Client Id min len: 2 for field length and clientIdMinLen for
