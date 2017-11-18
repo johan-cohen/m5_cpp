@@ -40,7 +40,6 @@
 
 #include "PktConnect.hpp"
 
-#include <stdexcept>
 #include <cstring>
 
 namespace  m5 {
@@ -184,22 +183,29 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	uint32_t remLenWS;
 	uint32_t remLen;
 
+	status(StatusCode::SUCCESS);
+	expectedWireSize(0);
+
 	payloadWS = payloadWireSize();
 	propWS = properties.wireSize();
 	propWSWS = VBIWireSize(propWS);
 	if (propWSWS == 0) {
-		return 0;
+		status(StatusCode::INVALID_PROPERTY_VBI);
+		goto lb_exit;
 	}
 
 	remLen = 1 + 2 + 4 + 1 + 2 + propWSWS + propWS + payloadWS;
 	remLenWS = VBIWireSize(remLen);
 	if (remLenWS == 0) {
-		return 0;
+		status(StatusCode::INVALID_REMLEN_VBI);
+		goto lb_exit;
 	}
 
 	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
+	expectedWireSize(fullPktSize);
+	if (buf.bytesToWrite() < expectedWireSize()) {
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
 	}
 
 	buf.writeNum8(m5::firstByte(PktType::CONNECT));
@@ -209,16 +215,18 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	buf.writeNum8(packConnectFlags());
 	buf.writeNum16(keepAlive());
 	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
+		status(StatusCode::PROPERTY_WRITE_ERROR);
 	}
 	writePayload(buf);
 
-	return fullPktSize;
+lb_exit:
+	return buf.length() - initialLength;
 }
 
 uint32_t PktConnect::readFrom(AppBuf &buf)
 {
-	std::size_t alreadyTraversed = buf.traversed();
+	const auto alreadyTraversed = buf.traversed();
+	uint32_t fullPktSize;
 	uint8_t connectFlags;
 	uint8_t remLenWS;
 	uint32_t remLen;
@@ -226,17 +234,20 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	int rc;
 
 	if (buf.bytesToRead() < m5::connectPktMinSize) {
-		throw std::out_of_range("No enough space in input buffer");
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
 	}
 
 	first = buf.readNum8();
 	if (m5::packetType(first) != PktType::CONNECT) {
-		throw std::invalid_argument("CONNECT msg not found in buf");
+		status(StatusCode::INVALID_FIXED_HEADER);
+		goto lb_exit;
 	}
 
 	rc = buf.readVBI(remLen, remLenWS);
 	if (rc != EXIT_SUCCESS) {
-		return remLenWS;
+		status(StatusCode::INVALID_REMLEN_VBI);
+		goto lb_exit;
 	}
 
 	/* Add 1 to allow the min property length wire size to be 1 byte
@@ -244,16 +255,19 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	 * the content.
 	 */
 	if (remLen < m5::connectVarHdrMinSize + 1 + 2 + m5::clientIdMinLen) {
-		throw std::out_of_range("No enough space in input buffer");
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
 	}
 
 	if (memcmp(buf.ptrRead(), protocolNameStr, protocolNameWireSize) != 0) {
-		throw std::invalid_argument("Invalid protocol name string");
+		status(StatusCode::INVALID_PROTOCOL_NAME);
+		goto lb_exit;
 	}
 	buf.readSkip(protocolNameWireSize);
 
 	if (buf.readNum8() != protocolVersion5) {
-		throw std::invalid_argument("Invalid protocol version");
+		status(StatusCode::INVALID_PROTOCOL_VERSION);
+		goto lb_exit;
 	}
 
 	connectFlags = buf.readNum8();
@@ -267,41 +281,48 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	rc = buf.readBinary(_clientId);
 	if (rc != EXIT_SUCCESS || !validClientIdSize(clientId().size())) {
-		throw std::invalid_argument("Invalid Client Id size");
+		status(StatusCode::INVALID_CONNECT_PAYLOAD);
+		goto lb_exit;
 	}
 
 	if (flagWillMsg(connectFlags) == true) {
 		rc = buf.readBinary(_willTopic);
 		if (rc != EXIT_SUCCESS) {
-			return buf.traversed() - alreadyTraversed;
+			status(StatusCode::INVALID_CONNECT_PAYLOAD);
+			goto lb_exit;
 		}
 
 		rc = buf.readBinary(_willMsg);
 		if (rc != EXIT_SUCCESS) {
-			return buf.traversed() - alreadyTraversed;
+			status(StatusCode::INVALID_CONNECT_PAYLOAD);
+			goto lb_exit;
 		}
 	}
 
 	if (flagUserName(connectFlags) == true) {
 		rc = buf.readBinary(_userName);
 		if (rc != EXIT_SUCCESS) {
-			return buf.traversed() - alreadyTraversed;
+			status(StatusCode::INVALID_CONNECT_PAYLOAD);
+			goto lb_exit;
 		}
 	}
 
 	if (flagPassword(connectFlags) == true) {
 		rc = buf.readBinary(_password);
 		if (rc != EXIT_SUCCESS) {
-			return buf.traversed() - alreadyTraversed;
+			status(StatusCode::INVALID_CONNECT_PAYLOAD);
+			goto lb_exit;
 		}
 	}
 
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
+	fullPktSize = 1 + remLenWS + remLen;
+	expectedWireSize(fullPktSize);
+	if (buf.traversed() - alreadyTraversed != expectedWireSize()) {
+		status(StatusCode::FINISHED_READING_INVALID_LENGTH);
 	}
 
-	return fullPktSize;
+lb_exit:
+	return buf.traversed() - alreadyTraversed;
 }
 
 uint32_t PktConnect::getId(void) const
