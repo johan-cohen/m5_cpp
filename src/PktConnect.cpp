@@ -131,7 +131,7 @@ uint32_t PktConnect::payloadWireSize(void) const
 
 void PktConnect::writePayload(AppBuf &buf)
 {
-	buf.writeBinary(&clientId()[0], clientId().size());
+	buf.writeBinary(clientId().data(), clientId().size());
 
 	if (willMsg().size() > 0) {
 		buf.writeBinary(willTopic().data(), willTopic().size());
