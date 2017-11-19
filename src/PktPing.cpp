@@ -47,6 +47,9 @@ namespace m5 {
 PktPing::PktPing(PktType type) : Packet(type, 0x00)
 {
 	Packet::hasProperties = false;
+
+	minBufferSize = 2;
+	minRemLen = 0;
 }
 
 enum StatusCode PktPing::writeVariableHeader(AppBuf &buf)
@@ -70,21 +73,23 @@ uint32_t PktPing::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
+enum StatusCode PktPing::readVariableHeader(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktPing::readPayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t PktPing::readFrom(AppBuf &buf)
 {
-	if (buf.bytesToRead() < 2) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	if (buf.readNum8() != m5::firstByte(this->_packetType)) {
-		throw std::invalid_argument("PING msg not found in buf");
-	}
-
-	if (buf.readNum8() != 0) {
-		throw std::invalid_argument("Invalid Remaining Length found");
-	}
-
-	return 2;
+	return Packet::readFrom(buf);
 }
 
 }

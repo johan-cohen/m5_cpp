@@ -171,11 +171,17 @@ void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
 {
 	Packet::hasProperties = true;
+
+	Packet::minBufferSize = connectPktMinSize;
+	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
 }
 
 PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
 {
 	Packet::hasProperties = true;
+
+	Packet::minBufferSize = connectPktMinSize;
+	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
 
 	this->readFrom(buf);
 }
@@ -184,6 +190,9 @@ PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
 		       Packet(PktType::CONNECT, 0x0)
 {
 	Packet::hasProperties = true;
+
+	Packet::minBufferSize = connectPktMinSize;
+	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
 
 	init(clientId, len, cleanStart);
 }
@@ -208,51 +217,15 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-uint32_t PktConnect::readFrom(AppBuf &buf)
+enum StatusCode PktConnect::readVariableHeader(AppBuf &buf)
 {
-	const auto alreadyTraversed = buf.traversed();
-	uint32_t fullPktSize;
-	uint8_t connectFlags;
-	uint8_t remLenWS;
-	uint32_t remLen;
-	uint8_t first;
-	StatusCode rc;
-
-	if (buf.bytesToRead() < m5::connectPktMinSize) {
-		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
-		goto lb_exit;
-	}
-
-	first = buf.readNum8();
-	if (m5::packetType(first) != PktType::CONNECT) {
-		status(StatusCode::INVALID_FIXED_HEADER);
-		goto lb_exit;
-	}
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		status(rc);
-		goto lb_exit;
-	}
-
-	/* Add 1 to allow the min property length wire size to be 1 byte
-	 * Add the Client Id min len: 2 for field length and clientIdMinLen for
-	 * the content.
-	 */
-	if (remLen < m5::connectVarHdrMinSize + 1 + 2 + m5::clientIdMinLen) {
-		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
-		goto lb_exit;
-	}
-
 	if (memcmp(buf.ptrRead(), protocolNameStr, protocolNameWireSize) != 0) {
-		status(StatusCode::INVALID_PROTOCOL_NAME);
-		goto lb_exit;
+		return StatusCode::INVALID_PROTOCOL_NAME;
 	}
 	buf.readSkip(protocolNameWireSize);
 
 	if (buf.readNum8() != protocolVersion5) {
-		status(StatusCode::INVALID_PROTOCOL_VERSION);
-		goto lb_exit;
+		return StatusCode::INVALID_PROTOCOL_VERSION;
 	}
 
 	connectFlags = buf.readNum8();
@@ -264,50 +237,50 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	properties.read(buf);
 
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktConnect::readPayload(AppBuf &buf)
+{
+	enum StatusCode rc;
+
 	rc = buf.readBinary(_clientId);
 	if (rc != StatusCode::SUCCESS || !validClientIdSize(clientId().size())) {
-		status(StatusCode::INVALID_CONNECT_PAYLOAD);
-		goto lb_exit;
+		return StatusCode::INVALID_CONNECT_PAYLOAD;
 	}
 
 	if (flagWillMsg(connectFlags) == true) {
 		rc = buf.readBinary(_willTopic);
 		if (rc != StatusCode::SUCCESS) {
-			status(StatusCode::INVALID_CONNECT_PAYLOAD);
-			goto lb_exit;
+			return StatusCode::INVALID_CONNECT_PAYLOAD;
 		}
 
 		rc = buf.readBinary(_willMsg);
 		if (rc != StatusCode::SUCCESS) {
-			status(StatusCode::INVALID_CONNECT_PAYLOAD);
-			goto lb_exit;
+			return StatusCode::INVALID_CONNECT_PAYLOAD;
 		}
 	}
 
 	if (flagUserName(connectFlags) == true) {
 		rc = buf.readBinary(_userName);
 		if (rc != StatusCode::SUCCESS) {
-			status(StatusCode::INVALID_CONNECT_PAYLOAD);
-			goto lb_exit;
+			return StatusCode::INVALID_CONNECT_PAYLOAD;
 		}
 	}
 
 	if (flagPassword(connectFlags) == true) {
 		rc = buf.readBinary(_password);
 		if (rc != StatusCode::SUCCESS) {
-			status(StatusCode::INVALID_CONNECT_PAYLOAD);
-			goto lb_exit;
+			return StatusCode::INVALID_CONNECT_PAYLOAD;
 		}
 	}
 
-	fullPktSize = 1 + remLenWS + remLen;
-	expectedWireSize(fullPktSize);
-	if (buf.traversed() - alreadyTraversed != expectedWireSize()) {
-		status(StatusCode::FINISHED_READING_INVALID_LENGTH);
-	}
+	return StatusCode::SUCCESS;
+}
 
-lb_exit:
-	return buf.traversed() - alreadyTraversed;
+uint32_t PktConnect::readFrom(AppBuf &buf)
+{
+	return Packet::readFrom(buf);
 }
 
 void PktConnect::clientId(const uint8_t *data, uint16_t size)

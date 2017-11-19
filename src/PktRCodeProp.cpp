@@ -47,11 +47,17 @@ namespace m5 {
 PktRCodeProp::PktRCodeProp(PktType type) : Packet(type, 0x00)
 {
 	Packet::hasProperties = true;
+
+	minBufferSize = 2;
+	minRemLen = 0;
 }
 
 PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
 	Packet::hasProperties = true;
+
+	minBufferSize = 2;
+	minRemLen = 0;
 
 	this->readFrom(buf);
 }
@@ -118,39 +124,30 @@ uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
+enum StatusCode PktRCodeProp::readVariableHeader(AppBuf &buf)
+{
+	if (remainingLength > 0) {
+		reasonCode((enum ReasonCode)buf.readNum8());
+		if (remainingLength > 1) {
+			properties.read(buf);
+		}
+	} else {
+		reasonCode((enum ReasonCode)0x00);
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktRCodeProp::readPayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint8_t remLenWS;
-	uint32_t remLen;
-	StatusCode rc;
-
-	if (buf.bytesToRead() < 3) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	if (buf.readNum8() != m5::firstByte(this->_packetType)) {
-		throw std::invalid_argument("Msg not found in buf");
-	}
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		return remLenWS;
-	}
-
-	if (remLen < 1) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	this->_reasonCode = buf.readNum8();
-	properties.read(buf);
-
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
-	}
-
-	return fullPktSize;
+	return Packet::readFrom(buf);
 }
 
 }

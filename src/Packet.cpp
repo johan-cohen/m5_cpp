@@ -55,7 +55,8 @@ uint32_t Packet::writeTo(AppBuf &buf)
 	uint32_t fullPktSize;
 	enum StatusCode rc;
 	uint8_t remLenWS;
-	uint32_t remLen;
+
+	remainingLength = 0;
 
 	status(StatusCode::SUCCESS);
 	expectedWireSize(0);
@@ -72,14 +73,14 @@ uint32_t Packet::writeTo(AppBuf &buf)
 		variableHeaderSize += propWSWS + properties.wireSize();
 	}
 
-	remLen = variableHeaderSize + payloadSize;
-	remLenWS  = VBIWireSize(remLen);
+	remainingLength = variableHeaderSize + payloadSize;
+	remLenWS  = VBIWireSize(remainingLength);
 	if (remLenWS == 0) {
 		status(StatusCode::INVALID_REMLEN_VBI);
 		goto lb_exit;
 	}
 
-	fullPktSize = 1 + remLenWS + remLen;
+	fullPktSize = 1 + remLenWS + remainingLength;
 	expectedWireSize(fullPktSize);
 	if (buf.bytesToWrite() < expectedWireSize()) {
 		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
@@ -87,7 +88,7 @@ uint32_t Packet::writeTo(AppBuf &buf)
 	}
 
 	buf.writeNum8(m5::firstByte(packetType(), fixedHeaderReserved));
-	buf.writeVBI(remLen);
+	buf.writeVBI(remainingLength);
 
 	rc = writeVariableHeader(buf);
 	if (rc != StatusCode::SUCCESS) {
@@ -107,6 +108,88 @@ uint32_t Packet::writeTo(AppBuf &buf)
 
 lb_exit:
 	return buf.length() - initialLength;
+}
+
+enum StatusCode Packet::fixedHeaderFlags(uint8_t flags)
+{
+	if ((flags & 0x0F) != fixedHeaderReserved) {
+		return StatusCode::INVALID_FIXED_HEADER;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+uint32_t Packet::readFrom(AppBuf &buf)
+{
+	const auto alreadyTraversed = buf.traversed();
+	uint32_t fullPktSize;
+	std::size_t traversed;
+	enum StatusCode rc;
+	uint8_t remLenWS;
+	uint8_t first;
+
+	remainingLength = 0;
+
+	status(StatusCode::SUCCESS);
+	expectedWireSize(0);
+
+	if (buf.bytesToRead() < minBufferSize) {
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
+	}
+
+	first = buf.readNum8();
+	if (m5::packetType(first) != _packetType) {
+		status(StatusCode::INVALID_PACKET_TYPE);
+		goto lb_exit;
+	}
+
+	rc = fixedHeaderFlags(first & 0x0F);
+	if (rc != StatusCode::SUCCESS) {
+		status(rc);
+		goto lb_exit;
+	}
+
+	rc = buf.readVBI(remainingLength, remLenWS);
+
+	if (rc != StatusCode::SUCCESS) {
+		status(StatusCode::INVALID_REMLEN_VBI);
+		goto lb_exit;
+	}
+
+	if (remainingLength < minRemLen) {
+		status(StatusCode::INVALID_REMLEN);
+		goto lb_exit;
+	}
+
+	rc = readVariableHeader(buf);
+	if (rc != StatusCode::SUCCESS) {
+		status(rc);
+		goto lb_exit;
+	}
+
+	traversed = buf.traversed() - alreadyTraversed;
+	if (traversed > 1 + remLenWS + remainingLength) {
+		status(StatusCode::INVALID_REMLEN);
+		goto lb_exit;
+	}
+
+	payloadSize = 1 + remLenWS + remainingLength - traversed;
+	rc = readPayload(buf);
+	if (rc != StatusCode::SUCCESS) {
+		status(rc);
+		goto lb_exit;
+	}
+
+	fullPktSize = 1 + remLenWS + remainingLength;
+	expectedWireSize(fullPktSize);
+
+	if (buf.traversed() - alreadyTraversed != expectedWireSize()) {
+		status(StatusCode::FINISHED_READING_INVALID_LENGTH);
+	}
+
+lb_exit:
+	return buf.traversed() - alreadyTraversed;
 }
 
 }

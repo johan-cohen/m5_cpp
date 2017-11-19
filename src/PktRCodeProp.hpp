@@ -55,6 +55,9 @@ private:
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
 
+	enum StatusCode readVariableHeader(AppBuf &buf) override;
+	enum StatusCode readPayload(AppBuf &buf) override;
+
 protected:
 	PktRCodeProp(enum PktType type);
 	PktRCodeProp(enum PktType type, AppBuf &buf);

@@ -56,6 +56,9 @@ private:
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
 
+	enum StatusCode readVariableHeader(AppBuf &buf) override;
+	enum StatusCode readPayload(AppBuf &buf) override;
+
 public:
 	PktConnAck(bool sessionPresent = false,
 		   ReasonCode reasonCode = ReasonCode::SUCCESS);

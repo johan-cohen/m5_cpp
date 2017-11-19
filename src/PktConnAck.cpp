@@ -49,6 +49,9 @@ PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
 	this->_reasonCode = (uint8_t)reasonCode;
 
 	Packet::hasProperties = true;
+
+	Packet::minBufferSize = 5;
+	Packet::minRemLen = 3;
 }
 
 void PktConnAck::assignedClientIdentifier(const uint8_t *data, uint16_t size)
@@ -269,58 +272,30 @@ uint32_t PktConnAck::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-
-uint32_t PktConnAck::readFrom(AppBuf &buf)
+enum StatusCode PktConnAck::readVariableHeader(AppBuf &buf)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint32_t fullPktSize;
-	uint8_t remLenWS;
-	uint32_t remLen;
-	uint8_t number;
-	StatusCode rc;
-
-	status(StatusCode::SUCCESS);
-	expectedWireSize(0);
-
-	if (buf.bytesToRead() < 5) {
-		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
-		goto lb_exit;
-	}
-
-	number = buf.readNum8();
-	if (number != m5::firstByte(PktType::CONNACK)) {
-		status(StatusCode::INVALID_FIXED_HEADER);
-		goto lb_exit;
-	}
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		status(StatusCode::INVALID_REMLEN_VBI);
-		goto lb_exit;
-	}
-
-	if (remLen < 3) {
-		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
-		goto lb_exit;
-	}
-
-	number = buf.readNum8();
+	auto number = buf.readNum8();
 	if (number & 0xFD) {
-		status(StatusCode::RESERVED_MUST_BE_ZERO);
-		goto lb_exit;
+		return StatusCode::RESERVED_MUST_BE_ZERO;
 	}
 	this->_sessionPresent = number ? true : false;
 	this->_reasonCode = buf.readNum8();
+
 	properties.read(buf);
 
-	fullPktSize = 1 + remLenWS + remLen;
-	expectedWireSize(fullPktSize);
-	if (buf.traversed() - alreadyTraversed != expectedWireSize()) {
-		status(StatusCode::FINISHED_READING_INVALID_LENGTH);
-	}
+	return StatusCode::SUCCESS;
+}
 
-lb_exit:
-	return buf.traversed() - alreadyTraversed;
+enum StatusCode PktConnAck::readPayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
+uint32_t PktConnAck::readFrom(AppBuf &buf)
+{
+	return Packet::readFrom(buf);
 }
 
 }

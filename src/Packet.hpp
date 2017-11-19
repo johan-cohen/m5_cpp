@@ -61,8 +61,16 @@ protected:
 	Properties properties;
 	uint32_t payloadSize = 0;
 
+	uint32_t remainingLength = 0;
+	uint32_t minBufferSize = 0;
+	uint32_t minRemLen = 0;
+
 	virtual enum StatusCode writeVariableHeader(AppBuf &buf) = 0;
 	virtual enum StatusCode writePayload(AppBuf &buf) = 0;
+
+	virtual enum StatusCode fixedHeaderFlags(uint8_t flags);
+	virtual enum StatusCode readVariableHeader(AppBuf &buf) = 0;
+	virtual enum StatusCode readPayload(AppBuf &buf) = 0;
 
 	virtual void status(enum StatusCode ec) { _status = ec; }
 	virtual void expectedWireSize(uint32_t ws) { _expectedWireSize = ws; }
@@ -72,7 +80,7 @@ protected:
 public:
 	virtual ~Packet() {}
 	virtual uint32_t writeTo(AppBuf &buf);
-	virtual uint32_t readFrom(AppBuf &buf) = 0;
+	virtual uint32_t readFrom(AppBuf &buf);
 
 	enum PktType packetType(void) const { return _packetType; }
 

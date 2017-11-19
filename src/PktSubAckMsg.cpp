@@ -47,11 +47,17 @@ namespace m5 {
 PktSubAckMsg::PktSubAckMsg(PktType type) :Packet(type, 0x00)
 {
 	Packet::hasProperties = true;
+
+	minBufferSize = 6;
+	minRemLen = 4;
 }
 
 PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
 	Packet::hasProperties = true;
+
+	minBufferSize = 6;
+	minRemLen = 4;
 
 	this->readFrom(buf);
 }
@@ -116,55 +122,30 @@ uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-uint32_t PktSubAckMsg::readFrom(AppBuf &buf)
+enum StatusCode PktSubAckMsg::readVariableHeader(AppBuf &buf)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint32_t remLen;
-	uint8_t remLenWS;
-	StatusCode rc;
-
-	if (buf.bytesToRead() < 6) {
-		throw std::invalid_argument("Invalid input buffer");
-	}
-
-	if (buf.readNum8() != m5::firstByte(this->_packetType)) {
-		throw std::invalid_argument("Invalid packet type");
-	}
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		return remLenWS;
-	}
-
-	if (remLen > buf.bytesToRead()) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
 	this->packetId(buf.readNum16());
 	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
+		return StatusCode::INVALID_PACKET_ID;
 	}
 
 	properties.read(buf);
 
-	auto propertiesFullSize = VBIWireSize(properties.wireSize()) + properties.wireSize();
-	auto minRemLen = 2 + propertiesFullSize;
-	if (minRemLen >= remLen) {
-		throw std::out_of_range("Corrupted input buffer");
-	}
+	return StatusCode::SUCCESS;
+}
 
-	while (minRemLen < remLen) {
-		/* no need to check for bytesToRead here */
+enum StatusCode PktSubAckMsg::readPayload(AppBuf &buf)
+{
+	for (uint32_t i = 0; i < payloadSize; i++) {
 		this->append((ReasonCode)buf.readNum8());
-		minRemLen++;
 	}
 
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
-	}
+	return StatusCode::SUCCESS;
+}
 
-	return fullPktSize;
+uint32_t PktSubAckMsg::readFrom(AppBuf &buf)
+{
+	return Packet::readFrom(buf);
 }
 
 }

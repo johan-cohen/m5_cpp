@@ -47,6 +47,8 @@ namespace m5 {
 
 PktUnsubscribe::PktUnsubscribe() : Packet(PktType::UNSUBSCRIBE, 0x02)
 {
+	minBufferSize = 7;
+	minRemLen = 5;
 }
 
 PktUnsubscribe::PktUnsubscribe(AppBuf &buf) : Packet(PktType::UNSUBSCRIBE, 0x02)
@@ -101,54 +103,47 @@ uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
+enum StatusCode PktUnsubscribe::fixedHeaderFlags(uint8_t flags)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint32_t remLen;
-	uint8_t remLenWS;
-	StatusCode rc;
-
-	if (buf.bytesToRead() < 7) {
-		throw std::invalid_argument("Invalid input buffer");
+	if ((flags & 0x02) != 0x02) {
+		return StatusCode::INVALID_FIXED_HEADER;
 	}
 
-	if (buf.readNum8() != m5::firstByte(PktType::UNSUBSCRIBE, 0x02)) {
-		throw std::invalid_argument("SUBACK: Invalid packet type");
-	}
+	return StatusCode::SUCCESS;
+}
 
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		return remLenWS;
-	}
-
-	if (buf.bytesToRead() < remLen) {
-		return remLenWS;
-	}
-
+enum StatusCode PktUnsubscribe::readVariableHeader(AppBuf &buf)
+{
 	this->packetId(buf.readNum16());
 	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
+		return StatusCode::INVALID_PACKET_ID;
 	}
 
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktUnsubscribe::readPayload(AppBuf &buf)
+{
 	uint32_t minRemLen = 2;
-	while (minRemLen < remLen) {
+
+	while (minRemLen < remainingLength) {
 		ByteArray *topic;
 
 		topic =  buf.readBinary();
 		if (topic->size() == 0) {
-			return buf.traversed() - alreadyTraversed;
+			return StatusCode::INVALID_TOPIC_NAME;
 		}
 
 		this->_topics.push_back(topic);
 		minRemLen += 2 + topic->size();
 	}
 
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
-	}
+	return StatusCode::SUCCESS;
+}
 
-	return fullPktSize;
+uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
+{
+	return Packet::readFrom(buf);
 }
 
 }

@@ -57,6 +57,11 @@ private:
 
 	virtual enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	virtual enum StatusCode writePayload(AppBuf &buf) override;
+
+	enum StatusCode fixedHeaderFlags(uint8_t flags) override;
+	enum StatusCode readVariableHeader(AppBuf &buf) override;
+	enum StatusCode readPayload(AppBuf &buf) override;
+
 public:
 	PktUnsubscribe();
 	PktUnsubscribe(AppBuf &buf);

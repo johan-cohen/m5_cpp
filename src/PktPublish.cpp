@@ -48,6 +48,9 @@ namespace m5 {
 PktPublish::PktPublish() : Packet(PktType::PUBLISH, 0x00)
 {
 	hasProperties = true;
+
+	minBufferSize = 6;
+	minRemLen = 4;
 }
 
 PktPublish::~PktPublish()
@@ -185,17 +188,6 @@ uint8_t PktPublish::headerFlags(void)
 	return flags;
 }
 
-void PktPublish::headerFlags(uint8_t firstByte)
-{
-	this->retain(firstByte & 0x01);
-	this->QoS((PktQoS)((firstByte & 0x06) >> 1));
-	this->dup(firstByte & 0x08);
-
-	if ((int)this->QoS() >= 0x03) {
-		throw std::invalid_argument("Invalid QoS");
-	}
-}
-
 enum StatusCode PktPublish::writeVariableHeader(AppBuf &buf)
 {
 	buf.writeBinary(this->topic());
@@ -239,71 +231,64 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-uint32_t PktPublish::readFrom(AppBuf &buf)
+enum StatusCode PktPublish::fixedHeaderFlags(uint8_t flags)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint32_t remLen;
-	uint8_t remLenWS;
-	uint8_t first;
+	this->retain(flags & 0x01);
+	this->QoS((PktQoS)((flags & 0x06) >> 1));
+	this->dup(flags & 0x08);
+
+	if ((int)this->QoS() >= 0x03) {
+		return StatusCode::INVALID_QOS;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktPublish::readVariableHeader(AppBuf &buf)
+{
 	StatusCode rc;
-
-	if (buf.bytesToRead() < 4) {
-		throw std::invalid_argument("Invalid input buffer");
-	}
-
-	first = buf.readNum8();
-	if (m5::packetType(first) != PktType::PUBLISH) {
-		throw std::invalid_argument("Invalid packet type");
-	}
-
-	headerFlags(first);
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		return remLenWS;
-	}
-
-	if (remLen > buf.bytesToRead()) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
 
 	rc = buf.readBinary(this->_topic);
 	if (rc != StatusCode::SUCCESS) {
-		return buf.traversed() - alreadyTraversed;
+		return rc;
 	}
 
 	if (this->topic().size() == 0) {
-		throw std::invalid_argument("Invalid topic size");
+		return StatusCode::INVALID_TOPIC_NAME;
 	}
 
 	if(this->QoS() != PktQoS::QoS0) {
 		if (buf.bytesToRead() < 2) {
-			throw std::invalid_argument("Invalid input buffer");
+			return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 		}
 
 		this->packetId(buf.readNum16());
 		if (this->packetId() == 0) {
-			throw std::invalid_argument("Invalid packet Id");
+			return StatusCode::INVALID_PACKET_ID;
 		}
 	}
 
 	properties.read(buf);
 
-	const auto traversed = buf.traversed() - alreadyTraversed;
-	const auto payloadSize = 1 + remLenWS + remLen - traversed;
+	return StatusCode::SUCCESS;
+}
 
+enum StatusCode PktPublish::readPayload(AppBuf &buf)
+{
 	if (buf.bytesToRead() < payloadSize) {
-		throw std::invalid_argument("Invalid input buffer");
+		return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 	}
 
-	buf.read(this->_payload, payloadSize);
-
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
+	if (payloadSize > 0) {
+		buf.read(this->_payload, payloadSize);
 	}
 
-	return fullPktSize;
+	return StatusCode::SUCCESS;
+}
+
+uint32_t PktPublish::readFrom(AppBuf &buf)
+{
+	return Packet::readFrom(buf);
 }
 
 }

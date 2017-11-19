@@ -45,6 +45,9 @@ namespace m5 {
 PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved) : Packet(type, reserved)
 {
 	Packet::hasProperties = true;
+
+	minBufferSize = 6;
+	minRemLen = 4;
 }
 
 void PktPubMsg::packetId(uint16_t id)
@@ -122,44 +125,30 @@ uint32_t PktPubMsg::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-uint32_t PktPubMsg::readFrom(AppBuf &buf)
+enum StatusCode PktPubMsg::readVariableHeader(AppBuf &buf)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint32_t remLen;
-	uint8_t remLenWS;
-	StatusCode rc;
-
-	if (buf.bytesToRead() < 6) {
-		throw std::invalid_argument("Invalid input buffer");
-	}
-
-	if (buf.readNum8() != m5::firstByte(packetType(), fixedHeaderReserved)) {
-		throw std::invalid_argument("Invalid packet type");
-	}
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		return remLenWS;
-	}
-
-	if (remLen > buf.bytesToRead()) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
 	this->packetId(buf.readNum16());
 	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
+		return StatusCode::INVALID_PACKET_ID;
 	}
 
-	this->reasonCode((ReasonCode)buf.readNum8());
+	this->reasonCode((enum ReasonCode)buf.readNum8());
+
 	properties.read(buf);
 
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
-	}
+	return StatusCode::SUCCESS;
+}
 
-	return fullPktSize;
+enum StatusCode PktPubMsg::readPayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
+uint32_t PktPubMsg::readFrom(AppBuf &buf)
+{
+	return Packet::readFrom(buf);
 }
 
 }

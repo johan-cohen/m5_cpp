@@ -53,6 +53,8 @@ class PktConnect : public Packet {
 private:
 	uint16_t _keepAlive = 0;
 
+	uint8_t connectFlags = 0x00;
+
 	uint8_t _willRetain = 0;
 	uint8_t _willQoS = 0;
 	uint8_t _cleanStart = 1;
@@ -68,6 +70,9 @@ private:
 
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
+
+	enum StatusCode readVariableHeader(AppBuf &buf) override;
+	enum StatusCode readPayload(AppBuf &buf) override;
 
 	void init(const uint8_t *clientId, uint16_t len, bool cleanStart);
 

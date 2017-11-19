@@ -60,11 +60,17 @@ TopicOptions::TopicOptions(const char *topic, uint8_t options) :
 PktSubscribe::PktSubscribe() : Packet(PktType::SUBSCRIBE, 0x02)
 {
 	hasProperties = true;
+
+	minBufferSize = 9;
+	minRemLen = 7;
 }
 
 PktSubscribe::PktSubscribe(AppBuf &buf) : Packet(PktType::SUBSCRIBE, 0x02)
 {
 	hasProperties = true;
+
+	minBufferSize = 9;
+	minRemLen = 7;
 
 	this->readFrom(buf);
 }
@@ -144,17 +150,25 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 	return Packet::writeTo(buf);
 }
 
-void PktSubscribe::readPayload(AppBuf &buf)
+enum StatusCode PktSubscribe::readVariableHeader(AppBuf &buf)
+{
+	this->packetId(buf.readNum16());
+	properties.read(buf);
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktSubscribe::readPayload(AppBuf &buf)
 {
 	do {
 		if (buf.bytesToRead() < 2) {
-			throw std::out_of_range("No enough space in input buffer");
+			return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 		}
 
 		auto len = buf.readNum16();
 
 		if (buf.bytesToRead() < (uint16_t)(len + 1)) {
-			throw std::out_of_range("No enough space in input buffer");
+			return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 		}
 
 		auto ptr = buf.ptrRead();
@@ -163,45 +177,13 @@ void PktSubscribe::readPayload(AppBuf &buf)
 
 		this->append(ptr, len, options);
 	} while (buf.bytesToRead() > 1);
+
+	return StatusCode::SUCCESS;
 }
 
 uint32_t PktSubscribe::readFrom(AppBuf &buf)
 {
-	std::size_t alreadyTraversed = buf.traversed();
-	uint8_t remLenWS;
-	uint32_t remLen;
-	StatusCode rc;
-
-	if (buf.bytesToRead() < 8) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	if (buf.readNum8() != m5::firstByte(PktType::SUBSCRIBE, 0x02)) {
-		throw std::invalid_argument("Invalid fixed header");
-	}
-
-	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != StatusCode::SUCCESS) {
-		return remLenWS;
-	}
-
-	if (remLen < 6) {
-		throw std::out_of_range("No enough space in input buffer");
-	}
-
-	this->packetId(buf.readNum16());
-	properties.read(buf);
-
-	Packet::payloadSize = buf.bytesToRead();
-	readPayload(buf);
-	Packet::payloadSize -= buf.bytesToRead();
-
-	uint32_t fullPktSize = 1 + remLenWS + remLen;
-	if (buf.traversed() - alreadyTraversed != fullPktSize) {
-		throw std::invalid_argument("Corrupted input buffer");
-	}
-
-	return fullPktSize;
+	return Packet::readFrom(buf);
 }
 
 }

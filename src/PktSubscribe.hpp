@@ -66,7 +66,8 @@ private:
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
 
-	void readPayload(AppBuf &buf);
+	enum StatusCode readVariableHeader(AppBuf &buf) override;
+	enum StatusCode readPayload(AppBuf &buf) override;
 
 public:
 	PktSubscribe();
