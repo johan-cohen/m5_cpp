@@ -52,7 +52,7 @@ TopicOptions::TopicOptions(const uint8_t *topic, uint16_t size, uint8_t options)
 }
 
 TopicOptions::TopicOptions(const char *topic, uint8_t options) :
-	                   topic(topic, topic + strlen(topic)),
+			   topic(topic, topic + strlen(topic)),
 			   options(options)
 {
 }
