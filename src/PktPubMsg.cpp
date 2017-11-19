@@ -58,7 +58,7 @@ void PktPubMsg::packetId(uint16_t id)
 
 void PktPubMsg::reasonCode(ReasonCode rc)
 {
-	this->_reasonCode = rc;
+	this->_reasonCode = (uint8_t)rc;
 }
 
 void PktPubMsg::reasonString(const uint8_t *data, uint16_t size)

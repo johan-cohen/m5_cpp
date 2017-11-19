@@ -81,7 +81,7 @@ enum class PktType {
 	AUTH
 };
 
-enum PropertyId {
+enum class PropertyId {
 	PAYLOAD_FORMAT_INDICATOR = 0x01,
 	PUBLICATION_EXPIRY_INTERVAL,
 	CONTENT_TYPE,
@@ -126,7 +126,7 @@ enum PropertyId {
 	SHARED_SUBSCRIPTION_AVAILABLE,
 };
 
-enum ReasonCode {
+enum class ReasonCode {
 	SUCCESS = 0,
 	NORMAL_DISCONNECTION = 0,
 	GRANTED_QOS0 = 0,
@@ -208,7 +208,7 @@ static inline uint8_t VBIWireSize(uint32_t value)
 	return 0;
 }
 
-static inline PktType packetType(uint8_t byte)
+static inline enum PktType packetType(uint8_t byte)
 {
 	return (PktType)((byte & 0xF0) >> 4);
 }

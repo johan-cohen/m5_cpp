@@ -44,9 +44,14 @@
 #include <cstring>
 #include <cerrno>
 
+namespace  m5 {
+
 #define __POW2(n) (((uint64_t)1) << (n))
 
-namespace  m5 {
+static uint64_t pow2(enum PropertyId id)
+{
+	return (uint64_t)0x01 << (uint8_t)id;
+}
 
 void Properties::computePktFlags(void)
 {
@@ -55,44 +60,44 @@ void Properties::computePktFlags(void)
 
 	switch (pktType) {
 	case PktType::CONNECT:
-		allowedProperties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
-		allowedProperties += __POW2(PropertyId::AUTH_METHOD);
-		allowedProperties += __POW2(PropertyId::AUTH_DATA);
-		allowedProperties += __POW2(PropertyId::REQUEST_PROBLEM_INFORMATION);
-		allowedProperties += __POW2(PropertyId::WILL_DELAY_INTERVAL);
-		allowedProperties += __POW2(PropertyId::REQUEST_RESPONSE_INFORMATION);
-		allowedProperties += __POW2(PropertyId::RECEIVE_MAXIMUM);
-		allowedProperties += __POW2(PropertyId::TOPIC_ALIAS_MAXIMUM);
-		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
-		allowedProperties += __POW2(PropertyId::MAXIMUM_PACKET_SIZE);
+		allowedProperties += pow2(PropertyId::SESSION_EXPIRY_INTERVAL);
+		allowedProperties += pow2(PropertyId::AUTH_METHOD);
+		allowedProperties += pow2(PropertyId::AUTH_DATA);
+		allowedProperties += pow2(PropertyId::REQUEST_PROBLEM_INFORMATION);
+		allowedProperties += pow2(PropertyId::WILL_DELAY_INTERVAL);
+		allowedProperties += pow2(PropertyId::REQUEST_RESPONSE_INFORMATION);
+		allowedProperties += pow2(PropertyId::RECEIVE_MAXIMUM);
+		allowedProperties += pow2(PropertyId::TOPIC_ALIAS_MAXIMUM);
+		allowedProperties += pow2(PropertyId::USER_PROPERTY);
+		allowedProperties += pow2(PropertyId::MAXIMUM_PACKET_SIZE);
 		break;
 	case PktType::CONNACK:
-		allowedProperties += __POW2(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
-		allowedProperties += __POW2(PropertyId::SERVER_KEEP_ALIVE);
-		allowedProperties += __POW2(PropertyId::AUTH_METHOD);
-		allowedProperties += __POW2(PropertyId::AUTH_DATA);
-		allowedProperties += __POW2(PropertyId::RESPONSE_INFORMATION);
-		allowedProperties += __POW2(PropertyId::SERVER_REFERENCE);
-		allowedProperties += __POW2(PropertyId::REASON_STR);
-		allowedProperties += __POW2(PropertyId::RECEIVE_MAXIMUM);
-		allowedProperties += __POW2(PropertyId::TOPIC_ALIAS_MAXIMUM);
-		allowedProperties += __POW2(PropertyId::MAXIMUM_QOS);
-		allowedProperties += __POW2(PropertyId::RETAIN_AVAILABLE);
-		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
-		allowedProperties += __POW2(PropertyId::MAXIMUM_PACKET_SIZE);
-		allowedProperties += __POW2(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
-		allowedProperties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
-		allowedProperties += __POW2(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
+		allowedProperties += pow2(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
+		allowedProperties += pow2(PropertyId::SERVER_KEEP_ALIVE);
+		allowedProperties += pow2(PropertyId::AUTH_METHOD);
+		allowedProperties += pow2(PropertyId::AUTH_DATA);
+		allowedProperties += pow2(PropertyId::RESPONSE_INFORMATION);
+		allowedProperties += pow2(PropertyId::SERVER_REFERENCE);
+		allowedProperties += pow2(PropertyId::REASON_STR);
+		allowedProperties += pow2(PropertyId::RECEIVE_MAXIMUM);
+		allowedProperties += pow2(PropertyId::TOPIC_ALIAS_MAXIMUM);
+		allowedProperties += pow2(PropertyId::MAXIMUM_QOS);
+		allowedProperties += pow2(PropertyId::RETAIN_AVAILABLE);
+		allowedProperties += pow2(PropertyId::USER_PROPERTY);
+		allowedProperties += pow2(PropertyId::MAXIMUM_PACKET_SIZE);
+		allowedProperties += pow2(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
+		allowedProperties += pow2(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
+		allowedProperties += pow2(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 		break;
 	case PktType::PUBLISH:
-		allowedProperties += __POW2(PropertyId::PAYLOAD_FORMAT_INDICATOR);
-		allowedProperties += __POW2(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
-		allowedProperties += __POW2(PropertyId::CONTENT_TYPE);
-		allowedProperties += __POW2(PropertyId::RESPONSE_TOPIC);
-		allowedProperties += __POW2(PropertyId::CORRELATION_DATA);
-		allowedProperties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
-		allowedProperties += __POW2(PropertyId::TOPIC_ALIAS);
-		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += pow2(PropertyId::PAYLOAD_FORMAT_INDICATOR);
+		allowedProperties += pow2(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
+		allowedProperties += pow2(PropertyId::CONTENT_TYPE);
+		allowedProperties += pow2(PropertyId::RESPONSE_TOPIC);
+		allowedProperties += pow2(PropertyId::CORRELATION_DATA);
+		allowedProperties += pow2(PropertyId::SUBSCRIPTION_IDENTIFIER);
+		allowedProperties += pow2(PropertyId::TOPIC_ALIAS);
+		allowedProperties += pow2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::PUBACK:
 	case PktType::PUBREC:
@@ -100,27 +105,27 @@ void Properties::computePktFlags(void)
 	case PktType::PUBCOMP:
 	case PktType::SUBACK:
 	case PktType::UNSUBACK:
-		allowedProperties += __POW2(PropertyId::REASON_STR);
-		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += pow2(PropertyId::REASON_STR);
+		allowedProperties += pow2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::SUBSCRIBE:
-		allowedProperties += __POW2(PropertyId::SUBSCRIPTION_IDENTIFIER);
+		allowedProperties += pow2(PropertyId::SUBSCRIPTION_IDENTIFIER);
 		break;
 	case PktType::UNSUBSCRIBE:
 	case PktType::PINGREQ:
 	case PktType::PINGRESP:
 		break;
 	case PktType::DISCONNECT:
-		allowedProperties += __POW2(PropertyId::SESSION_EXPIRY_INTERVAL);
-		allowedProperties += __POW2(PropertyId::SERVER_REFERENCE);
-		allowedProperties += __POW2(PropertyId::REASON_STR);
-		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += pow2(PropertyId::SESSION_EXPIRY_INTERVAL);
+		allowedProperties += pow2(PropertyId::SERVER_REFERENCE);
+		allowedProperties += pow2(PropertyId::REASON_STR);
+		allowedProperties += pow2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::AUTH:
-		allowedProperties += __POW2(PropertyId::AUTH_METHOD);
-		allowedProperties += __POW2(PropertyId::AUTH_DATA);
-		allowedProperties += __POW2(PropertyId::REASON_STR);
-		allowedProperties += __POW2(PropertyId::USER_PROPERTY);
+		allowedProperties += pow2(PropertyId::AUTH_METHOD);
+		allowedProperties += pow2(PropertyId::AUTH_DATA);
+		allowedProperties += pow2(PropertyId::REASON_STR);
+		allowedProperties += pow2(PropertyId::USER_PROPERTY);
 		break;
 	case PktType::RESERVED:
 	default:
@@ -164,19 +169,14 @@ void Properties::resetPacketType(const PktType type)
 	this->computePktFlags();
 }
 
-bool Properties::isAllowed(uint8_t id) const
-{
-	return allowed() & __POW2(id);
-}
-
 bool Properties::isAllowed(PropertyId id) const
 {
-	return isAllowed((uint8_t)id);
+	return allowed() & pow2(id);
 }
 
 bool Properties::isEnabled(PropertyId id) const
 {
-	return enabled() & __POW2(id);
+	return enabled() & pow2(id);
 }
 
 void Properties::append(ByteArray *key, ByteArray *value)
@@ -208,7 +208,7 @@ void Properties::append(PropertyId id, ByteArray *src)
 	}
 
 	if (isEnabled(id)) {
-		auto it = binProps.find(id);
+		auto it = binProps.find((uint8_t)id);
 		if (it == binProps.end()) {
 			throw std::out_of_range("Property enabled but not found");
 		}
@@ -218,10 +218,10 @@ void Properties::append(PropertyId id, ByteArray *src)
 
 		delete item;
 		binProps.erase(it);
-		binProps.insert(BinaryPropPair(id, src));
+		binProps.insert(BinaryPropPair((uint8_t)id, src));
 	} else {
 		/* assume compiler will optimize this... */
-		binProps.insert(BinaryPropPair(id, src));
+		binProps.insert(BinaryPropPair((uint8_t)id, src));
 		enableProperty(id);
 
 		this->_wireSize += propertyIdSize + binaryLenSize + src->size();
@@ -241,7 +241,7 @@ void Properties::append(PropertyId id, uint32_t value, uint32_t wireSize)
 	}
 
 	if (isEnabled(id)) {
-		auto it = numProps.find(id);
+		auto it = numProps.find((uint8_t)id);
 		NumSize &numSize = (*it).second;
 
 		numSize.num = value;
@@ -267,7 +267,7 @@ const ByteArray &Properties::valueBinary(PropertyId id) const
 		return none;
 	}
 
-	auto it = binProps.find(id);
+	auto it = binProps.find((uint8_t)id);
 
 	return *((*it).second);
 }
@@ -278,14 +278,14 @@ uint32_t Properties::valueNum(PropertyId id) const
 		return 0;
 	}
 
-	auto it = numProps.find(id);
+	auto it = numProps.find((uint8_t)id);
 
 	return ((*it).second).num;
 }
 
 void Properties::enableProperty(PropertyId id)
 {
-	this->enabledProperties |= __POW2(id);
+	this->enabledProperties |= pow2(id);
 }
 
 void Properties::payloadFormatIndicator(bool v)
@@ -639,15 +639,15 @@ uint32_t Properties::read(AppBuf &buf)
 	while (bytesAtBeginning - buf.bytesToRead() < propWS) {
 		auto id = buf.readNum8();
 
-		switch (id) {
-		case PAYLOAD_FORMAT_INDICATOR:
-		case REQUEST_PROBLEM_INFORMATION:
-		case REQUEST_RESPONSE_INFORMATION:
-		case MAXIMUM_QOS:
-		case RETAIN_AVAILABLE:
-		case WILDCARD_SUBSCRIPTION_AVAILABLE:
-		case SUBSCRIPTION_IDENTIFIER_AVAILABLE:
-		case SHARED_SUBSCRIPTION_AVAILABLE:
+		switch ((enum PropertyId)id) {
+		case PropertyId::PAYLOAD_FORMAT_INDICATOR:
+		case PropertyId::REQUEST_PROBLEM_INFORMATION:
+		case PropertyId::REQUEST_RESPONSE_INFORMATION:
+		case PropertyId::MAXIMUM_QOS:
+		case PropertyId::RETAIN_AVAILABLE:
+		case PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE:
+		case PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE:
+		case PropertyId::SHARED_SUBSCRIPTION_AVAILABLE:
 			if (buf.bytesToRead() < 1) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
@@ -657,10 +657,10 @@ uint32_t Properties::read(AppBuf &buf)
 			this->append((PropertyId)id, number, fieldLen);
 			break;
 
-		case SERVER_KEEP_ALIVE:
-		case RECEIVE_MAXIMUM:
-		case TOPIC_ALIAS_MAXIMUM:
-		case TOPIC_ALIAS:
+		case PropertyId::SERVER_KEEP_ALIVE:
+		case PropertyId::RECEIVE_MAXIMUM:
+		case PropertyId::TOPIC_ALIAS_MAXIMUM:
+		case PropertyId::TOPIC_ALIAS:
 			if (buf.bytesToRead() < 2) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
@@ -670,10 +670,10 @@ uint32_t Properties::read(AppBuf &buf)
 			this->append((PropertyId)id, number, fieldLen);
 			break;
 
-		case PUBLICATION_EXPIRY_INTERVAL:
-		case SESSION_EXPIRY_INTERVAL:
-		case WILL_DELAY_INTERVAL:
-		case MAXIMUM_PACKET_SIZE:
+		case PropertyId::PUBLICATION_EXPIRY_INTERVAL:
+		case PropertyId::SESSION_EXPIRY_INTERVAL:
+		case PropertyId::WILL_DELAY_INTERVAL:
+		case PropertyId::MAXIMUM_PACKET_SIZE:
 			if (buf.bytesToRead() < 4) {
 				throw std::invalid_argument("Invalid input buffer");
 			}
@@ -683,15 +683,15 @@ uint32_t Properties::read(AppBuf &buf)
 			this->append((PropertyId)id, number, fieldLen);
 			break;
 
-		case CONTENT_TYPE:
-		case RESPONSE_TOPIC:
-		case CORRELATION_DATA:
-		case ASSIGNED_CLIENT_IDENTIFIER:
-		case AUTH_METHOD:
-		case AUTH_DATA:
-		case RESPONSE_INFORMATION:
-		case SERVER_REFERENCE:
-		case REASON_STR:
+		case PropertyId::CONTENT_TYPE:
+		case PropertyId::RESPONSE_TOPIC:
+		case PropertyId::CORRELATION_DATA:
+		case PropertyId::ASSIGNED_CLIENT_IDENTIFIER:
+		case PropertyId::AUTH_METHOD:
+		case PropertyId::AUTH_DATA:
+		case PropertyId::RESPONSE_INFORMATION:
+		case PropertyId::SERVER_REFERENCE:
+		case PropertyId::REASON_STR:
 			value = new ByteArray();
 			rc = buf.readBinary(*value);
 			if (rc != EXIT_SUCCESS) {
@@ -701,7 +701,7 @@ uint32_t Properties::read(AppBuf &buf)
 			this->append((PropertyId)id, value);
 			break;
 
-		case SUBSCRIPTION_IDENTIFIER:
+		case PropertyId::SUBSCRIPTION_IDENTIFIER:
 			rc = buf.readVBI(number, numberWS);
 			if (rc != EXIT_SUCCESS) {
 				goto lb_exit;
@@ -709,7 +709,7 @@ uint32_t Properties::read(AppBuf &buf)
 			this->append((PropertyId)id, number, numberWS);
 			break;
 
-		case USER_PROPERTY:
+		case PropertyId::USER_PROPERTY:
 			key = new ByteArray();
 			value = new ByteArray();
 			rc = buf.readKeyValue(*key, *value);
@@ -765,7 +765,7 @@ uint32_t Properties::write(AppBuf &buf)
 		auto num = (*itNum).second;
 
 		buf.writeNum8(id);
-		if (id != PropertyId::SUBSCRIPTION_IDENTIFIER) {
+		if ((enum PropertyId)id != PropertyId::SUBSCRIPTION_IDENTIFIER) {
 			writeNumProp(buf, num.num, num.size);
 		} else {
 			buf.writeVBI(num.num);
@@ -790,7 +790,7 @@ uint32_t Properties::write(AppBuf &buf)
 		auto key = (*itUser).first;
 		auto value = (*itUser).second;
 
-		buf.writeNum8(PropertyId::USER_PROPERTY);
+		buf.writeNum8((uint8_t)PropertyId::USER_PROPERTY);
 		buf.writeBinary(key->data(), key->size());
 		buf.writeBinary(value->data(), value->size());
 

@@ -95,7 +95,6 @@ public:
 	enum PktType packetType() const { return pktType; }
 
 	bool isAllowed(PropertyId id) const;
-	bool isAllowed(uint8_t id) const;
 
 	bool isEnabled(PropertyId id) const;
 
