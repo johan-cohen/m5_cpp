@@ -123,7 +123,7 @@ uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint8_t remLenWS;
 	uint32_t remLen;
-	int rc;
+	StatusCode rc;
 
 	if (buf.bytesToRead() < 3) {
 		throw std::out_of_range("No enough space in input buffer");
@@ -134,7 +134,7 @@ uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 	}
 
 	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return remLenWS;
 	}
 

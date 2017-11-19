@@ -47,7 +47,6 @@ int test(void)
 {
 	const char str[] = "Hello, World!";
 	m5::AppBuf *buf;
-	int rc;
 
 	buf = new m5::AppBuf(64);
 
@@ -113,8 +112,8 @@ int test(void)
 	buf->writeString(str);
 
 	m5::ByteArray v;
-	rc = buf->readBinary(v);
-	if (rc != EXIT_SUCCESS || v.size() != strlen(str)) {
+	auto rc = buf->readBinary(v);
+	if (rc != m5::StatusCode::SUCCESS || v.size() != strlen(str)) {
 		error_exit("readBinary len");
 	}
 	if (memcmp(v.data(), str, strlen(str)) != 0) {

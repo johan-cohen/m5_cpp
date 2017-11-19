@@ -245,7 +245,7 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 	uint32_t remLen;
 	uint8_t remLenWS;
 	uint8_t first;
-	int rc;
+	StatusCode rc;
 
 	if (buf.bytesToRead() < 4) {
 		throw std::invalid_argument("Invalid input buffer");
@@ -259,7 +259,7 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 	headerFlags(first);
 
 	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return remLenWS;
 	}
 
@@ -268,7 +268,7 @@ uint32_t PktPublish::readFrom(AppBuf &buf)
 	}
 
 	rc = buf.readBinary(this->_topic);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return buf.traversed() - alreadyTraversed;
 	}
 

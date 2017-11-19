@@ -277,7 +277,7 @@ uint32_t PktConnAck::readFrom(AppBuf &buf)
 	uint8_t remLenWS;
 	uint32_t remLen;
 	uint8_t number;
-	int rc;
+	StatusCode rc;
 
 	status(StatusCode::SUCCESS);
 	expectedWireSize(0);
@@ -294,7 +294,7 @@ uint32_t PktConnAck::readFrom(AppBuf &buf)
 	}
 
 	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		status(StatusCode::INVALID_REMLEN_VBI);
 		goto lb_exit;
 	}

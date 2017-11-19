@@ -42,8 +42,6 @@
 
 #include <endian.h>
 #include <cstring>
-#include <cstdlib>
-#include <cerrno>
 
 namespace m5 {
 
@@ -123,58 +121,58 @@ uint32_t AppBuf::readNum32(void)
 	return readNum<uint32_t>();
 }
 
-int AppBuf::readBinary(ByteArray &dst)
+enum StatusCode AppBuf::readBinary(ByteArray &dst)
 {
 	/* two bytes for the length, length could be 0... */
 	if (bytesToRead() < 2) {
-		return -ENOMEM;
+		return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 	}
 
 	auto len = this->readNum16();
 	if (len == 0) {
 		dst.clear();
 
-		return EXIT_SUCCESS;
+		return StatusCode::SUCCESS;
 	}
 
 	if (len > bytesToRead()) {
-		return -ENOMEM;
+		return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 	}
 
 	dst.assign(ptrRead(), ptrRead() + len);
 	this->_offset += len;
 
-	return EXIT_SUCCESS;
+	return StatusCode::SUCCESS;
 }
 
 ByteArray *AppBuf::readBinary(void)
 {
 	ByteArray *data = new ByteArray();
 
-	int rc = readBinary(*data);
+	enum StatusCode rc = readBinary(*data);
 	(void)rc;
 
 	return data;
 }
 
-int AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
+enum StatusCode AppBuf::readKeyValue(ByteArray &key, ByteArray &value)
 {
-	int rc;
+	enum StatusCode rc;
 
 	rc = readBinary(key);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return rc;
 	}
 
 	rc = readBinary(value);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return rc;
 	}
 
-	return EXIT_SUCCESS;
+	return StatusCode::SUCCESS;
 }
 
-int AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
+enum StatusCode AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 {
 	uint32_t multiplier = 1;
 	uint8_t encoded;
@@ -183,11 +181,11 @@ int AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 	wireSize = 0;
 	do {
 		if (bytesToRead() < 1) {
-			return -ENOMEM;
+			return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 		}
 
 		if (multiplier > 128 * 128 * 128) {
-			return -EINVAL;
+			return StatusCode::INVALID_VBI;
 		}
 
 		encoded = readNum8();
@@ -197,7 +195,7 @@ int AppBuf::readVBI(uint32_t &v, uint8_t &wireSize)
 		multiplier *= 128;
 	} while ((encoded & 128) != 0);
 
-	return EXIT_SUCCESS;
+	return StatusCode::SUCCESS;
 }
 
 void AppBuf::readSkip(std::size_t n, bool forward)

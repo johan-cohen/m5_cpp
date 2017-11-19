@@ -617,6 +617,7 @@ bool Properties::sharedSubscriptionAvailable(void) const
 
 uint32_t Properties::read(AppBuf &buf)
 {
+	enum StatusCode rc;
 	uint32_t fieldLen;
 	uint8_t propWSWS;
 	uint32_t propWS;
@@ -624,10 +625,9 @@ uint32_t Properties::read(AppBuf &buf)
 	uint32_t number;
 	ByteArray *value;
 	ByteArray *key;
-	int rc;
 
 	rc = buf.readVBI(propWS, propWSWS);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return propWSWS;
 	}
 
@@ -694,7 +694,7 @@ uint32_t Properties::read(AppBuf &buf)
 		case PropertyId::REASON_STR:
 			value = new ByteArray();
 			rc = buf.readBinary(*value);
-			if (rc != EXIT_SUCCESS) {
+			if (rc != StatusCode::SUCCESS) {
 				delete value;
 				goto lb_exit;
 			}
@@ -703,7 +703,7 @@ uint32_t Properties::read(AppBuf &buf)
 
 		case PropertyId::SUBSCRIPTION_IDENTIFIER:
 			rc = buf.readVBI(number, numberWS);
-			if (rc != EXIT_SUCCESS) {
+			if (rc != StatusCode::SUCCESS) {
 				goto lb_exit;
 			}
 			this->append((PropertyId)id, number, numberWS);
@@ -713,7 +713,7 @@ uint32_t Properties::read(AppBuf &buf)
 			key = new ByteArray();
 			value = new ByteArray();
 			rc = buf.readKeyValue(*key, *value);
-			if (rc != EXIT_SUCCESS) {
+			if (rc != StatusCode::SUCCESS) {
 				delete key;
 				delete value;
 				goto lb_exit;

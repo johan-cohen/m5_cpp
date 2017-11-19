@@ -216,7 +216,7 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	uint8_t remLenWS;
 	uint32_t remLen;
 	uint8_t first;
-	int rc;
+	StatusCode rc;
 
 	if (buf.bytesToRead() < m5::connectPktMinSize) {
 		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
@@ -230,8 +230,8 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	}
 
 	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != EXIT_SUCCESS) {
-		status(StatusCode::INVALID_REMLEN_VBI);
+	if (rc != StatusCode::SUCCESS) {
+		status(rc);
 		goto lb_exit;
 	}
 
@@ -265,20 +265,20 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	properties.read(buf);
 
 	rc = buf.readBinary(_clientId);
-	if (rc != EXIT_SUCCESS || !validClientIdSize(clientId().size())) {
+	if (rc != StatusCode::SUCCESS || !validClientIdSize(clientId().size())) {
 		status(StatusCode::INVALID_CONNECT_PAYLOAD);
 		goto lb_exit;
 	}
 
 	if (flagWillMsg(connectFlags) == true) {
 		rc = buf.readBinary(_willTopic);
-		if (rc != EXIT_SUCCESS) {
+		if (rc != StatusCode::SUCCESS) {
 			status(StatusCode::INVALID_CONNECT_PAYLOAD);
 			goto lb_exit;
 		}
 
 		rc = buf.readBinary(_willMsg);
-		if (rc != EXIT_SUCCESS) {
+		if (rc != StatusCode::SUCCESS) {
 			status(StatusCode::INVALID_CONNECT_PAYLOAD);
 			goto lb_exit;
 		}
@@ -286,7 +286,7 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	if (flagUserName(connectFlags) == true) {
 		rc = buf.readBinary(_userName);
-		if (rc != EXIT_SUCCESS) {
+		if (rc != StatusCode::SUCCESS) {
 			status(StatusCode::INVALID_CONNECT_PAYLOAD);
 			goto lb_exit;
 		}
@@ -294,7 +294,7 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 	if (flagPassword(connectFlags) == true) {
 		rc = buf.readBinary(_password);
-		if (rc != EXIT_SUCCESS) {
+		if (rc != StatusCode::SUCCESS) {
 			status(StatusCode::INVALID_CONNECT_PAYLOAD);
 			goto lb_exit;
 		}

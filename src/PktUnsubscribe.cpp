@@ -106,7 +106,7 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 	std::size_t alreadyTraversed = buf.traversed();
 	uint32_t remLen;
 	uint8_t remLenWS;
-	int rc;
+	StatusCode rc;
 
 	if (buf.bytesToRead() < 7) {
 		throw std::invalid_argument("Invalid input buffer");
@@ -117,7 +117,7 @@ uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 	}
 
 	rc = buf.readVBI(remLen, remLenWS);
-	if (rc != EXIT_SUCCESS) {
+	if (rc != StatusCode::SUCCESS) {
 		return remLenWS;
 	}
 
