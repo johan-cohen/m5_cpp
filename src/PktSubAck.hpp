@@ -50,7 +50,7 @@ public:
 	PktSubAck() : PktSubAckMsg(PktType::SUBACK) {}
 	PktSubAck(AppBuf &buf) : PktSubAckMsg(PktType::SUBACK, buf) {}
 
-	virtual ~PktSubAck() {}
+	~PktSubAck() {}
 };
 
 }

@@ -50,7 +50,7 @@ public:
 	PktUnsubAck() : PktSubAckMsg(PktType::UNSUBACK) {}
 	PktUnsubAck(AppBuf &buf) : PktSubAckMsg(PktType::UNSUBACK, buf) {}
 
-	virtual ~PktUnsubAck() {}
+	~PktUnsubAck() {}
 };
 
 }

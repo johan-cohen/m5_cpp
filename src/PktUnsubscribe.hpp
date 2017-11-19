@@ -60,7 +60,7 @@ private:
 public:
 	PktUnsubscribe();
 	PktUnsubscribe(AppBuf &buf);
-	virtual ~PktUnsubscribe();
+	~PktUnsubscribe();
 
 	void packetId(uint16_t id) { this->_packetId = id; }
 	uint16_t packetId(void) { return this->_packetId; }
