@@ -192,7 +192,7 @@ public:
 	uint32_t wireSize(void) const { return _wireSize; }
 
 	uint32_t read(AppBuf &buf);
-	uint32_t write(AppBuf &buf) WARN_UNUSED_RC;
+	uint32_t write(AppBuf &buf);
 };
 
 }

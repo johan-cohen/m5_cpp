@@ -42,10 +42,9 @@
 
 namespace m5 {
 
-PktPubMsg::PktPubMsg(PktType type, uint8_t reserved) : properties(type)
+PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved) : Packet(type, reserved)
 {
-	this->_packetType = type;
-	this->_reserved = reserved;
+	Packet::hasProperties = true;
 }
 
 void PktPubMsg::packetId(uint16_t id)
@@ -93,45 +92,34 @@ const UserProperty &PktPubMsg::userProperty(void) const
 	return properties.userProperty();
 }
 
+enum StatusCode PktPubMsg::writeVariableHeader(AppBuf &buf)
+{
+	buf.writeNum16(this->packetId());
+	buf.writeNum8((uint8_t)this->reasonCode());
+
+	if (properties.write(buf) == 0) {
+		return StatusCode::PROPERTY_WRITE_ERROR;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktPubMsg::writePayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t PktPubMsg::writeTo(AppBuf &buf)
 {
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
-
 	if (this->packetId() == 0) {
 		throw std::invalid_argument("Invalid packet Id");
 	}
 
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		return 0;
-	}
+	Packet::variableHeaderSize = 2 + 1;
 
-	remLen = 2 + 1 + propWSWS + propWS;
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		return 0;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	buf.writeNum8(m5::firstByte(_packetType, _reserved));
-	buf.writeVBI(remLen);
-	buf.writeNum16(this->packetId());
-	buf.writeNum8((uint8_t)this->reasonCode());
-	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
-	}
-
-	return fullPktSize;
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktPubMsg::readFrom(AppBuf &buf)
@@ -145,7 +133,7 @@ uint32_t PktPubMsg::readFrom(AppBuf &buf)
 		throw std::invalid_argument("Invalid input buffer");
 	}
 
-	if (buf.readNum8() != m5::firstByte(this->_packetType, this->_reserved)) {
+	if (buf.readNum8() != m5::firstByte(packetType(), fixedHeaderReserved)) {
 		throw std::invalid_argument("Invalid packet type");
 	}
 

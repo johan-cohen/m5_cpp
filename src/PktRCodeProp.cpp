@@ -44,9 +44,15 @@
 
 namespace m5 {
 
-PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) :
-	_packetType(type), properties(type)
+PktRCodeProp::PktRCodeProp(PktType type) : Packet(type, 0x00)
 {
+	Packet::hasProperties = true;
+}
+
+PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) : Packet(type, 0x00)
+{
+	Packet::hasProperties = true;
+
 	this->readFrom(buf);
 }
 
@@ -87,40 +93,29 @@ const UserProperty &PktRCodeProp::userProperty(void) const
 	return properties.userProperty();
 }
 
+enum StatusCode PktRCodeProp::writeVariableHeader(AppBuf &buf)
+{
+	buf.writeNum8(this->_reasonCode);
+
+	if (properties.write(buf) == 0) {
+		return StatusCode::PROPERTY_WRITE_ERROR;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktRCodeProp::writePayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 {
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
+	Packet::variableHeaderSize = 1;
 
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		return 0;
-	}
-
-	remLen = 1 + propWSWS + propWS;
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		return 0;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	buf.writeNum8(m5::firstByte(this->_packetType, 0));
-	buf.writeVBI(remLen);
-	buf.writeNum8(this->_reasonCode);
-	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
-	}
-
-	return fullPktSize;
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktRCodeProp::readFrom(AppBuf &buf)

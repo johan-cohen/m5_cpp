@@ -38,61 +38,76 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "test_Common.hpp"
-#include "PktPubAck.hpp"
-#include "PktPubRec.hpp"
-#include "PktPubRel.hpp"
-#include "PktPubComp.hpp"
+#include "Packet.hpp"
 
-#include <stdexcept>
+namespace m5 {
 
-template <typename T> int test(void)
+Packet::Packet(enum PktType type, uint8_t fixedHeaderReserved) :
+	_packetType(type),
+	fixedHeaderReserved(fixedHeaderReserved),
+	properties(type)
 {
-	uint16_t u16 = 0xABCD;
-	m5::AppBuf buf(16);
-	uint32_t bytes;
-	T *pub;
-
-	pub = new T();
-	pub->packetId(u16);
-	pub->reasonCode(m5::ReasonCode::SERVER_BUSY);
-
-	bytes = pub->writeTo(buf);
-	if (bytes == 0) {
-		throw std::logic_error("write");
-	}
-
-	T pubRead;
-	pubRead.readFrom(buf);
-
-	if (pub->reasonCode() != pubRead.reasonCode()) {
-		throw std::logic_error("read: Reason Code");
-	}
-	if (pub->packetId() != pubRead.packetId()) {
-		throw std::logic_error("read: Packet Id");
-	}
-
-	delete pub;
-
-	return 0;
 }
 
-int main(void)
+uint32_t Packet::writeTo(AppBuf &buf)
 {
-	int rc;
+	const auto initialLength = buf.length();
+	uint32_t fullPktSize;
+	enum StatusCode rc;
+	uint8_t remLenWS;
+	uint32_t remLen;
 
-	rc = test<m5::PktPubAck>();
-	test_rc(rc, "PktPubAck");
+	status(StatusCode::SUCCESS);
+	expectedWireSize(0);
 
-	rc = test<m5::PktPubRec>();
-	test_rc(rc, "PktPubRec");
+	if (hasProperties) {
+		uint32_t propWSWS;
 
-	rc = test<m5::PktPubRel>();
-	test_rc(rc, "PktPubRel");
+		propWSWS = VBIWireSize(properties.wireSize());
+		if (propWSWS == 0) {
+			status(StatusCode::INVALID_PROPERTY_VBI);
+			goto lb_exit;
+		}
 
-	rc = test<m5::PktPubComp>();
-	test_rc(rc, "PktPubComp");
+		variableHeaderSize += propWSWS + properties.wireSize();
+	}
 
-	return 0;
+	remLen = variableHeaderSize + payloadSize;
+	remLenWS  = VBIWireSize(remLen);
+	if (remLenWS == 0) {
+		status(StatusCode::INVALID_REMLEN_VBI);
+		goto lb_exit;
+	}
+
+	fullPktSize = 1 + remLenWS + remLen;
+	expectedWireSize(fullPktSize);
+	if (buf.bytesToWrite() < expectedWireSize()) {
+		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
+		goto lb_exit;
+	}
+
+	buf.writeNum8(m5::firstByte(packetType(), fixedHeaderReserved));
+	buf.writeVBI(remLen);
+
+	rc = writeVariableHeader(buf);
+	if (rc != StatusCode::SUCCESS) {
+		status(rc);
+		goto lb_exit;
+	}
+
+	rc = writePayload(buf);
+	if (rc != StatusCode::SUCCESS) {
+		status(rc);
+		goto lb_exit;
+	}
+
+	if (buf.length() - initialLength != fullPktSize) {
+		status(StatusCode::FINISHED_WRITING_INVALID_LENGTH);
+	}
+
+lb_exit:
+	return buf.length() - initialLength;
+}
+
 }
 

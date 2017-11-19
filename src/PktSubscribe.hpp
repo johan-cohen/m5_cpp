@@ -61,15 +61,14 @@ public:
 class PktSubscribe : public Packet {
 private:
 	std::list<TopicOptions *> _topics;
-	uint32_t payloadWS = 0;
 	uint16_t _packetId = 0;
 
-	void writePayload(AppBuf &buf);
+	enum StatusCode writeVariableHeader(AppBuf &buf) override;
+	enum StatusCode writePayload(AppBuf &buf) override;
+
 	void readPayload(AppBuf &buf);
 
-	Properties properties;
 public:
-
 	PktSubscribe();
 	PktSubscribe(AppBuf &buf);
 	~PktSubscribe();
@@ -85,9 +84,8 @@ public:
 	void subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void) const;
 
-	uint32_t writeTo(AppBuf &buf) override WARN_UNUSED_RC;
+	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const override { return (uint32_t)PktType::SUBSCRIBE; }
 };
 
 }

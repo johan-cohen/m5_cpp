@@ -128,7 +128,21 @@ uint32_t PktConnect::payloadWireSize(void) const
 	return wireSize;
 }
 
-void PktConnect::writePayload(AppBuf &buf)
+enum StatusCode PktConnect::writeVariableHeader(AppBuf &buf)
+{
+	buf.writeString(protocolStr);
+	buf.writeNum8(protocolVersion5);
+	buf.writeNum8(packConnectFlags());
+	buf.writeNum16(keepAlive());
+
+	if (properties.write(buf) == 0) {
+		return StatusCode::PROPERTY_WRITE_ERROR;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktConnect::writePayload(AppBuf &buf)
 {
 	buf.writeBinary(clientId().data(), clientId().size());
 
@@ -144,6 +158,8 @@ void PktConnect::writePayload(AppBuf &buf)
 	if (password().size() > 0) {
 		buf.writeBinary(password().data(), password().size());
 	}
+
+	return StatusCode::SUCCESS;
 }
 
 void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
@@ -152,20 +168,31 @@ void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 	this->cleanStart(cleanStart);
 }
 
-PktConnect::PktConnect(AppBuf &buf) : properties(PktType::CONNECT)
+PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
 {
+	Packet::hasProperties = true;
+}
+
+PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
+{
+	Packet::hasProperties = true;
+
 	this->readFrom(buf);
 }
 
 PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
-		       properties(PktType::CONNECT)
+		       Packet(PktType::CONNECT, 0x0)
 {
+	Packet::hasProperties = true;
+
 	init(clientId, len, cleanStart);
 }
 
 PktConnect::PktConnect(const char *clientId, bool cleanStart) :
-		       properties(PktType::CONNECT)
+		       Packet(PktType::CONNECT, 0x0)
 {
+	Packet::hasProperties = true;
+
 	init((const uint8_t *)clientId, strlen(clientId), cleanStart);
 }
 
@@ -175,52 +202,10 @@ PktConnect::~PktConnect()
 
 uint32_t PktConnect::writeTo(AppBuf &buf)
 {
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t payloadWS;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
+	Packet::variableHeaderSize = 1 + 2 + 4 + 1 + 2;
+	Packet::payloadSize = payloadWireSize();
 
-	status(StatusCode::SUCCESS);
-	expectedWireSize(0);
-
-	payloadWS = payloadWireSize();
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		status(StatusCode::INVALID_PROPERTY_VBI);
-		goto lb_exit;
-	}
-
-	remLen = 1 + 2 + 4 + 1 + 2 + propWSWS + propWS + payloadWS;
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		status(StatusCode::INVALID_REMLEN_VBI);
-		goto lb_exit;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	expectedWireSize(fullPktSize);
-	if (buf.bytesToWrite() < expectedWireSize()) {
-		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
-		goto lb_exit;
-	}
-
-	buf.writeNum8(m5::firstByte(PktType::CONNECT));
-	buf.writeVBI(remLen);
-	buf.writeString(protocolStr);
-	buf.writeNum8(protocolVersion5);
-	buf.writeNum8(packConnectFlags());
-	buf.writeNum16(keepAlive());
-	if (properties.write(buf) != propWSWS + propWS) {
-		status(StatusCode::PROPERTY_WRITE_ERROR);
-	}
-	writePayload(buf);
-
-lb_exit:
-	return buf.length() - initialLength;
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktConnect::readFrom(AppBuf &buf)
@@ -323,11 +308,6 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 
 lb_exit:
 	return buf.traversed() - alreadyTraversed;
-}
-
-uint32_t PktConnect::getId(void) const
-{
-	return (uint32_t)PktType::CONNECT;
 }
 
 void PktConnect::clientId(const uint8_t *data, uint16_t size)

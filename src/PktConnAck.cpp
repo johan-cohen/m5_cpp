@@ -43,10 +43,12 @@
 namespace m5 {
 
 PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
-		       properties(PktType::CONNACK)
+		       Packet(PktType::CONNACK, 0x00)
 {
 	this->_sessionPresent = sessionPresent;
 	this->_reasonCode = (uint8_t)reasonCode;
+
+	Packet::hasProperties = true;
 }
 
 void PktConnAck::assignedClientIdentifier(const uint8_t *data, uint16_t size)
@@ -240,50 +242,33 @@ bool PktConnAck::sharedSubscriptionAvailable(void) const
 	return properties.sharedSubscriptionAvailable();
 }
 
-uint32_t PktConnAck::writeTo(AppBuf &buf)
+enum StatusCode PktConnAck::writeVariableHeader(AppBuf &buf)
 {
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
-
-	status(StatusCode::SUCCESS);
-	expectedWireSize(0);
-
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		status(StatusCode::INVALID_PROPERTY_VBI);
-		goto lb_exit;
-	}
-
-	remLen = 2 + propWSWS + propWS;
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		status(StatusCode::INVALID_REMLEN_VBI);
-		goto lb_exit;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	expectedWireSize(fullPktSize);
-	if (buf.bytesToWrite() < expectedWireSize()) {
-		status(StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER);
-		goto lb_exit;
-	}
-
-	buf.writeNum8(m5::firstByte(PktType::CONNACK));
-	buf.writeVBI(remLen);
 	buf.writeNum8(this->_sessionPresent ? 0x01 : 0x00);
 	buf.writeNum8(this->_reasonCode);
-	if (properties.write(buf) != propWSWS + propWS) {
+
+	if (properties.write(buf) == 0) {
 		status(StatusCode::PROPERTY_WRITE_ERROR);
 	}
 
-lb_exit:
-	return buf.length() - initialLength;
+	return StatusCode::SUCCESS;
 }
+
+enum StatusCode PktConnAck::writePayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
+
+uint32_t PktConnAck::writeTo(AppBuf &buf)
+{
+	Packet::variableHeaderSize = 1 + 1;
+
+	return Packet::writeTo(buf);
+}
+
 
 uint32_t PktConnAck::readFrom(AppBuf &buf)
 {

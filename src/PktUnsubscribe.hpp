@@ -53,11 +53,12 @@ class PktUnsubscribe : public Packet
 {
 private:
 	std::list<ByteArray *> _topics;
-	uint32_t payloadSize = 0;
 	uint16_t _packetId = 0;
 
+	virtual enum StatusCode writeVariableHeader(AppBuf &buf) override;
+	virtual enum StatusCode writePayload(AppBuf &buf) override;
 public:
-	PktUnsubscribe() {}
+	PktUnsubscribe();
 	PktUnsubscribe(AppBuf &buf);
 	virtual ~PktUnsubscribe();
 
@@ -67,9 +68,8 @@ public:
 	void append(const char *str);
 	const std::list<ByteArray *> &topics() const { return _topics; }
 
-	uint32_t writeTo(AppBuf &buf) override WARN_UNUSED_RC;
+	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const override { return (uint32_t)PktType::UNSUBSCRIBE; }
 };
 
 }

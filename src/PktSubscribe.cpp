@@ -46,7 +46,7 @@
 namespace m5 {
 
 TopicOptions::TopicOptions(const uint8_t *topic, uint16_t size, uint8_t options) :
-	                   topic(topic, topic + size),
+			   topic(topic, topic + size),
 			   options(options)
 {
 }
@@ -57,12 +57,15 @@ TopicOptions::TopicOptions(const char *topic, uint8_t options) :
 {
 }
 
-PktSubscribe::PktSubscribe() : properties(PktType::SUBSCRIBE)
+PktSubscribe::PktSubscribe() : Packet(PktType::SUBSCRIBE, 0x02)
 {
+	hasProperties = true;
 }
 
-PktSubscribe::PktSubscribe(AppBuf &buf) : properties(PktType::SUBSCRIBE)
+PktSubscribe::PktSubscribe(AppBuf &buf) : Packet(PktType::SUBSCRIBE, 0x02)
 {
+	hasProperties = true;
+
 	this->readFrom(buf);
 }
 
@@ -82,7 +85,7 @@ void PktSubscribe::append(const uint8_t *topic, uint16_t size, uint8_t options)
 	TopicOptions *item;
 
 	item = new TopicOptions(topic, size, options);
-	payloadWS += stringLenSize + item->topic.size() + 1;
+	Packet::payloadSize += stringLenSize + item->topic.size() + 1;
 
 	this->_topics.push_back(item);
 }
@@ -103,7 +106,18 @@ uint32_t PktSubscribe::subscriptionIdentifier(void) const
 	return properties.subscriptionIdentifier();
 }
 
-void PktSubscribe::writePayload(AppBuf &buf)
+enum StatusCode PktSubscribe::writeVariableHeader(AppBuf &buf)
+{
+	buf.writeNum16(packetId());
+
+	if (properties.write(buf) == 0) {
+		return StatusCode::PROPERTY_WRITE_ERROR;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktSubscribe::writePayload(AppBuf &buf)
 {
 	auto it = _topics.begin();
 
@@ -115,51 +129,19 @@ void PktSubscribe::writePayload(AppBuf &buf)
 
 		it++;
 	}
+
+	return StatusCode::SUCCESS;
 }
 
 uint32_t PktSubscribe::writeTo(AppBuf &buf)
 {
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
-
-	if (payloadWS == 0) {
-		throw std::invalid_argument("No topics in SUBSCRIBE msg");
-	}
-
 	if (packetId() == 0) {
 		throw std::invalid_argument("Invalid Packet ID");
 	}
 
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		return 0;
-	}
+	Packet::variableHeaderSize = 2;
 
-	remLen = 2 + propWSWS + propWS + payloadWS;
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		return 0;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	buf.writeNum8(m5::firstByte(PktType::SUBSCRIBE, 0x02));
-	buf.writeVBI(remLen);
-	buf.writeNum16(packetId());
-	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
-	}
-	writePayload(buf);
-
-	return fullPktSize;
+	return Packet::writeTo(buf);
 }
 
 void PktSubscribe::readPayload(AppBuf &buf)
@@ -210,9 +192,9 @@ uint32_t PktSubscribe::readFrom(AppBuf &buf)
 	this->packetId(buf.readNum16());
 	properties.read(buf);
 
-	this->payloadWS = buf.bytesToRead();
+	Packet::payloadSize = buf.bytesToRead();
 	readPayload(buf);
-	this->payloadWS -= buf.bytesToRead();
+	Packet::payloadSize -= buf.bytesToRead();
 
 	uint32_t fullPktSize = 1 + remLenWS + remLen;
 	if (buf.traversed() - alreadyTraversed != fullPktSize) {

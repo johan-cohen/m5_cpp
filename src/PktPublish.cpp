@@ -45,9 +45,9 @@
 
 namespace m5 {
 
-PktPublish::PktPublish() : properties(PktType::PUBLISH)
+PktPublish::PktPublish() : Packet(PktType::PUBLISH, 0x00)
 {
-
+	hasProperties = true;
 }
 
 PktPublish::~PktPublish()
@@ -185,60 +185,6 @@ uint8_t PktPublish::headerFlags(void)
 	return flags;
 }
 
-uint32_t PktPublish::writeTo(AppBuf &buf)
-{
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
-
-	if (this->QoS() != PktQoS::QoS0 && this->packetId() == 0) {
-		throw std::out_of_range("Invalid packet Id for this QoS level");
-	}
-
-	if (this->topic().size() == 0) {
-		throw std::out_of_range("Invalid topic name");
-	}
-
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		return 0;
-	}
-	remLen = stringLenSize + topic().size() +
-		 propWSWS + propWS + payload().size();
-	if (this->QoS() != PktQoS::QoS0) {
-		remLen += 2;
-	}
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		return 0;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	buf.writeNum8(m5::firstByte(PktType::PUBLISH, headerFlags()));
-	buf.writeVBI(remLen);
-	buf.writeBinary(this->topic());
-	if (this->QoS() != PktQoS::QoS0) {
-		buf.writeNum16(this->packetId());
-	}
-	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
-	}
-
-	if (this->payload().size() > 0) {
-		buf.write(this->payload().data(), this->payload().size());
-	}
-
-	return fullPktSize;
-}
-
 void PktPublish::headerFlags(uint8_t firstByte)
 {
 	this->retain(firstByte & 0x01);
@@ -248,6 +194,49 @@ void PktPublish::headerFlags(uint8_t firstByte)
 	if ((int)this->QoS() >= 0x03) {
 		throw std::invalid_argument("Invalid QoS");
 	}
+}
+
+enum StatusCode PktPublish::writeVariableHeader(AppBuf &buf)
+{
+	buf.writeBinary(this->topic());
+	if (this->QoS() != PktQoS::QoS0) {
+		buf.writeNum16(this->packetId());
+	}
+
+	if (properties.write(buf) == 0) {
+		return StatusCode::PROPERTY_WRITE_ERROR;
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktPublish::writePayload(AppBuf &buf)
+{
+	if (this->payload().size() > 0) {
+		buf.write(this->payload().data(), this->payload().size());
+	}
+
+	return StatusCode::SUCCESS;
+}
+
+uint32_t PktPublish::writeTo(AppBuf &buf)
+{
+	if (this->QoS() != PktQoS::QoS0 && this->packetId() == 0) {
+		throw std::out_of_range("Invalid packet Id for this QoS level");
+	}
+
+	if (this->topic().size() == 0) {
+		throw std::out_of_range("Invalid topic name");
+	}
+
+	Packet::fixedHeaderReserved = headerFlags();
+	Packet::variableHeaderSize = stringLenSize + topic().size();
+	if (this->QoS() != PktQoS::QoS0) {
+		Packet::variableHeaderSize += 2;
+	}
+	Packet::payloadSize = this->payload().size();
+
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktPublish::readFrom(AppBuf &buf)

@@ -44,12 +44,15 @@
 
 namespace m5 {
 
-PktSubAckMsg::PktSubAckMsg(PktType type) : _packetType(type), properties(type)
+PktSubAckMsg::PktSubAckMsg(PktType type) :Packet(type, 0x00)
 {
+	Packet::hasProperties = true;
 }
 
-PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : _packetType(type), properties(type)
+PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
+	Packet::hasProperties = true;
+
 	this->readFrom(buf);
 }
 
@@ -85,47 +88,32 @@ const UserProperty &PktSubAckMsg::userProperty(void) const
 	return properties.userProperty();
 }
 
-uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
+enum StatusCode PktSubAckMsg::writeVariableHeader(AppBuf &buf)
 {
-	const auto initialLength = buf.length();
-	uint32_t fullPktSize;
-	uint32_t propWSWS;
-	uint32_t propWS;
-	uint32_t remLenWS;
-	uint32_t remLen;
-
-	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
-	}
-
-	propWS = properties.wireSize();
-	propWSWS = VBIWireSize(propWS);
-	if (propWSWS == 0) {
-		return 0;
-	}
-
-	remLen = 2 + propWSWS + propWS + _reasonCodes.size();
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		return 0;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	buf.writeNum8(m5::firstByte(this->_packetType));
-	buf.writeVBI(remLen);
 	buf.writeNum16(this->packetId());
-	if (properties.write(buf) != propWSWS + propWS) {
-		return buf.length() - initialLength;
+
+	if (properties.write(buf) == 0) {
+		return StatusCode::PROPERTY_WRITE_ERROR;
 	}
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktSubAckMsg::writePayload(AppBuf &buf)
+{
 	for (auto it = _reasonCodes.begin(); it != _reasonCodes.end(); it++) {
 		buf.writeNum8(*it);
 	}
 
-	return fullPktSize;
+	return StatusCode::SUCCESS;
+}
+
+uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
+{
+	Packet::variableHeaderSize = 2;
+	Packet::payloadSize = _reasonCodes.size();
+
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktSubAckMsg::readFrom(AppBuf &buf)

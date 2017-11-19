@@ -53,7 +53,8 @@ private:
 	bool _sessionPresent = false;
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
 
-	Properties properties;
+	enum StatusCode writeVariableHeader(AppBuf &buf) override;
+	enum StatusCode writePayload(AppBuf &buf) override;
 
 public:
 	PktConnAck(bool sessionPresent = false,
@@ -117,8 +118,8 @@ public:
 	void sharedSubscriptionAvailable(bool v);
 	bool sharedSubscriptionAvailable(void) const;
 
-	uint32_t writeTo(AppBuf &buf);
-	uint32_t readFrom(AppBuf &buf);
+	uint32_t writeTo(AppBuf &buf) override;
+	uint32_t readFrom(AppBuf &buf) override;
 	uint32_t getId(void) const { return (uint32_t)PktType::CONNACK; }
 };
 

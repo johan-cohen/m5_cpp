@@ -49,16 +49,15 @@ namespace m5 {
 
 class PktPubMsg : public Packet
 {
-protected:
-	PktPubMsg(PktType type, uint8_t reserved = 0);
-
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
-	PktType _packetType = PktType::RESERVED;
-	uint8_t _reserved = 0;
 	uint16_t _packetId = 0;
 
-	Properties properties;
+	enum StatusCode writeVariableHeader(AppBuf &buf) override;
+	enum StatusCode writePayload(AppBuf &buf) override;
+
+protected:
+	PktPubMsg(enum PktType type, uint8_t reserved = 0);
 
 public:
 	virtual ~PktPubMsg() {}
@@ -78,9 +77,8 @@ public:
 	void userProperty(const char *key, const char *val);
 	const UserProperty &userProperty(void) const;
 
-	uint32_t writeTo(AppBuf &buf) override WARN_UNUSED_RC;
+	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const override { return (uint32_t)_packetType; }
 };
 
 }

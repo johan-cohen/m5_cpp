@@ -66,7 +66,8 @@ private:
 	uint8_t packConnectFlags(void);
 	uint32_t payloadWireSize(void) const;
 
-	void writePayload(AppBuf &buf);
+	enum StatusCode writeVariableHeader(AppBuf &buf) override;
+	enum StatusCode writePayload(AppBuf &buf) override;
 
 	void init(const uint8_t *clientId, uint16_t len, bool cleanStart);
 
@@ -79,10 +80,8 @@ private:
 
 	bool validClientIdSize(uint16_t size);
 
-	Properties properties;
-
 public:
-	PktConnect() : properties(PktType::CONNECT) {}
+	PktConnect();
 	PktConnect(AppBuf &buf);
 	PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart = true);
 	PktConnect(const char *clientId, bool cleanStart = true);
@@ -90,7 +89,6 @@ public:
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const override;
 
 	uint16_t keepAlive(void) const { return this->_keepAlive; }
 	void keepAlive(uint16_t keepAlive);

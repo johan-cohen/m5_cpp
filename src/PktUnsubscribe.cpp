@@ -45,7 +45,11 @@
 
 namespace m5 {
 
-PktUnsubscribe::PktUnsubscribe(AppBuf &buf)
+PktUnsubscribe::PktUnsubscribe() : Packet(PktType::UNSUBSCRIBE, 0x02)
+{
+}
+
+PktUnsubscribe::PktUnsubscribe(AppBuf &buf) : Packet(PktType::UNSUBSCRIBE, 0x02)
 {
 	this->readFrom(buf);
 }
@@ -69,37 +73,32 @@ void PktUnsubscribe::append(const char *str)
 	payloadSize += stringLenSize + item->size();
 }
 
-uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
+enum StatusCode PktUnsubscribe::writeVariableHeader(AppBuf &buf)
 {
-	uint32_t fullPktSize;
-	uint32_t remLenWS;
-	uint32_t remLen;
-
-	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
-	}
-
-	remLen = 2 + this->payloadSize;
-	remLenWS = VBIWireSize(remLen);
-	if (remLenWS == 0) {
-		return 0;
-	}
-
-	fullPktSize = 1 + remLenWS + remLen;
-	if (buf.bytesToWrite() < fullPktSize) {
-		throw std::out_of_range("No enough space in buffer");
-	}
-
-	buf.writeNum8(m5::firstByte(PktType::UNSUBSCRIBE, 0x02));
-	buf.writeVBI(remLen);
 	buf.writeNum16(this->packetId());
 
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktUnsubscribe::writePayload(AppBuf &buf)
+{
 	for (auto it = _topics.begin(); it != _topics.end(); it++) {
 		ByteArray *item = *it;
 		buf.writeBinary(*item);
 	}
 
-	return fullPktSize;
+	return StatusCode::SUCCESS;
+}
+
+uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
+{
+	if (this->packetId() == 0) {
+		throw std::invalid_argument("Invalid packet Id");
+	}
+
+	Packet::variableHeaderSize = 2;
+
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktUnsubscribe::readFrom(AppBuf &buf)

@@ -41,6 +41,7 @@
 #ifndef __PACKET_HPP__
 #define __PACKET_HPP__
 
+#include "Properties.hpp"
 #include "Common.hpp"
 #include "AppBuf.hpp"
 
@@ -52,14 +53,28 @@ private:
 	uint32_t _expectedWireSize = 0;
 
 protected:
+	enum PktType _packetType;
+	uint8_t fixedHeaderReserved = 0x00;
+	uint32_t variableHeaderSize = 0;
+
+	bool hasProperties = false;
+	Properties properties;
+	uint32_t payloadSize = 0;
+
+	virtual enum StatusCode writeVariableHeader(AppBuf &buf) = 0;
+	virtual enum StatusCode writePayload(AppBuf &buf) = 0;
+
 	virtual void status(enum StatusCode ec) { _status = ec; }
 	virtual void expectedWireSize(uint32_t ws) { _expectedWireSize = ws; }
 
+	Packet(enum PktType type, uint8_t fixedHeaderReserved = 0x00);
+
 public:
 	virtual ~Packet() {}
-	virtual uint32_t writeTo(AppBuf &buf) = 0;
+	virtual uint32_t writeTo(AppBuf &buf);
 	virtual uint32_t readFrom(AppBuf &buf) = 0;
-	virtual uint32_t getId(void) const = 0;
+
+	enum PktType packetType(void) const { return _packetType; }
 
 	virtual enum StatusCode status() const { return _status; }
 	virtual uint32_t expectedWireSize() const { return _expectedWireSize; }

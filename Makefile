@@ -79,6 +79,7 @@ $(OBJS_DIR)/test_%.o:			\
 	$(SRCS_DIR)/%.cpp		\
 	$(SRCS_DIR)/%.hpp		\
 	$(SRCS_DIR)/AppBuf.hpp		\
+	$(SRCS_DIR)/Packet.hpp		\
 	$(SRCS_DIR)/test_Common.hpp	\
 	$(SRCS_DIR)/Properties.hpp	\
 	$(SRCS_DIR)/Common.hpp
@@ -95,7 +96,8 @@ $(BINS_DIR)/test_PktPubMsg:		\
 	$(OBJS_DIR)/PktPubAck.o		\
 	$(OBJS_DIR)/PktPubRec.o		\
 	$(OBJS_DIR)/Properties.o	\
-	$(OBJS_DIR)/AppBuf.o
+	$(OBJS_DIR)/AppBuf.o		\
+	$(OBJS_DIR)/Packet.o
 	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) -o $@ $^
 
 $(BINS_DIR)/test_PktRCodeProp:		\
@@ -104,14 +106,16 @@ $(BINS_DIR)/test_PktRCodeProp:		\
 	$(OBJS_DIR)/PktAuth.o		\
 	$(OBJS_DIR)/PktDisconnect.o	\
 	$(OBJS_DIR)/Properties.o	\
-	$(OBJS_DIR)/AppBuf.o
+	$(OBJS_DIR)/AppBuf.o		\
+	$(OBJS_DIR)/Packet.o
 	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) -o $@ $^
 
 $(BINS_DIR)/test_%:			\
 	$(OBJS_DIR)/test_%.o		\
 	$(OBJS_DIR)/%.o			\
 	$(OBJS_DIR)/Properties.o	\
-	$(OBJS_DIR)/AppBuf.o
+	$(OBJS_DIR)/AppBuf.o		\
+	$(OBJS_DIR)/Packet.o
 	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) -o $@ $^
 
 tests: $(TESTS)

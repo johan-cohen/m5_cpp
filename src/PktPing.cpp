@@ -44,16 +44,30 @@
 
 namespace m5 {
 
+PktPing::PktPing(PktType type) : Packet(type, 0x00)
+{
+	Packet::hasProperties = false;
+}
+
+enum StatusCode PktPing::writeVariableHeader(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
+enum StatusCode PktPing::writePayload(AppBuf &buf)
+{
+	(void)buf;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t PktPing::writeTo(AppBuf &buf)
 {
-	if (buf.bytesToWrite() < 2) {
-		throw std::out_of_range("No enough space in buffer");
-	}
+	Packet::variableHeaderSize = 0;
 
-	buf.writeNum8(m5::firstByte(this->_packetType));
-	buf.writeNum8(0);
-
-	return 2;
+	return Packet::writeTo(buf);
 }
 
 uint32_t PktPing::readFrom(AppBuf &buf)

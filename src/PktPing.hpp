@@ -49,17 +49,17 @@ namespace m5 {
 
 class PktPing : public Packet {
 protected:
-	PktPing(PktType type) : _packetType(type) {}
+	PktPing(enum PktType type);
 
 private:
-	PktType _packetType;
+	enum StatusCode writeVariableHeader(AppBuf &buf) override;
+	enum StatusCode writePayload(AppBuf &buf) override;
 
 public:
 	virtual ~PktPing() {}
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const override { return (uint32_t)_packetType; }
 };
 
 class PktPingReq : public PktPing {
