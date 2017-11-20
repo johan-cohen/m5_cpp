@@ -97,7 +97,6 @@ public:
 	void topicAliasMaximum(uint16_t v);
 	uint16_t topicAliasMaximum(void) const;
 
-
 	void maximumQoS(PktQoS qos);
 	PktQoS maximumQoS(void) const;
 
