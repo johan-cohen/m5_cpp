@@ -106,9 +106,9 @@ enum StatusCode PktSubAckMsg::writePayload(AppBuf &buf)
 
 uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 {
-	Packet::hasProperties = true;
-	Packet::variableHeaderSize = 2;
 	Packet::payloadSize = _reasonCodes.size();
+	Packet::variableHeaderSize = 2;
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
