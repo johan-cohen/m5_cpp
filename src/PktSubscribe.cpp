@@ -59,19 +59,10 @@ TopicOptions::TopicOptions(const char *topic, uint8_t options) :
 
 PktSubscribe::PktSubscribe() : Packet(PktType::SUBSCRIBE, 0x02)
 {
-	hasProperties = true;
-
-	minBufferSize = 9;
-	minRemLen = 7;
 }
 
 PktSubscribe::PktSubscribe(AppBuf &buf) : Packet(PktType::SUBSCRIBE, 0x02)
 {
-	hasProperties = true;
-
-	minBufferSize = 9;
-	minRemLen = 7;
-
 	this->readFrom(buf);
 }
 
@@ -146,6 +137,7 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 	}
 
 	Packet::variableHeaderSize = 2;
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
@@ -183,6 +175,9 @@ enum StatusCode PktSubscribe::readPayload(AppBuf &buf)
 
 uint32_t PktSubscribe::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 9;
+	Packet::minRemLen = 7;
+
 	return Packet::readFrom(buf);
 }
 

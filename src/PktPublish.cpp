@@ -47,15 +47,10 @@ namespace m5 {
 
 PktPublish::PktPublish() : Packet(PktType::PUBLISH, 0x00)
 {
-	hasProperties = true;
-
-	minBufferSize = 6;
-	minRemLen = 4;
 }
 
 PktPublish::~PktPublish()
 {
-
 }
 
 void PktPublish::topic(const uint8_t *data, uint16_t size)
@@ -221,6 +216,7 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 		throw std::out_of_range("Invalid topic name");
 	}
 
+	Packet::hasProperties = true;
 	Packet::fixedHeaderReserved = headerFlags();
 	Packet::variableHeaderSize = stringLenSize + topic().size();
 	if (this->QoS() != PktQoS::QoS0) {
@@ -288,6 +284,9 @@ enum StatusCode PktPublish::readPayload(AppBuf &buf)
 
 uint32_t PktPublish::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 6;
+	Packet::minRemLen = 4;
+
 	return Packet::readFrom(buf);
 }
 

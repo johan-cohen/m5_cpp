@@ -44,10 +44,6 @@ namespace m5 {
 
 PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved) : Packet(type, reserved)
 {
-	Packet::hasProperties = true;
-
-	minBufferSize = 6;
-	minRemLen = 4;
 }
 
 void PktPubMsg::packetId(uint16_t id)
@@ -121,6 +117,7 @@ uint32_t PktPubMsg::writeTo(AppBuf &buf)
 	}
 
 	Packet::variableHeaderSize = 2 + 1;
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
@@ -148,6 +145,9 @@ enum StatusCode PktPubMsg::readPayload(AppBuf &buf)
 
 uint32_t PktPubMsg::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 6;
+	Packet::minRemLen = 4;
+
 	return Packet::readFrom(buf);
 }
 

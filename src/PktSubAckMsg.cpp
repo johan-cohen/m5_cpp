@@ -46,19 +46,10 @@ namespace m5 {
 
 PktSubAckMsg::PktSubAckMsg(PktType type) :Packet(type, 0x00)
 {
-	Packet::hasProperties = true;
-
-	minBufferSize = 6;
-	minRemLen = 4;
 }
 
 PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
-	Packet::hasProperties = true;
-
-	minBufferSize = 6;
-	minRemLen = 4;
-
 	this->readFrom(buf);
 }
 
@@ -116,6 +107,7 @@ enum StatusCode PktSubAckMsg::writePayload(AppBuf &buf)
 
 uint32_t PktSubAckMsg::writeTo(AppBuf &buf)
 {
+	Packet::hasProperties = true;
 	Packet::variableHeaderSize = 2;
 	Packet::payloadSize = _reasonCodes.size();
 
@@ -145,6 +137,9 @@ enum StatusCode PktSubAckMsg::readPayload(AppBuf &buf)
 
 uint32_t PktSubAckMsg::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 6;
+	Packet::minRemLen = 4;
+
 	return Packet::readFrom(buf);
 }
 

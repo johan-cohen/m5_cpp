@@ -46,10 +46,6 @@ namespace m5 {
 
 PktPing::PktPing(PktType type) : Packet(type, 0x00)
 {
-	Packet::hasProperties = false;
-
-	minBufferSize = 2;
-	minRemLen = 0;
 }
 
 enum StatusCode PktPing::writeVariableHeader(AppBuf &buf)
@@ -69,6 +65,7 @@ enum StatusCode PktPing::writePayload(AppBuf &buf)
 uint32_t PktPing::writeTo(AppBuf &buf)
 {
 	Packet::variableHeaderSize = 0;
+	Packet::hasProperties = false;
 
 	return Packet::writeTo(buf);
 }
@@ -89,6 +86,9 @@ enum StatusCode PktPing::readPayload(AppBuf &buf)
 
 uint32_t PktPing::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 2;
+	Packet::minRemLen = 0;
+
 	return Packet::readFrom(buf);
 }
 

@@ -47,8 +47,6 @@ namespace m5 {
 
 PktUnsubscribe::PktUnsubscribe() : Packet(PktType::UNSUBSCRIBE, 0x02)
 {
-	minBufferSize = 7;
-	minRemLen = 5;
 }
 
 PktUnsubscribe::PktUnsubscribe(AppBuf &buf) : Packet(PktType::UNSUBSCRIBE, 0x02)
@@ -99,6 +97,7 @@ uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
 	}
 
 	Packet::variableHeaderSize = 2;
+	Packet::hasProperties = false;
 
 	return Packet::writeTo(buf);
 }
@@ -143,6 +142,9 @@ enum StatusCode PktUnsubscribe::readPayload(AppBuf &buf)
 
 uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 7;
+	Packet::minRemLen = 5;
+
 	return Packet::readFrom(buf);
 }
 

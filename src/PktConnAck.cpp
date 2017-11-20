@@ -47,11 +47,6 @@ PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
 {
 	this->_sessionPresent = sessionPresent;
 	this->_reasonCode = (uint8_t)reasonCode;
-
-	Packet::hasProperties = true;
-
-	Packet::minBufferSize = 5;
-	Packet::minRemLen = 3;
 }
 
 void PktConnAck::assignedClientIdentifier(const uint8_t *data, uint16_t size)
@@ -268,6 +263,7 @@ enum StatusCode PktConnAck::writePayload(AppBuf &buf)
 uint32_t PktConnAck::writeTo(AppBuf &buf)
 {
 	Packet::variableHeaderSize = 1 + 1;
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
@@ -295,6 +291,9 @@ enum StatusCode PktConnAck::readPayload(AppBuf &buf)
 
 uint32_t PktConnAck::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 5;
+	Packet::minRemLen = 3;
+
 	return Packet::readFrom(buf);
 }
 

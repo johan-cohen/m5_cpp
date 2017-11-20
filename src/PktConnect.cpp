@@ -170,38 +170,22 @@ void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 
 PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
 {
-	Packet::hasProperties = true;
-
-	Packet::minBufferSize = connectPktMinSize;
-	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
 }
 
 PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
 {
-	Packet::hasProperties = true;
-
-	Packet::minBufferSize = connectPktMinSize;
-	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
-
 	this->readFrom(buf);
 }
 
 PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
 		       Packet(PktType::CONNECT, 0x0)
 {
-	Packet::hasProperties = true;
-
-	Packet::minBufferSize = connectPktMinSize;
-	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
-
 	init(clientId, len, cleanStart);
 }
 
 PktConnect::PktConnect(const char *clientId, bool cleanStart) :
 		       Packet(PktType::CONNECT, 0x0)
 {
-	Packet::hasProperties = true;
-
 	init((const uint8_t *)clientId, strlen(clientId), cleanStart);
 }
 
@@ -213,6 +197,7 @@ uint32_t PktConnect::writeTo(AppBuf &buf)
 {
 	Packet::variableHeaderSize = 1 + 2 + 4 + 1 + 2;
 	Packet::payloadSize = payloadWireSize();
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
@@ -280,6 +265,9 @@ enum StatusCode PktConnect::readPayload(AppBuf &buf)
 
 uint32_t PktConnect::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = connectPktMinSize;
+	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
+
 	return Packet::readFrom(buf);
 }
 

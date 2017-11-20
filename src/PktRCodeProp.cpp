@@ -46,19 +46,10 @@ namespace m5 {
 
 PktRCodeProp::PktRCodeProp(PktType type) : Packet(type, 0x00)
 {
-	Packet::hasProperties = true;
-
-	minBufferSize = 2;
-	minRemLen = 0;
 }
 
 PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
-	Packet::hasProperties = true;
-
-	minBufferSize = 2;
-	minRemLen = 0;
-
 	this->readFrom(buf);
 }
 
@@ -120,6 +111,7 @@ enum StatusCode PktRCodeProp::writePayload(AppBuf &buf)
 uint32_t PktRCodeProp::writeTo(AppBuf &buf)
 {
 	Packet::variableHeaderSize = 1;
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
@@ -147,6 +139,9 @@ enum StatusCode PktRCodeProp::readPayload(AppBuf &buf)
 
 uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 {
+	Packet::minBufferSize = 2;
+	Packet::minRemLen = 0;
+
 	return Packet::readFrom(buf);
 }
 
