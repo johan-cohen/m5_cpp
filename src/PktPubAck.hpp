@@ -51,6 +51,7 @@ class PktPubAck: public PktPubMsg
 {
 public:
 	PktPubAck() : PktPubMsg(PktType::PUBACK, 0x00) {}
+	PktPubAck(AppBuf &buf) : PktPubMsg(PktType::PUBACK, 0x00, buf) {}
 	~PktPubAck() {}
 };
 

@@ -49,6 +49,11 @@ PktConnAck::PktConnAck(bool sessionPresent, ReasonCode reasonCode) :
 	this->_reasonCode = (uint8_t)reasonCode;
 }
 
+PktConnAck::PktConnAck(AppBuf &buf) : Packet(PktType::CONNACK, 0x00)
+{
+	this->readFrom(buf);
+}
+
 void PktConnAck::assignedClientIdentifier(const uint8_t *data, uint16_t size)
 {
 	properties.assignedClientIdentifier(data, size);

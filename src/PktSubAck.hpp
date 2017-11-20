@@ -49,7 +49,6 @@ class PktSubAck : public PktSubAckMsg {
 public:
 	PktSubAck() : PktSubAckMsg(PktType::SUBACK) {}
 	PktSubAck(AppBuf &buf) : PktSubAckMsg(PktType::SUBACK, buf) {}
-
 	~PktSubAck() {}
 };
 

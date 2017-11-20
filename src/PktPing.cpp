@@ -48,6 +48,11 @@ PktPing::PktPing(PktType type) : Packet(type, 0x00)
 {
 }
 
+PktPing::PktPing(enum PktType type, AppBuf &buf) : Packet(type, 0x00)
+{
+	this->readFrom(buf);
+}
+
 enum StatusCode PktPing::writeVariableHeader(AppBuf &buf)
 {
 	(void)buf;

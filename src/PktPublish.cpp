@@ -49,6 +49,11 @@ PktPublish::PktPublish() : Packet(PktType::PUBLISH, 0x00)
 {
 }
 
+PktPublish::PktPublish(AppBuf &buf) : Packet(PktType::PUBLISH, 0x00)
+{
+	this->readFrom(buf);
+}
+
 PktPublish::~PktPublish()
 {
 }

@@ -48,15 +48,16 @@
 namespace m5 {
 
 class PktPing : public Packet {
-protected:
-	PktPing(enum PktType type);
-
 private:
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
 
 	enum StatusCode readVariableHeader(AppBuf &buf) override;
 	enum StatusCode readPayload(AppBuf &buf) override;
+
+protected:
+	PktPing(enum PktType type);
+	PktPing(enum PktType type, AppBuf &buf);
 
 public:
 	virtual ~PktPing() {}
@@ -68,12 +69,14 @@ public:
 class PktPingReq : public PktPing {
 public:
 	PktPingReq() : PktPing(PktType::PINGREQ) {}
+	PktPingReq(AppBuf &buf) : PktPing(PktType::PINGREQ, buf) {}
 	~PktPingReq() {}
 };
 
 class PktPingResp : public PktPing {
 public:
 	PktPingResp() : PktPing(PktType::PINGRESP) {}
+	PktPingResp(AppBuf &buf) : PktPing(PktType::PINGRESP, buf) {}
 	~PktPingResp() {}
 };
 

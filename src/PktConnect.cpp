@@ -172,11 +172,6 @@ PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
 {
 }
 
-PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
-{
-	this->readFrom(buf);
-}
-
 PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
 		       Packet(PktType::CONNECT, 0x0)
 {
@@ -187,6 +182,11 @@ PktConnect::PktConnect(const char *clientId, bool cleanStart) :
 		       Packet(PktType::CONNECT, 0x0)
 {
 	init((const uint8_t *)clientId, strlen(clientId), cleanStart);
+}
+
+PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
+{
+	this->readFrom(buf);
 }
 
 PktConnect::~PktConnect()

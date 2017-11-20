@@ -51,6 +51,7 @@ class PktPubRel: public PktPubMsg
 {
 public:
 	PktPubRel() : PktPubMsg(PktType::PUBREL, 0x02) {}
+	PktPubRel(AppBuf &buf) : PktPubMsg(PktType::PUBREL, 0x02, buf) {}
 	~PktPubRel() {}
 };
 

@@ -62,7 +62,7 @@ private:
 public:
 	PktConnAck(bool sessionPresent = false,
 		   ReasonCode reasonCode = ReasonCode::SUCCESS);
-
+	PktConnAck(AppBuf &buf);
 	~PktConnAck() {}
 
 	void assignedClientIdentifier(const uint8_t *data, uint16_t size);

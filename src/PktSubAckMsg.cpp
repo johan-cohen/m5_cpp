@@ -44,7 +44,7 @@
 
 namespace m5 {
 
-PktSubAckMsg::PktSubAckMsg(PktType type) :Packet(type, 0x00)
+PktSubAckMsg::PktSubAckMsg(PktType type) : Packet(type, 0x00)
 {
 }
 
@@ -52,7 +52,6 @@ PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
 	this->readFrom(buf);
 }
-
 
 void PktSubAckMsg::reasonString(const uint8_t *data, uint16_t size)
 {

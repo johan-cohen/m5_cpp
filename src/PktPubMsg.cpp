@@ -42,8 +42,15 @@
 
 namespace m5 {
 
-PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved) : Packet(type, reserved)
+PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved) :
+	Packet(type, reserved)
 {
+}
+
+PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved, AppBuf &buf) :
+	Packet(type, reserved)
+{
+	this->readFrom(buf);
 }
 
 void PktPubMsg::packetId(uint16_t id)

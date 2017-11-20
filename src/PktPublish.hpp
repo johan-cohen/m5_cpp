@@ -71,6 +71,7 @@ private:
 
 public:
 	PktPublish();
+	PktPublish(AppBuf &buf);
 	~PktPublish();
 
 	PktQoS QoS(void) const { return this->_QoS; }

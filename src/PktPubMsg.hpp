@@ -61,6 +61,7 @@ private:
 
 protected:
 	PktPubMsg(enum PktType type, uint8_t reserved = 0);
+	PktPubMsg(enum PktType type, uint8_t reserved, AppBuf &buf);
 
 public:
 	virtual ~PktPubMsg() {}

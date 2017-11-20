@@ -51,6 +51,7 @@ class PktPubComp: public PktPubMsg
 {
 public:
 	PktPubComp() : PktPubMsg(PktType::PUBCOMP, 0x00) {}
+	PktPubComp(AppBuf &buf) : PktPubMsg(PktType::PUBCOMP, 0x00, buf) {}
 	~PktPubComp() {}
 };
 
