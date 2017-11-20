@@ -56,6 +56,15 @@ static const uint32_t binaryLenSize = 2;
 static const uint32_t stringLenSize = binaryLenSize;
 static const uint32_t integerLenSize = 2;
 
+static const uint32_t fixedHeaderSize = 1;
+static const uint32_t remLenMinSize = 1;
+static const uint32_t topicNameMinSize = 1;
+static const uint32_t packetIdSize = 2;
+static const uint32_t propertyMinSize = 1; /* empty property field, just length */
+static const uint32_t reasonCodeSize = 1;
+static const uint32_t subscribeOptionsSize = 1;
+static const uint32_t flagsSize = 1;
+
 enum class PktQoS {
 	QoS0 = 0,
 	QoS1,

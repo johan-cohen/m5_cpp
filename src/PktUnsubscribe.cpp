@@ -142,8 +142,7 @@ enum StatusCode PktUnsubscribe::readPayload(AppBuf &buf)
 
 uint32_t PktUnsubscribe::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 7;
-	Packet::minRemLen = 5;
+	Packet::minRemLen = packetIdSize + stringLenSize + topicNameMinSize;
 
 	return Packet::readFrom(buf);
 }

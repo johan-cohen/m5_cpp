@@ -296,8 +296,7 @@ enum StatusCode PktConnAck::readPayload(AppBuf &buf)
 
 uint32_t PktConnAck::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 5;
-	Packet::minRemLen = 3;
+	Packet::minRemLen = flagsSize + reasonCodeSize + propertyMinSize;
 
 	return Packet::readFrom(buf);
 }

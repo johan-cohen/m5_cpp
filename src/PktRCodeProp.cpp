@@ -139,7 +139,6 @@ enum StatusCode PktRCodeProp::readPayload(AppBuf &buf)
 
 uint32_t PktRCodeProp::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 2;
 	Packet::minRemLen = 0;
 
 	return Packet::readFrom(buf);

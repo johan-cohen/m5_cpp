@@ -175,8 +175,9 @@ enum StatusCode PktSubscribe::readPayload(AppBuf &buf)
 
 uint32_t PktSubscribe::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 9;
-	Packet::minRemLen = 7;
+	Packet::minRemLen = packetIdSize + propertyMinSize +
+			    stringLenSize + topicNameMinSize +
+			    subscribeOptionsSize;
 
 	return Packet::readFrom(buf);
 }

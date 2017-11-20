@@ -121,6 +121,7 @@ enum StatusCode Packet::fixedHeaderFlags(uint8_t flags)
 
 uint32_t Packet::readFrom(AppBuf &buf)
 {
+	const auto minBufferSize = fixedHeaderSize + VBIWireSize(minRemLen) + minRemLen;
 	const auto alreadyTraversed = buf.traversed();
 	uint32_t fullPktSize;
 	std::size_t traversed;

@@ -63,7 +63,6 @@ protected:
 	uint32_t payloadSize = 0;
 
 	uint32_t remainingLength = 0;
-	uint32_t minBufferSize = 0;
 	uint32_t minRemLen = 0;
 
 	virtual enum StatusCode writeVariableHeader(AppBuf &buf) = 0;

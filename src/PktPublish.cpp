@@ -289,8 +289,8 @@ enum StatusCode PktPublish::readPayload(AppBuf &buf)
 
 uint32_t PktPublish::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 6;
-	Packet::minRemLen = 4;
+	Packet::minRemLen = stringLenSize + topicNameMinSize +
+			    packetIdSize + propertyMinSize;
 
 	return Packet::readFrom(buf);
 }

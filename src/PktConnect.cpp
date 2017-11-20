@@ -51,11 +51,12 @@ static const uint8_t protocolVersion5 = 0x05;
 
 static const char protocolStr[] = "MQTT";
 static const uint8_t protocolNameStr[] = {0, 4, 'M', 'Q', 'T', 'T'};
-static const std::size_t protocolNameWireSize = sizeof(protocolNameStr);
+static const uint32_t protocolNameWireSize = sizeof(protocolNameStr);
 
-/* Protocol Name (2 + 4), Protocol Level (1), Conn Flags (1), Keep Alive (2) */
-static const uint32_t connectVarHdrMinSize = 10;
-static const uint32_t connectPktMinSize = 2 + connectVarHdrMinSize;
+/* Protocol Name (2 + 4), Protocol Level (1), Conn Flags (1), Keep Alive (2)
+ * No properties are considered here.
+ */
+static const uint32_t varHeaderSize = sizeof(protocolNameStr) + 1 + flagsSize + 2;
 
 PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
 {
@@ -195,7 +196,7 @@ void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 
 uint32_t PktConnect::writeTo(AppBuf &buf)
 {
-	Packet::variableHeaderSize = 1 + 2 + 4 + 1 + 2;
+	Packet::variableHeaderSize = varHeaderSize;
 	Packet::payloadSize = payloadWireSize();
 	Packet::hasProperties = true;
 
@@ -265,8 +266,8 @@ enum StatusCode PktConnect::readPayload(AppBuf &buf)
 
 uint32_t PktConnect::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = connectPktMinSize;
-	Packet::minRemLen = connectVarHdrMinSize + 1 + 2 + clientIdMinLen;
+	Packet::minRemLen = varHeaderSize + propertyMinSize +
+			    stringLenSize + clientIdMinLen;
 
 	return Packet::readFrom(buf);
 }

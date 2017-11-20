@@ -136,8 +136,7 @@ enum StatusCode PktSubAckMsg::readPayload(AppBuf &buf)
 
 uint32_t PktSubAckMsg::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 6;
-	Packet::minRemLen = 4;
+	Packet::minRemLen = packetIdSize + propertyMinSize + reasonCodeSize;
 
 	return Packet::readFrom(buf);
 }

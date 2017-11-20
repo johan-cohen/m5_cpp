@@ -152,8 +152,7 @@ enum StatusCode PktPubMsg::readPayload(AppBuf &buf)
 
 uint32_t PktPubMsg::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 6;
-	Packet::minRemLen = 4;
+	Packet::minRemLen = packetIdSize + reasonCodeSize + propertyMinSize;
 
 	return Packet::readFrom(buf);
 }

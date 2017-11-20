@@ -91,7 +91,6 @@ enum StatusCode PktPing::readPayload(AppBuf &buf)
 
 uint32_t PktPing::readFrom(AppBuf &buf)
 {
-	Packet::minBufferSize = 2;
 	Packet::minRemLen = 0;
 
 	return Packet::readFrom(buf);
