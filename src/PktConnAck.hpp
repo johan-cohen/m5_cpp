@@ -123,10 +123,9 @@ public:
 
 	uint32_t writeTo(AppBuf &buf) override;
 	uint32_t readFrom(AppBuf &buf) override;
-	uint32_t getId(void) const { return (uint32_t)PktType::CONNACK; }
 };
 
 }
 
-
 #endif
+
