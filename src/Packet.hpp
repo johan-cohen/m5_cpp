@@ -55,6 +55,7 @@ private:
 protected:
 	enum PktType _packetType;
 	uint8_t fixedHeaderReserved = 0x00;
+	/* set the variable header size without considering properties */
 	uint32_t variableHeaderSize = 0;
 
 	bool hasProperties = false;
