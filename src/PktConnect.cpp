@@ -57,6 +57,31 @@ static const std::size_t protocolNameWireSize = sizeof(protocolNameStr);
 static const uint32_t connectVarHdrMinSize = 10;
 static const uint32_t connectPktMinSize = 2 + connectVarHdrMinSize;
 
+PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
+{
+}
+
+PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
+		       Packet(PktType::CONNECT, 0x0)
+{
+	init(clientId, len, cleanStart);
+}
+
+PktConnect::PktConnect(const char *clientId, bool cleanStart) :
+		       Packet(PktType::CONNECT, 0x0)
+{
+	init((const uint8_t *)clientId, strlen(clientId), cleanStart);
+}
+
+PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
+{
+	this->readFrom(buf);
+}
+
+PktConnect::~PktConnect()
+{
+}
+
 uint8_t PktConnect::packConnectFlags(void)
 {
 	uint8_t flags;
@@ -166,31 +191,6 @@ void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
 {
 	this->clientId(clientId, len);
 	this->cleanStart(cleanStart);
-}
-
-PktConnect::PktConnect() : Packet(PktType::CONNECT, 0x00)
-{
-}
-
-PktConnect::PktConnect(const uint8_t *clientId, uint16_t len, bool cleanStart) :
-		       Packet(PktType::CONNECT, 0x0)
-{
-	init(clientId, len, cleanStart);
-}
-
-PktConnect::PktConnect(const char *clientId, bool cleanStart) :
-		       Packet(PktType::CONNECT, 0x0)
-{
-	init((const uint8_t *)clientId, strlen(clientId), cleanStart);
-}
-
-PktConnect::PktConnect(AppBuf &buf) : Packet(PktType::CONNECT, 0x0)
-{
-	this->readFrom(buf);
-}
-
-PktConnect::~PktConnect()
-{
 }
 
 uint32_t PktConnect::writeTo(AppBuf &buf)
