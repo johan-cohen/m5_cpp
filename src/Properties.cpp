@@ -529,18 +529,15 @@ uint16_t Properties::topicAlias(void) const
 	return valueNum(PropertyId::TOPIC_ALIAS);
 }
 
-void Properties::maximumQoS(enum PktQoS qos)
+enum StatusCode Properties::maximumQoS(enum PktQoS qos)
 {
-	switch (qos) {
-	case PktQoS::QoS0:
-	case PktQoS::QoS1:
-	case PktQoS::QoS2:
-		break;
-	default:
-		throw std::invalid_argument("Invalid QoS value");
+	if (validQoS(qos) == false) {
+		return StatusCode::INVALID_QOS;
 	}
 
 	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
+
+	return StatusCode::SUCCESS;
 }
 
 enum PktQoS Properties::maximumQoS(void) const
