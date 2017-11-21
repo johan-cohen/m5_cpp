@@ -46,8 +46,6 @@
 
 namespace  m5 {
 
-#define __POW2(n) (((uint64_t)1) << (n))
-
 static uint64_t pow2(enum PropertyId id)
 {
 	return (uint64_t)0x01 << (uint8_t)id;
