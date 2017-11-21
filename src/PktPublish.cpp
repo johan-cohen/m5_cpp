@@ -74,22 +74,6 @@ enum StatusCode PktPublish::QoS(enum PktQoS q)
 	return StatusCode::SUCCESS;
 }
 
-StatusCode PktPublish::packetId(uint16_t id)
-{
-	if (validPacketId(id) == false) {
-		return StatusCode::INVALID_ARGUMENT;
-	}
-
-	this->_packetId = id;
-
-	return StatusCode::SUCCESS;
-}
-
-uint16_t PktPublish::packetId(void) const
-{
-	return _packetId;
-}
-
 enum StatusCode PktPublish::topic(const uint8_t *data, uint16_t size)
 {
 	if (data == nullptr || size < topicNameMinSize) {
@@ -292,7 +276,7 @@ enum StatusCode PktPublish::readVariableHeader(AppBuf &buf)
 			return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 		}
 
-		this->packetId(buf.readNum16());
+		rc = this->packetId(buf.readNum16());
 		if (rc != StatusCode::SUCCESS) {
 			return rc;
 		}

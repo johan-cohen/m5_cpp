@@ -53,7 +53,6 @@ class PktSubAckMsg : public Packet
 {
 private:
 	std::list<uint8_t> _reasonCodes;
-	uint16_t _packetId = 0;
 
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
@@ -68,8 +67,8 @@ protected:
 public:
 	virtual ~PktSubAckMsg() {}
 
-	void packetId(uint16_t id) { this->_packetId = id; }
-	uint16_t packetId(void) { return this->_packetId; }
+	enum StatusCode packetId(uint16_t id) { return Packet::packetId(id); }
+	uint16_t packetId(void) { return Packet::packetId(); }
 
 	void append(enum ReasonCode rc) { this->_reasonCodes.push_back((uint8_t)rc); }
 	const std::list<uint8_t> &reasonCodes() const { return _reasonCodes; }

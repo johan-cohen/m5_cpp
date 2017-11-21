@@ -61,7 +61,6 @@ public:
 class PktSubscribe : public Packet {
 private:
 	std::list<TopicOptions *> _topics;
-	uint16_t _packetId = 0;
 
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
@@ -79,8 +78,8 @@ public:
 
 	const std::list<TopicOptions *> topics(void) const { return _topics; }
 
-	void packetId(uint16_t packetId) { this->_packetId = packetId; }
-	uint16_t packetId(void) const { return _packetId; }
+	StatusCode packetId(uint16_t id) { return Packet::packetId(id); }
+	uint16_t packetId(void) const { return Packet::packetId(); }
 
 	void subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void) const;

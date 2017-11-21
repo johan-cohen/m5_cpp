@@ -53,17 +53,6 @@ PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved, AppBuf &buf) :
 	this->readFrom(buf);
 }
 
-enum StatusCode PktPubMsg::packetId(uint16_t id)
-{
-	if (validPacketId(id) == false) {
-		return StatusCode::INVALID_PACKET_ID;
-	}
-
-	this->_packetId = id;
-
-	return StatusCode::SUCCESS;
-}
-
 void PktPubMsg::reasonCode(enum ReasonCode rc)
 {
 	this->_reasonCode = (uint8_t)rc;

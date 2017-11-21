@@ -49,6 +49,17 @@ Packet::Packet(enum PktType type, uint8_t fixedHeaderReserved) :
 {
 }
 
+StatusCode Packet::packetId(uint16_t id)
+{
+	if (validPacketId(id) == false) {
+		return StatusCode::INVALID_PACKET_ID;
+	}
+
+	this->_packetId = id;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t Packet::writeTo(AppBuf &buf)
 {
 	const auto initialLength = buf.length();

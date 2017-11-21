@@ -65,6 +65,8 @@ protected:
 	uint32_t remainingLength = 0;
 	uint32_t minRemLen = 0;
 
+	uint16_t _packetId = 0;
+
 	virtual enum StatusCode writeVariableHeader(AppBuf &buf) = 0;
 	virtual enum StatusCode writePayload(AppBuf &buf) = 0;
 
@@ -74,6 +76,9 @@ protected:
 
 	virtual void status(enum StatusCode ec) { _status = ec; }
 	virtual void expectedWireSize(uint32_t ws) { _expectedWireSize = ws; }
+
+	StatusCode packetId(uint16_t packetId);
+	uint16_t packetId(void) const { return _packetId; }
 
 	Packet(enum PktType type, uint8_t fixedHeaderReserved = 0x00);
 

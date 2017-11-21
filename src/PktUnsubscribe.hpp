@@ -53,7 +53,6 @@ class PktUnsubscribe : public Packet
 {
 private:
 	std::list<ByteArray *> _topics;
-	uint16_t _packetId = 0;
 
 	virtual enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	virtual enum StatusCode writePayload(AppBuf &buf) override;
@@ -67,8 +66,8 @@ public:
 	PktUnsubscribe(AppBuf &buf);
 	~PktUnsubscribe();
 
-	void packetId(uint16_t id) { this->_packetId = id; }
-	uint16_t packetId(void) { return this->_packetId; }
+	enum StatusCode packetId(uint16_t id) { return Packet::packetId(id); }
+	uint16_t packetId(void) { return Packet::packetId(); }
 
 	void append(const char *str);
 	const std::list<ByteArray *> &topics() const { return _topics; }

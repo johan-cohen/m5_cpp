@@ -54,7 +54,6 @@ private:
 	bool _retain = false;
 	bool _dup = false;
 
-	uint16_t _packetId = 0;
 	ByteArray _topic;
 
 	ByteArray _payload;
@@ -83,8 +82,8 @@ public:
 	bool dup(void) const { return this->_dup; }
 	void dup(bool f) { this->_dup = f; }
 
-	enum StatusCode packetId(uint16_t id);
-	uint16_t packetId(void) const;
+	enum StatusCode packetId(uint16_t id) { return Packet::packetId(id); }
+	uint16_t packetId(void) const { return Packet::packetId(); }
 
 	enum StatusCode topic(const uint8_t *data, uint16_t size);
 	enum StatusCode topic(const char *str);

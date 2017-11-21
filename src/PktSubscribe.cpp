@@ -87,7 +87,6 @@ void PktSubscribe::append(const uint8_t *topic, uint16_t size, uint8_t options)
 	this->_topics.push_back(item);
 }
 
-
 void PktSubscribe::append(const char *topic, uint8_t options)
 {
 	append((const uint8_t *)topic, strlen(topic), options);
@@ -132,10 +131,6 @@ enum StatusCode PktSubscribe::writePayload(AppBuf &buf)
 
 uint32_t PktSubscribe::writeTo(AppBuf &buf)
 {
-	if (packetId() == 0) {
-		throw std::invalid_argument("Invalid Packet ID");
-	}
-
 	Packet::variableHeaderSize = 2;
 	Packet::hasProperties = true;
 
@@ -144,7 +139,11 @@ uint32_t PktSubscribe::writeTo(AppBuf &buf)
 
 enum StatusCode PktSubscribe::readVariableHeader(AppBuf &buf)
 {
-	this->packetId(buf.readNum16());
+	auto rc = this->packetId(buf.readNum16());
+	if (rc != StatusCode::SUCCESS) {
+		return rc;
+	}
+
 	properties.read(buf);
 
 	return StatusCode::SUCCESS;

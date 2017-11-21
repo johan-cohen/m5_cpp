@@ -92,10 +92,6 @@ enum StatusCode PktUnsubscribe::writePayload(AppBuf &buf)
 
 uint32_t PktUnsubscribe::writeTo(AppBuf &buf)
 {
-	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
-	}
-
 	Packet::variableHeaderSize = 2;
 	Packet::hasProperties = false;
 
@@ -113,12 +109,7 @@ enum StatusCode PktUnsubscribe::fixedHeaderFlags(uint8_t flags)
 
 enum StatusCode PktUnsubscribe::readVariableHeader(AppBuf &buf)
 {
-	this->packetId(buf.readNum16());
-	if (this->packetId() == 0) {
-		return StatusCode::INVALID_PACKET_ID;
-	}
-
-	return StatusCode::SUCCESS;
+	return this->packetId(buf.readNum16());
 }
 
 enum StatusCode PktUnsubscribe::readPayload(AppBuf &buf)

@@ -51,7 +51,6 @@ class PktPubMsg : public Packet
 {
 private:
 	uint8_t _reasonCode = (uint8_t)ReasonCode::SUCCESS;
-	uint16_t _packetId = 0;
 
 	enum StatusCode writeVariableHeader(AppBuf &buf) override;
 	enum StatusCode writePayload(AppBuf &buf) override;
@@ -66,8 +65,8 @@ protected:
 public:
 	virtual ~PktPubMsg() {}
 
-	enum StatusCode packetId(uint16_t id);
-	uint16_t packetId(void) { return this->_packetId; }
+	enum StatusCode packetId(uint16_t id) { return Packet::packetId(id); }
+	uint16_t packetId(void) { return Packet::packetId(); }
 
 	void reasonCode(enum ReasonCode rc);
 	enum ReasonCode reasonCode(void) { return (enum ReasonCode)this->_reasonCode; }
