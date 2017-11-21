@@ -56,7 +56,6 @@ private:
 	uint8_t connectFlags = 0x00;
 
 	uint8_t _willRetain = 0;
-	uint8_t _willQoS = 0;
 	uint8_t _cleanStart = 1;
 
 	ByteArray _clientId;
@@ -115,8 +114,8 @@ public:
 	bool willRetain(void) const { return this->_willRetain; }
 	void willRetain(bool willRetain);
 
-	enum PktQoS willQoS(void) const { return (enum PktQoS)this->_willQoS; }
-	void willQoS(enum PktQoS qos);
+	enum PktQoS willQoS(void) const { return Packet::QoS(); }
+	enum StatusCode willQoS(enum PktQoS qos) { return Packet::QoS(qos); }
 
 	const ByteArray &userName(void) const { return _userName; }
 	void userName(const uint8_t *data, uint16_t size);

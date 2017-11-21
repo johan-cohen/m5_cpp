@@ -89,7 +89,7 @@ uint8_t PktConnect::packConnectFlags(void)
 
 	flags = (cleanStart() << 0x01);
 	flags += (willMsg().size() > 0 ? (0x01 << 2) : 0);
-	flags += ((_willQoS & 0x03) << 3);
+	flags += (((uint8_t)willQoS() & 0x03) << 3);
 	flags += (willRetain() == 1 ? (1 << 5) : 0);
 	flags += (password().size() > 0 ? (0x01 << 6) : 0);
 	flags += (userName().size() > 0 ? (0x01 << 7) : 0);
@@ -335,11 +335,6 @@ void PktConnect::keepAlive(uint16_t keepAlive)
 void PktConnect::willRetain(bool willRetain)
 {
 	this->_willRetain = (willRetain ? 1 : 0);
-}
-
-void PktConnect::willQoS(enum PktQoS qos)
-{
-	this->_willQoS = (uint8_t)qos;
 }
 
 void PktConnect::cleanStart(bool cleanStart)

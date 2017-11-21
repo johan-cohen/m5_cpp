@@ -50,13 +50,11 @@ namespace m5 {
 class PktPublish : public Packet
 {
 private:
-	enum PktQoS _QoS = PktQoS::QoS0;
 	bool _retain = false;
 	bool _dup = false;
 
-	ByteArray _topic;
-
 	ByteArray _payload;
+	ByteArray _topic;
 
 	void headerFlags(uint8_t firstByte);
 	uint8_t headerFlags(void);
@@ -73,8 +71,8 @@ public:
 	PktPublish(AppBuf &buf);
 	~PktPublish();
 
-	enum PktQoS QoS(void) const;
-	enum StatusCode QoS(enum PktQoS q);
+	enum PktQoS QoS(void) const { return Packet::QoS(); }
+	enum StatusCode QoS(enum PktQoS q) { return Packet::QoS(q); }
 
 	bool retain(void) const { return this->_retain; }
 	void retain (bool f) { this->_retain = f; }

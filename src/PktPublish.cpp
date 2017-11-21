@@ -58,22 +58,6 @@ PktPublish::~PktPublish()
 {
 }
 
-enum PktQoS PktPublish::QoS(void) const
-{
-	return this->_QoS;
-}
-
-enum StatusCode PktPublish::QoS(enum PktQoS q)
-{
-	if (validQoS(q) == false) {
-		return StatusCode::INVALID_ARGUMENT;
-	}
-
-	this->_QoS = q;
-
-	return StatusCode::SUCCESS;
-}
-
 enum StatusCode PktPublish::topic(const uint8_t *data, uint16_t size)
 {
 	if (data == nullptr || size < topicNameMinSize) {

@@ -65,6 +65,7 @@ protected:
 	uint32_t remainingLength = 0;
 	uint32_t minRemLen = 0;
 
+	enum PktQoS _QoS = PktQoS::QoS0;
 	uint16_t _packetId = 0;
 
 	virtual enum StatusCode writeVariableHeader(AppBuf &buf) = 0;
@@ -79,6 +80,9 @@ protected:
 
 	StatusCode packetId(uint16_t packetId);
 	uint16_t packetId(void) const { return _packetId; }
+
+	enum PktQoS QoS(void) const;
+	enum StatusCode QoS(enum PktQoS q);
 
 	Packet(enum PktType type, uint8_t fixedHeaderReserved = 0x00);
 

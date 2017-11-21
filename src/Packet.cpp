@@ -60,6 +60,22 @@ StatusCode Packet::packetId(uint16_t id)
 	return StatusCode::SUCCESS;
 }
 
+enum PktQoS Packet::QoS(void) const
+{
+	return this->_QoS;
+}
+
+enum StatusCode Packet::QoS(enum PktQoS q)
+{
+	if (validQoS(q) == false) {
+		return StatusCode::INVALID_ARGUMENT;
+	}
+
+	this->_QoS = q;
+
+	return StatusCode::SUCCESS;
+}
+
 uint32_t Packet::writeTo(AppBuf &buf)
 {
 	const auto initialLength = buf.length();
