@@ -44,11 +44,11 @@
 
 namespace m5 {
 
-PktRCodeProp::PktRCodeProp(PktType type) : Packet(type, 0x00)
+PktRCodeProp::PktRCodeProp(enum PktType type) : Packet(type, 0x00)
 {
 }
 
-PktRCodeProp::PktRCodeProp(PktType type, AppBuf &buf) : Packet(type, 0x00)
+PktRCodeProp::PktRCodeProp(enum PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
 	this->readFrom(buf);
 }
