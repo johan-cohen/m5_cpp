@@ -58,14 +58,14 @@ void PktPubMsg::reasonCode(enum ReasonCode rc)
 	this->_reasonCode = (uint8_t)rc;
 }
 
-void PktPubMsg::reasonString(const uint8_t *data, uint16_t size)
+enum StatusCode PktPubMsg::reasonString(const uint8_t *data, uint16_t size)
 {
-	properties.reasonString(data, size);
+	return properties.reasonString(data, size);
 }
 
-void PktPubMsg::reasonString(const char *str)
+enum StatusCode PktPubMsg::reasonString(const char *str)
 {
-	properties.reasonString(str);
+	return properties.reasonString(str);
 }
 
 const ByteArray &PktPubMsg::reasonString(void) const
@@ -73,15 +73,15 @@ const ByteArray &PktPubMsg::reasonString(void) const
 	return properties.reasonString();
 }
 
-void PktPubMsg::userProperty(const uint8_t *key, uint16_t keySize,
-			     const uint8_t *value, uint16_t valueSize)
+enum StatusCode PktPubMsg::userProperty(const uint8_t *key, uint16_t keySize,
+					const uint8_t *value, uint16_t valueSize)
 {
-	properties.userProperty(key, keySize, value, valueSize);
+	return properties.userProperty(key, keySize, value, valueSize);
 }
 
-void PktPubMsg::userProperty(const char *key, const char *val)
+enum StatusCode PktPubMsg::userProperty(const char *key, const char *val)
 {
-	properties.userProperty(key, val);
+	return properties.userProperty(key, val);
 }
 
 const UserProperty &PktPubMsg::userProperty(void) const
