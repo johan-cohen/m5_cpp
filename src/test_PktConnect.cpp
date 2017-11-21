@@ -38,10 +38,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PktConnect.hpp"
 #include "test_Common.hpp"
+#include "PktConnect.hpp"
 
-#include <stdexcept>
 #include <cstring>
 
 namespace m5 {
@@ -132,102 +131,102 @@ int test(void)
 	fullPktSize = 1 + remLenWireSize + remLen;
 
 	bytes = connect->writeTo(*buf);
-	if (bytes == 0) {
-
-		std::cout << "Bytes: " << bytes << "\n";
-
-		throw std::logic_error("write");
+	if (bytes == 0 || connect->status() != m5::StatusCode::SUCCESS) {
+		error_exit("writeTo");
 	}
 
 	if (buf->length() != fullPktSize) {
-		throw std::logic_error("writeTo");
+		error_exit("writeTo: buffer length");
 	}
 
-	if (buf->readNum8() != ((uint8_t)m5::PktType::CONNECT << 4)) {
-		throw std::logic_error("writeTo: PktType");
+	if (buf->readNum8() != m5::firstByte(m5::PktType::CONNECT)) {
+		error_exit("writeTo: packet type");
 	}
 
 	rc = buf->readVBI(vbi, vbiWS);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("writeTo: Remaining Length");
+		error_exit("writeTo: Remaining Length");
 	}
 
 	if (remLen != vbi || m5::VBIWireSize(remLen) != vbiWS) {
-		throw std::logic_error("writeTo: Remaining Length");
+		error_exit("writeTo: Remaining Length");
 	}
 
 	buf->read(bigString, sizeof(protocolNameStr));
 	if (memcmp(bigString, protocolNameStr, sizeof(protocolNameStr)) != 0) {
-		throw std::logic_error("writeTo: Protocol Name");
+		error_exit("writeTo: Protocol Name");
 	}
 
 	if (buf->readNum8() != 5) {
-		throw std::logic_error("writeTo: Protocol Version");
+		error_exit("writeTo: Protocol Version");
 	}
 
 	if (buf->readNum8() != 0xF6) {
-		throw std::logic_error("writeTo: Control Flags");
+		error_exit("writeTo: Control Flags");
 	}
 
 	if (buf->readNum16() != keepAlive) {
-		throw std::logic_error("writeTo: Keep Alive");
+		error_exit("writeTo: Keep Alive");
 	}
 
 	rc = buf->readVBI(vbi, vbiWS);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("writeTo: Properties Length");
+		error_exit("writeTo: Properties Length");
 	}
 
 	if (vbi != 0 || vbiWS != 1) {
-		throw std::logic_error("writeTo: Properties Length");
+		error_exit("writeTo: Properties Length");
 	}
 
 	m5::ByteArray str;
 	rc = buf->readBinary(str);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("readBinary");
+		error_exit("readBinary");
 	}
 	if (str.size() != strlen(clientId) || memcmp(str.data(), clientId, strlen(clientId)) != 0) {
-		throw std::logic_error("writeTo: clientId");
+		error_exit("writeTo: clientId");
 	}
 
 	rc = buf->readBinary(str);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("readBinary");
+		error_exit("readBinary");
 	}
 	if (str.size() != strlen(willTopic) || memcmp(str.data(), willTopic, strlen(willTopic)) != 0) {
-		throw std::logic_error("writeTo: willTopic");
+		error_exit("writeTo: willTopic");
 	}
 
 	rc = buf->readBinary(str);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("readBinary");
+		error_exit("readBinary");
 	}
 	if (str.size() != strlen(willMsg) || memcmp(str.data(), willMsg, strlen(willMsg)) != 0) {
-		throw std::logic_error("writeTo: willMsg");
+		error_exit("writeTo: willMsg");
 	}
 
 	rc = buf->readBinary(str);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("readBinary");
+		error_exit("readBinary");
 	}
 	if (str.size() != strlen(userName) || memcmp(str.data(), userName, strlen(userName)) != 0) {
-		throw std::logic_error("writeTo: userName");
+		error_exit("writeTo: userName");
 	}
 
 	rc = buf->readBinary(str);
 	if (rc != m5::StatusCode::SUCCESS) {
-		throw std::logic_error("readBinary");
+		error_exit("readBinary");
 	}
 	if (str.size() != strlen(password) || memcmp(str.data(), password, strlen(password)) != 0) {
-		throw std::logic_error("writeTo: password");
+		error_exit("writeTo: password");
 	}
 
 	buf->rewind();
 
 	m5::PktConnect *connectRead = new m5::PktConnect(*buf);
+	if (connectRead->status() != m5::StatusCode::SUCCESS) {
+		error_exit("PktConnect constructor read");
+	}
 	if (*connect != *connectRead) {
-		throw std::logic_error("PktConnect constructor");
+		error_exit("PktConnect constructor");
 	}
 	delete connectRead;
 
@@ -268,31 +267,31 @@ int testProperties(void)
 	connectRead = new m5::PktConnect(buf);
 
 	if (connectRead->sessionExpiryInterval() != u32) {
-		throw std::logic_error("properties: sessionExpiryInterval");
+		error_exit("properties: sessionExpiryInterval");
 	}
 
 	if (connectRead->requestProblemInformation() != true) {
-		throw std::logic_error("properties: requestProblemInformation");
+		error_exit("properties: requestProblemInformation");
 	}
 
 	if (connectRead->willDelayInterval() != u32) {
-		throw std::logic_error("properties: willDelayInterval");
+		error_exit("properties: willDelayInterval");
 	}
 
 	if (connectRead->requestResponseInformation() != true) {
-		throw std::logic_error("properties: ByteArray");
+		error_exit("properties: ByteArray");
 	}
 
 	if (connectRead->receiveMaximum() != u16) {
-		throw std::logic_error("properties: receiveMaximum");
+		error_exit("properties: receiveMaximum");
 	}
 
 	if (connectRead->topicAliasMaximum() != u16) {
-		throw std::logic_error("properties: topicAliasMaximum");
+		error_exit("properties: topicAliasMaximum");
 	}
 
 	if (connectRead->maximumPacketSize() != u32) {
-		throw std::logic_error("properties: maximumPacketSize");
+		error_exit("properties: maximumPacketSize");
 	}
 
 	delete connectRead;
