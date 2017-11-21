@@ -225,10 +225,10 @@ static inline uint8_t VBIWireSize(uint32_t value)
 
 static inline enum PktType packetType(uint8_t byte)
 {
-	return (PktType)((byte & 0xF0) >> 4);
+	return (enum PktType)((byte & 0xF0) >> 4);
 }
 
-static inline uint8_t firstByte(PktType type, uint8_t reserved = 0)
+static inline uint8_t firstByte(enum PktType type, uint8_t reserved = 0)
 {
 	return (((uint8_t)type) << 4) | (reserved & 0x0F);
 }
