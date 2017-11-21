@@ -41,7 +41,6 @@
 #include "PktPublish.hpp"
 #include "test_Common.hpp"
 
-#include <stdexcept>
 #include <cstring>
 
 int test(void)
@@ -53,65 +52,71 @@ int test(void)
 	const uint16_t payloadSize = strlen(str);
 	uint16_t u16 = 0xABCD;
 	m5::AppBuf buf(128);
-	uint32_t bytes;
+	m5::StatusCode sc;
 
 	publish = new m5::PktPublish();
 
 	publish->retain(true);
 	if (publish->retain() != true) {
-		throw std::logic_error("Retain");
+		error_exit("Retain");
 	}
 
 	publish->QoS(m5::PktQoS::QoS2);
 	if (publish->QoS() != m5::PktQoS::QoS2) {
-		throw std::logic_error("QoS");
+		error_exit("QoS");
 	}
 
 	publish->dup(true);
 	if (publish->dup() != true) {
-		throw std::logic_error("DUP");
+		error_exit("DUP");
 	}
 
 	publish->topic(str);
 	if (publish->topic() != array) {
-		throw std::logic_error("Topic");
+		error_exit("Topic");
 	}
 
 	publish->packetId(u16);
 	if (publish->packetId() != u16) {
-		throw std::logic_error("Packet Id");
+		error_exit("Packet Id");
 	}
 
-	publish->payload(payload, payloadSize);
+	sc = publish->payload(payload, payloadSize);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("Payload");
+	}
+
 	if (publish->payload() != array) {
-		throw std::logic_error("Payload");
+		error_exit("Payload");
 	}
 
-	bytes = publish->writeTo(buf);
-	if (bytes == 0) {
-		throw std::logic_error("write");
+	publish->writeTo(buf);
+	if (publish->status() != m5::StatusCode::SUCCESS) {
+		error_exit("write");
 	}
 
-	m5::PktPublish publishRead;
-	publishRead.readFrom(buf);
+	m5::PktPublish publishRead(buf);
+	if (publishRead.status() != m5::StatusCode::SUCCESS) {
+		error_exit("readFrom");
+	}
 
 	if (publish->retain() != publishRead.retain()) {
-		throw std::logic_error("read: Retain");
+		error_exit("read: Retain");
 	}
 	if (publish->QoS() != publishRead.QoS()) {
-		throw std::logic_error("read: QoS");
+		error_exit("read: QoS");
 	}
 	if (publish->dup() != publishRead.dup()) {
-		throw std::logic_error("read: DUP");
+		error_exit("read: DUP");
 	}
 	if (publish->topic() != publishRead.topic()) {
-		throw std::logic_error("read: Topic");
+		error_exit("read: Topic");
 	}
 	if (publish->packetId() != publishRead.packetId()) {
-		throw std::logic_error("read: Packet Id");
+		error_exit("read: Packet Id");
 	}
 	if (publish->payload() != publishRead.payload()) {
-		throw std::logic_error("read: Payload");
+		error_exit("read: Payload");
 	}
 
 	delete publish;
