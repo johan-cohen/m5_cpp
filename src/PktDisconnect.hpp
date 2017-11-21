@@ -52,11 +52,11 @@ public:
 	PktDisconnect(AppBuf &buf) : PktRCodeProp(PktType::DISCONNECT, buf) {}
 	~PktDisconnect() {}
 
-	void sessionExpiryInterval(uint32_t v);
+	enum StatusCode sessionExpiryInterval(uint32_t v);
 	uint32_t sessionExpiryInterval(void) const;
 
-	void serverReference(const uint8_t *data, uint16_t size);
-	void serverReference(const char *str);
+	enum StatusCode serverReference(const uint8_t *data, uint16_t size);
+	enum StatusCode serverReference(const char *str);
 	const ByteArray &serverReference(void) const;
 };
 

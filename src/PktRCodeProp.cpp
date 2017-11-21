@@ -57,14 +57,14 @@ void PktRCodeProp::reasonCode(enum ReasonCode rc)
 }
 
 
-void PktRCodeProp::reasonString(const uint8_t *data, uint16_t size)
+enum StatusCode PktRCodeProp::reasonString(const uint8_t *data, uint16_t size)
 {
-	properties.reasonString(data, size);
+	return properties.reasonString(data, size);
 }
 
-void PktRCodeProp::reasonString(const char *str)
+enum StatusCode PktRCodeProp::reasonString(const char *str)
 {
-	properties.reasonString(str);
+	return properties.reasonString(str);
 }
 
 const ByteArray &PktRCodeProp::reasonString(void) const
@@ -72,15 +72,15 @@ const ByteArray &PktRCodeProp::reasonString(void) const
 	return properties.reasonString();
 }
 
-void PktRCodeProp::userProperty(const uint8_t *key, uint16_t keySize,
-				const uint8_t *value, uint16_t valueSize)
+enum StatusCode PktRCodeProp::userProperty(const uint8_t *key, uint16_t keySize,
+					   const uint8_t *value, uint16_t valueSize)
 {
-	properties.userProperty(key, keySize, value, valueSize);
+	return properties.userProperty(key, keySize, value, valueSize);
 }
 
-void PktRCodeProp::userProperty(const char *key, const char *val)
+enum StatusCode PktRCodeProp::userProperty(const char *key, const char *val)
 {
-	properties.userProperty(key, val);
+	return properties.userProperty(key, val);
 }
 
 const UserProperty &PktRCodeProp::userProperty(void) const

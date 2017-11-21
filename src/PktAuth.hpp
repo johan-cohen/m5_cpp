@@ -52,11 +52,11 @@ public:
 	PktAuth(AppBuf &buf) : PktRCodeProp(PktType::AUTH, buf) {}
 	~PktAuth() {}
 
-	void authenticationMethod(const uint8_t *data, uint16_t size);
-	void authenticationMethod(const char *str);
+	enum StatusCode authenticationMethod(const uint8_t *data, uint16_t size);
+	enum StatusCode authenticationMethod(const char *str);
 	const ByteArray &authenticationMethod(void) const;
 
-	void authenticationData(const uint8_t *data, uint16_t size);
+	enum StatusCode authenticationData(const uint8_t *data, uint16_t size);
 	const ByteArray &authenticationData(void) const;
 };
 

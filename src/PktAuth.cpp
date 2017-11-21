@@ -42,14 +42,14 @@
 
 namespace m5 {
 
-void PktAuth::authenticationMethod(const uint8_t *data, uint16_t size)
+enum StatusCode PktAuth::authenticationMethod(const uint8_t *data, uint16_t size)
 {
-	properties.authenticationMethod(data, size);
+	return properties.authenticationMethod(data, size);
 }
 
-void PktAuth::authenticationMethod(const char *str)
+enum StatusCode PktAuth::authenticationMethod(const char *str)
 {
-	properties.authenticationMethod(str);
+	return properties.authenticationMethod(str);
 }
 
 const ByteArray &PktAuth::authenticationMethod(void) const
@@ -57,9 +57,9 @@ const ByteArray &PktAuth::authenticationMethod(void) const
 	return properties.authenticationMethod();
 }
 
-void PktAuth::authenticationData(const uint8_t *data, uint16_t size)
+enum StatusCode PktAuth::authenticationData(const uint8_t *data, uint16_t size)
 {
-	properties.authenticationData(data, size);
+	return properties.authenticationData(data, size);
 }
 
 const ByteArray &PktAuth::authenticationData(void) const
