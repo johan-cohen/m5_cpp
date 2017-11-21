@@ -53,13 +53,15 @@ PktPubMsg::PktPubMsg(enum PktType type, uint8_t reserved, AppBuf &buf) :
 	this->readFrom(buf);
 }
 
-void PktPubMsg::packetId(uint16_t id)
+enum StatusCode PktPubMsg::packetId(uint16_t id)
 {
-	if (id == 0) {
-		throw std::invalid_argument("Invalid packet Id");
+	if (validPacketId(id) == false) {
+		return StatusCode::INVALID_PACKET_ID;
 	}
 
 	this->_packetId = id;
+
+	return StatusCode::SUCCESS;
 }
 
 void PktPubMsg::reasonCode(enum ReasonCode rc)
@@ -119,10 +121,6 @@ enum StatusCode PktPubMsg::writePayload(AppBuf &buf)
 
 uint32_t PktPubMsg::writeTo(AppBuf &buf)
 {
-	if (this->packetId() == 0) {
-		throw std::invalid_argument("Invalid packet Id");
-	}
-
 	Packet::variableHeaderSize = 2 + 1;
 	Packet::hasProperties = true;
 
@@ -131,9 +129,9 @@ uint32_t PktPubMsg::writeTo(AppBuf &buf)
 
 enum StatusCode PktPubMsg::readVariableHeader(AppBuf &buf)
 {
-	this->packetId(buf.readNum16());
-	if (this->packetId() == 0) {
-		return StatusCode::INVALID_PACKET_ID;
+	auto rc = this->packetId(buf.readNum16());
+	if (rc != StatusCode::SUCCESS) {
+		return rc;
 	}
 
 	this->reasonCode((enum ReasonCode)buf.readNum8());

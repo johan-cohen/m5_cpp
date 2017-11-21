@@ -66,7 +66,7 @@ protected:
 public:
 	virtual ~PktPubMsg() {}
 
-	void packetId(uint16_t id);
+	enum StatusCode packetId(uint16_t id);
 	uint16_t packetId(void) { return this->_packetId; }
 
 	void reasonCode(enum ReasonCode rc);
