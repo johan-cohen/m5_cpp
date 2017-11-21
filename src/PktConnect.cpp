@@ -336,9 +336,9 @@ void PktConnect::cleanStart(bool cleanStart)
 	this->_cleanStart = (cleanStart ? 1 : 0);
 }
 
-void PktConnect::sessionExpiryInterval(uint32_t v)
+enum StatusCode PktConnect::sessionExpiryInterval(uint32_t v)
 {
-	properties.sessionExpiryInterval(v);
+	return properties.sessionExpiryInterval(v);
 }
 
 uint32_t PktConnect::sessionExpiryInterval(void) const
@@ -346,14 +346,14 @@ uint32_t PktConnect::sessionExpiryInterval(void) const
 	return properties.sessionExpiryInterval();
 }
 
-void PktConnect::authenticationMethod(const uint8_t *data, uint16_t size)
+enum StatusCode PktConnect::authenticationMethod(const uint8_t *data, uint16_t size)
 {
-	properties.authenticationMethod(data, size);
+	return properties.authenticationMethod(data, size);
 }
 
-void PktConnect::authenticationMethod(const char *str)
+enum StatusCode PktConnect::authenticationMethod(const char *str)
 {
-	properties.authenticationMethod(str);
+	return properties.authenticationMethod(str);
 }
 
 const ByteArray &PktConnect::authenticationMethod(void) const
@@ -361,9 +361,9 @@ const ByteArray &PktConnect::authenticationMethod(void) const
 	return properties.authenticationMethod();
 }
 
-void PktConnect::authenticationData(const uint8_t *data, uint16_t size)
+enum StatusCode PktConnect::authenticationData(const uint8_t *data, uint16_t size)
 {
-	properties.authenticationData(data, size);
+	return properties.authenticationData(data, size);
 }
 
 const ByteArray &PktConnect::authenticationData(void) const
@@ -371,9 +371,9 @@ const ByteArray &PktConnect::authenticationData(void) const
 	return properties.authenticationData();
 }
 
-void PktConnect::requestProblemInformation(bool v)
+enum StatusCode PktConnect::requestProblemInformation(bool v)
 {
-	properties.requestProblemInformation(v);
+	return properties.requestProblemInformation(v);
 }
 
 bool PktConnect::requestProblemInformation(void) const
@@ -381,9 +381,9 @@ bool PktConnect::requestProblemInformation(void) const
 	return properties.requestProblemInformation();
 }
 
-void PktConnect::willDelayInterval(uint32_t v)
+enum StatusCode PktConnect::willDelayInterval(uint32_t v)
 {
-	properties.willDelayInterval(v);
+	return properties.willDelayInterval(v);
 }
 
 uint32_t PktConnect::willDelayInterval(void) const
@@ -391,9 +391,9 @@ uint32_t PktConnect::willDelayInterval(void) const
 	return properties.willDelayInterval();
 }
 
-void PktConnect::requestResponseInformation(bool v)
+enum StatusCode PktConnect::requestResponseInformation(bool v)
 {
-	properties.requestResponseInformation(v);
+	return properties.requestResponseInformation(v);
 }
 
 bool PktConnect::requestResponseInformation(void) const
@@ -401,9 +401,9 @@ bool PktConnect::requestResponseInformation(void) const
 	return properties.requestResponseInformation();
 }
 
-void PktConnect::receiveMaximum(uint16_t v)
+enum StatusCode PktConnect::receiveMaximum(uint16_t v)
 {
-	properties.receiveMaximum(v);
+	return properties.receiveMaximum(v);
 }
 
 uint16_t PktConnect::receiveMaximum(void) const
@@ -411,9 +411,9 @@ uint16_t PktConnect::receiveMaximum(void) const
 	return properties.receiveMaximum();
 }
 
-void PktConnect::topicAliasMaximum(uint16_t v)
+enum StatusCode PktConnect::topicAliasMaximum(uint16_t v)
 {
-	properties.topicAliasMaximum(v);
+	return properties.topicAliasMaximum(v);
 }
 
 uint16_t PktConnect::topicAliasMaximum(void) const
@@ -422,15 +422,15 @@ uint16_t PktConnect::topicAliasMaximum(void) const
 }
 
 
-void PktConnect::userProperty(const uint8_t *key, uint16_t keySize,
-			      const uint8_t *value, uint16_t valueSize)
+enum StatusCode PktConnect::userProperty(const uint8_t *key, uint16_t keySize,
+					 const uint8_t *value, uint16_t valueSize)
 {
-	properties.userProperty(key, keySize, value, valueSize);
+	return properties.userProperty(key, keySize, value, valueSize);
 }
 
-void PktConnect::userProperty(const char *key, const char *val)
+enum StatusCode PktConnect::userProperty(const char *key, const char *val)
 {
-	properties.userProperty(key, val);
+	return properties.userProperty(key, val);
 }
 
 const UserProperty &PktConnect::userProperty(void) const
@@ -438,9 +438,9 @@ const UserProperty &PktConnect::userProperty(void) const
 	return properties.userProperty();
 }
 
-void PktConnect::maximumPacketSize(uint32_t v)
+enum StatusCode PktConnect::maximumPacketSize(uint32_t v)
 {
-	properties.maximumPacketSize(v);
+	return properties.maximumPacketSize(v);
 }
 
 uint32_t PktConnect::maximumPacketSize(void) const
