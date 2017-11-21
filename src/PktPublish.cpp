@@ -58,18 +58,52 @@ PktPublish::~PktPublish()
 {
 }
 
-void PktPublish::topic(const uint8_t *data, uint16_t size)
+enum PktQoS PktPublish::QoS(void) const
 {
-	if (data == nullptr || size < 1) {
-		throw std::invalid_argument("Invalid input buffer");
+	return this->_QoS;
+}
+
+enum StatusCode PktPublish::QoS(enum PktQoS q)
+{
+	if (validQoS(q) == false) {
+		return StatusCode::INVALID_ARGUMENT;
+	}
+
+	this->_QoS = q;
+
+	return StatusCode::SUCCESS;
+}
+
+StatusCode PktPublish::packetId(uint16_t id)
+{
+	if (validPacketId(id) == false) {
+		return StatusCode::INVALID_ARGUMENT;
+	}
+
+	this->_packetId = id;
+
+	return StatusCode::SUCCESS;
+}
+
+uint16_t PktPublish::packetId(void) const
+{
+	return _packetId;
+}
+
+enum StatusCode PktPublish::topic(const uint8_t *data, uint16_t size)
+{
+	if (data == nullptr || size < topicNameMinSize) {
+		return StatusCode::INVALID_ARGUMENT;
 	}
 
 	this->_topic.assign(data, data + size);
+
+	return StatusCode::SUCCESS;
 }
 
-void PktPublish::topic(const char *str)
+enum StatusCode PktPublish::topic(const char *str)
 {
-	topic((const uint8_t *)str, strlen(str));
+	return topic((const uint8_t *)str, strlen(str));
 }
 
 void PktPublish::payload(const uint8_t *data, uint16_t size)
@@ -213,21 +247,14 @@ enum StatusCode PktPublish::writePayload(AppBuf &buf)
 
 uint32_t PktPublish::writeTo(AppBuf &buf)
 {
-	if (this->QoS() != PktQoS::QoS0 && this->packetId() == 0) {
-		throw std::out_of_range("Invalid packet Id for this QoS level");
-	}
-
-	if (this->topic().size() == 0) {
-		throw std::out_of_range("Invalid topic name");
-	}
-
-	Packet::hasProperties = true;
-	Packet::fixedHeaderReserved = headerFlags();
 	Packet::variableHeaderSize = stringLenSize + topic().size();
 	if (this->QoS() != PktQoS::QoS0) {
 		Packet::variableHeaderSize += 2;
 	}
+
 	Packet::payloadSize = this->payload().size();
+	Packet::fixedHeaderReserved = headerFlags();
+	Packet::hasProperties = true;
 
 	return Packet::writeTo(buf);
 }
@@ -235,12 +262,14 @@ uint32_t PktPublish::writeTo(AppBuf &buf)
 enum StatusCode PktPublish::fixedHeaderFlags(uint8_t flags)
 {
 	this->retain(flags & 0x01);
-	this->QoS((PktQoS)((flags & 0x06) >> 1));
-	this->dup(flags & 0x08);
 
-	if ((int)this->QoS() >= 0x03) {
-		return StatusCode::INVALID_QOS;
+	auto qos = (flags & 0x06) >> 1;
+	auto rc = this->QoS((enum PktQoS)qos);
+	if (rc != StatusCode::SUCCESS) {
+		return rc;
 	}
+
+	this->dup(flags & 0x08);
 
 	return StatusCode::SUCCESS;
 }
@@ -254,18 +283,18 @@ enum StatusCode PktPublish::readVariableHeader(AppBuf &buf)
 		return rc;
 	}
 
-	if (this->topic().size() == 0) {
+	if (this->topic().size() < topicNameMinSize) {
 		return StatusCode::INVALID_TOPIC_NAME;
 	}
 
 	if(this->QoS() != PktQoS::QoS0) {
-		if (buf.bytesToRead() < 2) {
+		if (buf.bytesToRead() < packetIdSize) {
 			return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 		}
 
 		this->packetId(buf.readNum16());
-		if (this->packetId() == 0) {
-			return StatusCode::INVALID_PACKET_ID;
+		if (rc != StatusCode::SUCCESS) {
+			return rc;
 		}
 	}
 

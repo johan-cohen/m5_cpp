@@ -74,8 +74,8 @@ public:
 	PktPublish(AppBuf &buf);
 	~PktPublish();
 
-	PktQoS QoS(void) const { return this->_QoS; }
-	void QoS(PktQoS q) { this->_QoS = q; }
+	enum PktQoS QoS(void) const;
+	enum StatusCode QoS(enum PktQoS q);
 
 	bool retain(void) const { return this->_retain; }
 	void retain (bool f) { this->_retain = f; }
@@ -83,11 +83,11 @@ public:
 	bool dup(void) const { return this->_dup; }
 	void dup(bool f) { this->_dup = f; }
 
-	void packetId(uint16_t id) { this->_packetId = id; }
-	uint16_t packetId(void) const { return _packetId; }
+	enum StatusCode packetId(uint16_t id);
+	uint16_t packetId(void) const;
 
-	void topic(const uint8_t *data, uint16_t size);
-	void topic(const char *str);
+	enum StatusCode topic(const uint8_t *data, uint16_t size);
+	enum StatusCode topic(const char *str);
 	const ByteArray &topic(void) const { return _topic; }
 
 	void payload(const uint8_t *data, uint16_t size);
