@@ -202,6 +202,7 @@ enum class StatusCode {
 	INVALID_QOS,
 	INVALID_TOPIC_NAME,
 	INVALID_PACKET_ID,
+	INVALID_ARGUMENT,
 };
 
 static inline uint8_t VBIWireSize(uint32_t value)

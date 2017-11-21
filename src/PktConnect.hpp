@@ -102,15 +102,15 @@ public:
 	void cleanStart(bool cleanStart);
 
 	const ByteArray &clientId(void) const { return _clientId; }
-	void clientId(const uint8_t *data, uint16_t size);
-	void clientId(const char *str);
+	enum StatusCode clientId(const uint8_t *data, uint16_t size);
+	enum StatusCode clientId(const char *str);
 
 	const ByteArray &willTopic(void) const { return _willTopic; }
 	const ByteArray &willMsg(void) const { return _willMsg; }
 
-	void will(const uint8_t *topic, uint16_t topic_size,
-		     const uint8_t *msg, uint16_t msg_size);
-	void will(const char *topic, const char *msg);
+	enum StatusCode will(const uint8_t *topic, uint16_t topic_size,
+			     const uint8_t *msg, uint16_t msg_size);
+	enum StatusCode will(const char *topic, const char *msg);
 
 	bool willRetain(void) const { return this->_willRetain; }
 	void willRetain(bool willRetain);

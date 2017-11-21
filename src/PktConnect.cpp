@@ -272,35 +272,39 @@ uint32_t PktConnect::readFrom(AppBuf &buf)
 	return Packet::readFrom(buf);
 }
 
-void PktConnect::clientId(const uint8_t *data, uint16_t size)
+enum StatusCode PktConnect::clientId(const uint8_t *data, uint16_t size)
 {
 	if (!validClientIdSize(size)) {
-		throw std::invalid_argument("Invalid Client Id size");
+		return StatusCode::INVALID_ARGUMENT;
 	}
 
 	this->_clientId.assign(data, data + size);
+	return StatusCode::SUCCESS;
 }
 
-void PktConnect::clientId(const char *str)
+enum StatusCode PktConnect::clientId(const char *str)
 {
-	this->clientId((const uint8_t *)str, strlen(str));
+	return this->clientId((const uint8_t *)str, strlen(str));
 }
 
-void PktConnect::will(const uint8_t *topic, uint16_t topic_size,
-		      const uint8_t *msg, uint16_t msg_size)
+enum StatusCode PktConnect::will(const uint8_t *topic, uint16_t topic_size,
+				 const uint8_t *msg, uint16_t msg_size)
 {
-	if (topic == nullptr || topic_size == 0 || msg == nullptr || msg_size == 0) {
-		throw std::invalid_argument("Invalid Will Topic or Msg length");
+	if (topic == nullptr || topic_size < topicNameMinSize ||
+	    msg == nullptr || msg_size == 0) {
+		return StatusCode::INVALID_ARGUMENT;
 	}
 
 	this->_willTopic.assign(topic, topic + topic_size);
 	this->_willMsg.assign(msg, msg + msg_size);
+
+	return StatusCode::SUCCESS;
 }
 
-void PktConnect::will(const char *topic, const char *msg)
+enum StatusCode PktConnect::will(const char *topic, const char *msg)
 {
-	this->will((const uint8_t *)topic, strlen(topic),
-		   (const uint8_t *)msg, strlen(msg));
+	return this->will((const uint8_t *)topic, strlen(topic),
+			  (const uint8_t *)msg, strlen(msg));
 }
 
 void PktConnect::userName(const uint8_t *data, uint16_t size)
