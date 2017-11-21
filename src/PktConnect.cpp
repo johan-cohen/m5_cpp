@@ -107,9 +107,9 @@ bool PktConnect::flagWillMsg(uint8_t flags)
 	return flags & (1 << 2);
 }
 
-PktQoS PktConnect::flagWillQoS(uint8_t flags)
+enum PktQoS PktConnect::flagWillQoS(uint8_t flags)
 {
-	return (PktQoS)((flags & (3 << 3)) >> 3);
+	return (enum PktQoS)((flags & (3 << 3)) >> 3);
 }
 
 bool PktConnect::flagWillRetain(uint8_t flags)

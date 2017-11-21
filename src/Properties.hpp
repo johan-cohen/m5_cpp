@@ -165,8 +165,8 @@ public:
 	void topicAlias(uint16_t v);
 	uint16_t topicAlias(void) const;
 
-	void maximumQoS(PktQoS qos);
-	PktQoS maximumQoS(void) const;
+	void maximumQoS(enum PktQoS qos);
+	enum PktQoS maximumQoS(void) const;
 
 	void retainAvailable(bool v);
 	bool retainAvailable(void) const;

@@ -529,7 +529,7 @@ uint16_t Properties::topicAlias(void) const
 	return valueNum(PropertyId::TOPIC_ALIAS);
 }
 
-void Properties::maximumQoS(PktQoS qos)
+void Properties::maximumQoS(enum PktQoS qos)
 {
 	switch (qos) {
 	case PktQoS::QoS0:
@@ -543,9 +543,9 @@ void Properties::maximumQoS(PktQoS qos)
 	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
 }
 
-PktQoS Properties::maximumQoS(void) const
+enum PktQoS Properties::maximumQoS(void) const
 {
-	return (PktQoS)valueNum(PropertyId::MAXIMUM_QOS);
+	return (enum PktQoS)valueNum(PropertyId::MAXIMUM_QOS);
 }
 
 void Properties::retainAvailable(bool v)

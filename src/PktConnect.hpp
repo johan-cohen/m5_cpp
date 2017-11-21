@@ -78,7 +78,7 @@ private:
 
 	bool flagCleanStart(uint8_t flags);
 	bool flagWillMsg(uint8_t flags);
-	PktQoS flagWillQoS(uint8_t flags);
+	enum PktQoS flagWillQoS(uint8_t flags);
 	bool flagWillRetain(uint8_t flags);
 	bool flagPassword(uint8_t flags);
 	bool flagUserName(uint8_t flags);
@@ -115,7 +115,7 @@ public:
 	bool willRetain(void) const { return this->_willRetain; }
 	void willRetain(bool willRetain);
 
-	PktQoS willQoS(void) const { return (PktQoS)this->_willQoS; }
+	enum PktQoS willQoS(void) const { return (enum PktQoS)this->_willQoS; }
 	void willQoS(enum PktQoS qos);
 
 	const ByteArray &userName(void) const { return _userName; }

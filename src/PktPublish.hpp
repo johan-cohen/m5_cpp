@@ -50,7 +50,7 @@ namespace m5 {
 class PktPublish : public Packet
 {
 private:
-	PktQoS _QoS = PktQoS::QoS0;
+	enum PktQoS _QoS = PktQoS::QoS0;
 	bool _retain = false;
 	bool _dup = false;
 

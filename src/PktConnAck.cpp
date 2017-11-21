@@ -169,12 +169,12 @@ uint16_t PktConnAck::topicAliasMaximum(void) const
 	return properties.topicAliasMaximum();
 }
 
-void PktConnAck::maximumQoS(PktQoS qos)
+void PktConnAck::maximumQoS(enum PktQoS qos)
 {
 	properties.maximumQoS(qos);
 }
 
-PktQoS PktConnAck::maximumQoS(void) const
+enum PktQoS PktConnAck::maximumQoS(void) const
 {
 	return properties.maximumQoS();
 }
