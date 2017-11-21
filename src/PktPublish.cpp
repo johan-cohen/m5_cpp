@@ -73,18 +73,20 @@ enum StatusCode PktPublish::topic(const char *str)
 	return topic((const uint8_t *)str, strlen(str));
 }
 
-void PktPublish::payload(const uint8_t *data, uint16_t size)
+enum StatusCode PktPublish::payload(const uint8_t *data, uint16_t size)
 {
 	if (data == nullptr || size < 1) {
-		return;
+		return StatusCode::INVALID_ARGUMENT;
 	}
 
 	this->_payload.assign(data, data + size);
+
+	return StatusCode::SUCCESS;
 }
 
-void PktPublish::payloadFormatIndicator(bool v)
+enum StatusCode PktPublish::payloadFormatIndicator(bool v)
 {
-	properties.payloadFormatIndicator(v);
+	return properties.payloadFormatIndicator(v);
 }
 
 bool PktPublish::payloadFormatIndicator(void) const
@@ -92,9 +94,9 @@ bool PktPublish::payloadFormatIndicator(void) const
 	return properties.payloadFormatIndicator();
 }
 
-void PktPublish::publicationExpiryInterval(uint32_t v)
+enum StatusCode PktPublish::publicationExpiryInterval(uint32_t v)
 {
-	properties.publicationExpiryInterval(v);
+	return properties.publicationExpiryInterval(v);
 }
 
 uint32_t PktPublish::publicationExpiryInterval(void) const
@@ -102,14 +104,14 @@ uint32_t PktPublish::publicationExpiryInterval(void) const
 	return properties.publicationExpiryInterval();
 }
 
-void PktPublish::contentType(const uint8_t *data, uint16_t size)
+enum StatusCode PktPublish::contentType(const uint8_t *data, uint16_t size)
 {
-	properties.contentType(data, size);
+	return properties.contentType(data, size);
 }
 
-void PktPublish::contentType(const char *str)
+enum StatusCode PktPublish::contentType(const char *str)
 {
-	properties.contentType(str);
+	return properties.contentType(str);
 }
 
 const ByteArray &PktPublish::contentType(void) const
@@ -117,14 +119,14 @@ const ByteArray &PktPublish::contentType(void) const
 	return properties.contentType();
 }
 
-void PktPublish::responseTopic(const uint8_t *data, uint16_t size)
+enum StatusCode PktPublish::responseTopic(const uint8_t *data, uint16_t size)
 {
-	properties.responseTopic(data, size);
+	return properties.responseTopic(data, size);
 }
 
-void PktPublish::responseTopic(const char *str)
+enum StatusCode PktPublish::responseTopic(const char *str)
 {
-	properties.responseTopic(str);
+	return properties.responseTopic(str);
 }
 
 const ByteArray &PktPublish::responseTopic(void) const
@@ -132,9 +134,9 @@ const ByteArray &PktPublish::responseTopic(void) const
 	return properties.responseTopic();
 }
 
-void PktPublish::subscriptionIdentifier(uint32_t v)
+enum StatusCode PktPublish::subscriptionIdentifier(uint32_t v)
 {
-	properties.subscriptionIdentifier(v);
+	return properties.subscriptionIdentifier(v);
 }
 
 uint32_t PktPublish::subscriptionIdentifier(void) const
@@ -142,9 +144,9 @@ uint32_t PktPublish::subscriptionIdentifier(void) const
 	return properties.subscriptionIdentifier();
 }
 
-void PktPublish::correlationData(const uint8_t *data, uint16_t size)
+enum StatusCode PktPublish::correlationData(const uint8_t *data, uint16_t size)
 {
-	properties.correlationData(data, size);
+	return properties.correlationData(data, size);
 }
 
 const ByteArray &PktPublish::correlationData(void) const
@@ -152,9 +154,9 @@ const ByteArray &PktPublish::correlationData(void) const
 	return properties.correlationData();
 }
 
-void PktPublish::topicAlias(uint16_t v)
+enum StatusCode PktPublish::topicAlias(uint16_t v)
 {
-	properties.topicAlias(v);
+	return properties.topicAlias(v);
 }
 
 uint16_t PktPublish::topicAlias(void) const
@@ -162,15 +164,15 @@ uint16_t PktPublish::topicAlias(void) const
 	return properties.topicAlias();
 }
 
-void PktPublish::userProperty(const uint8_t *key, uint16_t keySize,
-			      const uint8_t *value, uint16_t valueSize)
+enum StatusCode PktPublish::userProperty(const uint8_t *key, uint16_t keySize,
+					 const uint8_t *value, uint16_t valueSize)
 {
-	properties.userProperty(key, keySize, value, valueSize);
+	return properties.userProperty(key, keySize, value, valueSize);
 }
 
-void PktPublish::userProperty(const char *key, const char *val)
+enum StatusCode PktPublish::userProperty(const char *key, const char *val)
 {
-	properties.userProperty(key, val);
+	return properties.userProperty(key, val);
 }
 
 const UserProperty &PktPublish::userProperty(void) const

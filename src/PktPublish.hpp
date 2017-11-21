@@ -87,35 +87,35 @@ public:
 	enum StatusCode topic(const char *str);
 	const ByteArray &topic(void) const { return _topic; }
 
-	void payload(const uint8_t *data, uint16_t size);
+	enum StatusCode payload(const uint8_t *data, uint16_t size);
 	const ByteArray &payload(void) const { return _payload; }
 
-	void payloadFormatIndicator(bool v);
+	enum StatusCode payloadFormatIndicator(bool v);
 	bool payloadFormatIndicator(void) const;
 
-	void publicationExpiryInterval(uint32_t v);
+	enum StatusCode publicationExpiryInterval(uint32_t v);
 	uint32_t publicationExpiryInterval(void) const;
 
-	void contentType(const uint8_t *data, uint16_t size);
-	void contentType(const char *str);
+	enum StatusCode contentType(const uint8_t *data, uint16_t size);
+	enum StatusCode contentType(const char *str);
 	const ByteArray &contentType(void) const;
 
-	void responseTopic(const uint8_t *data, uint16_t size);
-	void responseTopic(const char *str);
+	enum StatusCode responseTopic(const uint8_t *data, uint16_t size);
+	enum StatusCode responseTopic(const char *str);
 	const ByteArray &responseTopic(void) const;
 
-	void subscriptionIdentifier(uint32_t v);
+	enum StatusCode subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void) const;
 
-	void correlationData(const uint8_t *data, uint16_t size);
+	enum StatusCode correlationData(const uint8_t *data, uint16_t size);
 	const ByteArray &correlationData(void) const;
 
-	void topicAlias(uint16_t v);
+	enum StatusCode topicAlias(uint16_t v);
 	uint16_t topicAlias(void) const;
 
-	void userProperty(const uint8_t *key, uint16_t keySize,
-			  const uint8_t *value, uint16_t valueSize);
-	void userProperty(const char *key, const char *val);
+	enum StatusCode userProperty(const uint8_t *key, uint16_t keySize,
+				     const uint8_t *value, uint16_t valueSize);
+	enum StatusCode userProperty(const char *key, const char *val);
 	const UserProperty &userProperty(void) const;
 
 	uint32_t writeTo(AppBuf &buf) override;
