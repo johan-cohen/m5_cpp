@@ -83,6 +83,12 @@ PktConnect::~PktConnect()
 {
 }
 
+void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
+{
+	this->clientId(clientId, len);
+	this->cleanStart(cleanStart);
+}
+
 uint8_t PktConnect::packConnectFlags(void)
 {
 	uint8_t flags;
@@ -182,12 +188,6 @@ enum StatusCode PktConnect::writePayload(AppBuf &buf)
 	}
 
 	return StatusCode::SUCCESS;
-}
-
-void PktConnect::init(const uint8_t *clientId, uint16_t len, bool cleanStart)
-{
-	this->clientId(clientId, len);
-	this->cleanStart(cleanStart);
 }
 
 uint32_t PktConnect::writeTo(AppBuf &buf)
