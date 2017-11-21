@@ -87,7 +87,8 @@ $(OBJS_DIR)/test_%.o:			\
 
 $(OBJS_DIR)/%.o:			\
 	$(SRCS_DIR)/%.cpp		\
-	$(SRCS_DIR)/%.hpp
+	$(SRCS_DIR)/%.hpp		\
+	$(SRCS_DIR)/Common.hpp
 	$(CXX) $(CPPFLAGS) $(EXTRAFLAGS) $(INC) -c -o $@ $<
 
 $(BINS_DIR)/test_PktPubMsg:		\
