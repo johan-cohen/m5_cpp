@@ -88,11 +88,7 @@ enum StatusCode PktSubAckMsg::writeVariableHeader(AppBuf &buf)
 {
 	buf.writeNum16(this->packetId());
 
-	if (properties.write(buf) == 0) {
-		return StatusCode::PROPERTY_WRITE_ERROR;
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktSubAckMsg::writePayload(AppBuf &buf)
@@ -120,9 +116,7 @@ enum StatusCode PktSubAckMsg::readVariableHeader(AppBuf &buf)
 		return StatusCode::INVALID_PACKET_ID;
 	}
 
-	properties.read(buf);
-
-	return StatusCode::SUCCESS;
+	return properties.read(buf);
 }
 
 enum StatusCode PktSubAckMsg::readPayload(AppBuf &buf)

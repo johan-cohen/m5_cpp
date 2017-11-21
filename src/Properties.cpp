@@ -40,9 +40,7 @@
 
 #include "Properties.hpp"
 
-#include <stdexcept>
 #include <cstring>
-#include <cerrno>
 
 namespace  m5 {
 
@@ -177,10 +175,10 @@ bool Properties::isEnabled(PropertyId id) const
 	return enabled() & pow2(id);
 }
 
-void Properties::append(ByteArray *key, ByteArray *value)
+enum StatusCode Properties::append(ByteArray *key, ByteArray *value)
 {
 	if (!isAllowed(PropertyId::USER_PROPERTY)) {
-		throw std::invalid_argument("Invalid property for this packet");
+		return StatusCode::INVALID_PROPERTY;
 	}
 
 	userProps.push_back(KeyValuePair(key, value));
@@ -188,27 +186,29 @@ void Properties::append(ByteArray *key, ByteArray *value)
 	this->_wireSize += propertyIdSize +
 			   binaryLenSize + key->size() +
 			   binaryLenSize + value->size();
+
+	return StatusCode::SUCCESS;
 }
 
-void Properties::append(const uint8_t *key, uint16_t keySize,
-			const uint8_t *value, uint16_t valueSize)
+enum StatusCode Properties::append(const uint8_t *key, uint16_t keySize,
+				   const uint8_t *value, uint16_t valueSize)
 {
 	ByteArray *_key = new ByteArray(key, key + keySize);
 	ByteArray *_value = new ByteArray(value, value + valueSize);
 
-	append(_key, _value);
+	return append(_key, _value);
 }
 
-void Properties::append(PropertyId id, ByteArray *src)
+enum StatusCode Properties::append(PropertyId id, ByteArray *src)
 {
 	if (!isAllowed(id)) {
-		throw std::invalid_argument("Invalid property for this packet");
+		return StatusCode::INVALID_PROPERTY;
 	}
 
 	if (isEnabled(id)) {
 		auto it = binProps.find((uint8_t)id);
 		if (it == binProps.end()) {
-			throw std::out_of_range("Property enabled but not found");
+			return StatusCode::INTERNAL_ERROR;
 		}
 
 		ByteArray *item = (*it).second;
@@ -224,18 +224,21 @@ void Properties::append(PropertyId id, ByteArray *src)
 
 		this->_wireSize += propertyIdSize + binaryLenSize + src->size();
 	}
+
+	return StatusCode::SUCCESS;
 }
 
-void Properties::append(PropertyId id, const uint8_t *data, uint16_t size)
+enum StatusCode Properties::append(PropertyId id, const uint8_t *data, uint16_t size)
 {
 	ByteArray *src = new ByteArray(data, data + size);
-	append(id, src);
+
+	return append(id, src);
 }
 
-void Properties::append(PropertyId id, uint32_t value, uint32_t wireSize)
+enum StatusCode Properties::append(PropertyId id, uint32_t value, uint32_t wireSize)
 {
 	if (!isAllowed(id)) {
-		throw std::invalid_argument("Invalid property for this packet");
+		return StatusCode::INVALID_PROPERTY;
 	}
 
 	if (isEnabled(id)) {
@@ -255,6 +258,8 @@ void Properties::append(PropertyId id, uint32_t value, uint32_t wireSize)
 	}
 
 	enableProperty(id);
+
+	return StatusCode::SUCCESS;
 }
 
 const ByteArray &Properties::valueBinary(PropertyId id) const
@@ -286,9 +291,9 @@ void Properties::enableProperty(PropertyId id)
 	this->enabledProperties |= pow2(id);
 }
 
-void Properties::payloadFormatIndicator(bool v)
+enum StatusCode Properties::payloadFormatIndicator(bool v)
 {
-	append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v, 1);
+	return append(PropertyId::PAYLOAD_FORMAT_INDICATOR, v, 1);
 }
 
 bool Properties::payloadFormatIndicator(void) const
@@ -296,9 +301,9 @@ bool Properties::payloadFormatIndicator(void) const
 	return valueNum(PropertyId::PAYLOAD_FORMAT_INDICATOR);
 }
 
-void Properties::publicationExpiryInterval(uint32_t v)
+enum StatusCode Properties::publicationExpiryInterval(uint32_t v)
 {
-	append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v, 4);
+	return append(PropertyId::PUBLICATION_EXPIRY_INTERVAL, v, 4);
 }
 
 uint32_t Properties::publicationExpiryInterval(void) const
@@ -306,14 +311,14 @@ uint32_t Properties::publicationExpiryInterval(void) const
 	return valueNum(PropertyId::PUBLICATION_EXPIRY_INTERVAL);
 }
 
-void Properties::contentType(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::contentType(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::CONTENT_TYPE, data, size);
+	return append(PropertyId::CONTENT_TYPE, data, size);
 }
 
-void Properties::contentType(const char *str)
+enum StatusCode Properties::contentType(const char *str)
 {
-	contentType((const uint8_t *)str, strlen(str));
+	return contentType((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::contentType(void) const
@@ -321,14 +326,14 @@ const ByteArray &Properties::contentType(void) const
 	return valueBinary(PropertyId::CONTENT_TYPE);
 }
 
-void Properties::responseTopic(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::responseTopic(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::RESPONSE_TOPIC, data, size);
+	return append(PropertyId::RESPONSE_TOPIC, data, size);
 }
 
-void Properties::responseTopic(const char *str)
+enum StatusCode Properties::responseTopic(const char *str)
 {
-	responseTopic((const uint8_t *)str, strlen(str));
+	return responseTopic((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::responseTopic(void) const
@@ -336,15 +341,15 @@ const ByteArray &Properties::responseTopic(void) const
 	return valueBinary(PropertyId::RESPONSE_TOPIC);
 }
 
-void Properties::subscriptionIdentifier(uint32_t v)
+enum StatusCode Properties::subscriptionIdentifier(uint32_t v)
 {
 	auto ws = VBIWireSize(v);
 
 	if (v == 0 || ws == 0) {
-		throw std::invalid_argument("Invalid argument");
+		return StatusCode::INVALID_VBI;
 	}
 
-	append(PropertyId::SUBSCRIPTION_IDENTIFIER, v, ws);
+	return append(PropertyId::SUBSCRIPTION_IDENTIFIER, v, ws);
 }
 
 uint32_t Properties::subscriptionIdentifier(void) const
@@ -352,9 +357,9 @@ uint32_t Properties::subscriptionIdentifier(void) const
 	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER);
 }
 
-void Properties::correlationData(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::correlationData(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::CORRELATION_DATA, data, size);
+	return append(PropertyId::CORRELATION_DATA, data, size);
 }
 
 const ByteArray &Properties::correlationData(void) const
@@ -362,9 +367,9 @@ const ByteArray &Properties::correlationData(void) const
 	return valueBinary(PropertyId::CORRELATION_DATA);
 }
 
-void Properties::sessionExpiryInterval(uint32_t v)
+enum StatusCode Properties::sessionExpiryInterval(uint32_t v)
 {
-	append(PropertyId::SESSION_EXPIRY_INTERVAL, v, 4);
+	return append(PropertyId::SESSION_EXPIRY_INTERVAL, v, 4);
 }
 
 uint32_t Properties::sessionExpiryInterval(void) const
@@ -372,14 +377,14 @@ uint32_t Properties::sessionExpiryInterval(void) const
 	return valueNum(PropertyId::SESSION_EXPIRY_INTERVAL);
 }
 
-void Properties::assignedClientIdentifier(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::assignedClientIdentifier(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, data, size);
+	return append(PropertyId::ASSIGNED_CLIENT_IDENTIFIER, data, size);
 }
 
-void Properties::assignedClientIdentifier(const char *str)
+enum StatusCode Properties::assignedClientIdentifier(const char *str)
 {
-	assignedClientIdentifier((const uint8_t *)str, strlen(str));
+	return assignedClientIdentifier((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::assignedClientIdentifier(void) const
@@ -387,9 +392,9 @@ const ByteArray &Properties::assignedClientIdentifier(void) const
 	return valueBinary(PropertyId::ASSIGNED_CLIENT_IDENTIFIER);
 }
 
-void Properties::serverKeepAlive(uint16_t v)
+enum StatusCode Properties::serverKeepAlive(uint16_t v)
 {
-	append(PropertyId::SERVER_KEEP_ALIVE, v, 2);
+	return append(PropertyId::SERVER_KEEP_ALIVE, v, 2);
 }
 
 uint16_t Properties::serverKeepAlive(void) const
@@ -397,14 +402,14 @@ uint16_t Properties::serverKeepAlive(void) const
 	return valueNum(PropertyId::SERVER_KEEP_ALIVE);
 }
 
-void Properties::authenticationMethod(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::authenticationMethod(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::AUTH_METHOD, data, size);
+	return append(PropertyId::AUTH_METHOD, data, size);
 }
 
-void Properties::authenticationMethod(const char *str)
+enum StatusCode  Properties::authenticationMethod(const char *str)
 {
-	authenticationMethod((const uint8_t *)str, strlen(str));
+	return authenticationMethod((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::authenticationMethod(void) const
@@ -412,9 +417,9 @@ const ByteArray &Properties::authenticationMethod(void) const
 	return valueBinary(PropertyId::AUTH_METHOD);
 }
 
-void Properties::authenticationData(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::authenticationData(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::AUTH_DATA, data, size);
+	return append(PropertyId::AUTH_DATA, data, size);
 }
 
 const ByteArray &Properties::authenticationData(void) const
@@ -422,9 +427,9 @@ const ByteArray &Properties::authenticationData(void) const
 	return valueBinary(PropertyId::AUTH_DATA);
 }
 
-void Properties::requestProblemInformation(bool v)
+enum StatusCode Properties::requestProblemInformation(bool v)
 {
-	append(PropertyId::REQUEST_PROBLEM_INFORMATION, v, 1);
+	return append(PropertyId::REQUEST_PROBLEM_INFORMATION, v, 1);
 }
 
 bool Properties::requestProblemInformation(void) const
@@ -432,9 +437,9 @@ bool Properties::requestProblemInformation(void) const
 	return valueNum(PropertyId::REQUEST_PROBLEM_INFORMATION);
 }
 
-void Properties::willDelayInterval(uint32_t v)
+enum StatusCode Properties::willDelayInterval(uint32_t v)
 {
-	append(PropertyId::WILL_DELAY_INTERVAL, v, 4);
+	return append(PropertyId::WILL_DELAY_INTERVAL, v, 4);
 }
 
 uint32_t Properties::willDelayInterval(void) const
@@ -442,9 +447,9 @@ uint32_t Properties::willDelayInterval(void) const
 	return valueNum(PropertyId::WILL_DELAY_INTERVAL);
 }
 
-void Properties::requestResponseInformation(bool v)
+enum StatusCode Properties::requestResponseInformation(bool v)
 {
-	append(PropertyId::REQUEST_RESPONSE_INFORMATION, v, 1);
+	return append(PropertyId::REQUEST_RESPONSE_INFORMATION, v, 1);
 }
 
 bool Properties::requestResponseInformation(void) const
@@ -452,14 +457,14 @@ bool Properties::requestResponseInformation(void) const
 	return valueNum(PropertyId::REQUEST_RESPONSE_INFORMATION);
 }
 
-void Properties::responseInformation(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::responseInformation(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::RESPONSE_INFORMATION, data, size);
+	return append(PropertyId::RESPONSE_INFORMATION, data, size);
 }
 
-void Properties::responseInformation(const char *str)
+enum StatusCode Properties::responseInformation(const char *str)
 {
-	responseInformation((const uint8_t *)str, strlen(str));
+	return responseInformation((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::responseInformation(void) const
@@ -467,14 +472,14 @@ const ByteArray &Properties::responseInformation(void) const
 	return valueBinary(PropertyId::RESPONSE_INFORMATION);
 }
 
-void Properties::serverReference(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::serverReference(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::SERVER_REFERENCE, data, size);
+	return append(PropertyId::SERVER_REFERENCE, data, size);
 }
 
-void Properties::serverReference(const char *str)
+enum StatusCode Properties::serverReference(const char *str)
 {
-	serverReference((const uint8_t *)str, strlen(str));
+	return serverReference((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::serverReference(void) const
@@ -482,14 +487,14 @@ const ByteArray &Properties::serverReference(void) const
 	return valueBinary(PropertyId::SERVER_REFERENCE);
 }
 
-void Properties::reasonString(const uint8_t *data, uint16_t size)
+enum StatusCode Properties::reasonString(const uint8_t *data, uint16_t size)
 {
-	append(PropertyId::REASON_STR, data, size);
+	return append(PropertyId::REASON_STR, data, size);
 }
 
-void Properties::reasonString(const char *str)
+enum StatusCode Properties::reasonString(const char *str)
 {
-	reasonString((const uint8_t *)str, strlen(str));
+	return reasonString((const uint8_t *)str, strlen(str));
 }
 
 const ByteArray &Properties::reasonString(void) const
@@ -497,9 +502,9 @@ const ByteArray &Properties::reasonString(void) const
 	return valueBinary(PropertyId::REASON_STR);
 }
 
-void Properties::receiveMaximum(uint16_t v)
+enum StatusCode Properties::receiveMaximum(uint16_t v)
 {
-	append(PropertyId::RECEIVE_MAXIMUM, v, 2);
+	return append(PropertyId::RECEIVE_MAXIMUM, v, 2);
 }
 
 uint16_t Properties::receiveMaximum(void) const
@@ -507,9 +512,9 @@ uint16_t Properties::receiveMaximum(void) const
 	return valueNum(PropertyId::RECEIVE_MAXIMUM);
 }
 
-void Properties::topicAliasMaximum(uint16_t v)
+enum StatusCode Properties::topicAliasMaximum(uint16_t v)
 {
-	append(PropertyId::TOPIC_ALIAS_MAXIMUM, v, 2);
+	return append(PropertyId::TOPIC_ALIAS_MAXIMUM, v, 2);
 }
 
 uint16_t Properties::topicAliasMaximum(void) const
@@ -517,9 +522,9 @@ uint16_t Properties::topicAliasMaximum(void) const
 	return valueNum(PropertyId::TOPIC_ALIAS_MAXIMUM);
 }
 
-void Properties::topicAlias(uint16_t v)
+enum StatusCode Properties::topicAlias(uint16_t v)
 {
-	append(PropertyId::TOPIC_ALIAS, v, 2);
+	return append(PropertyId::TOPIC_ALIAS, v, 2);
 }
 
 uint16_t Properties::topicAlias(void) const
@@ -533,7 +538,7 @@ enum StatusCode Properties::maximumQoS(enum PktQoS qos)
 		return StatusCode::INVALID_QOS;
 	}
 
-	append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
+	return append(PropertyId::MAXIMUM_QOS, (uint8_t)qos, 1);
 
 	return StatusCode::SUCCESS;
 }
@@ -543,9 +548,9 @@ enum PktQoS Properties::maximumQoS(void) const
 	return (enum PktQoS)valueNum(PropertyId::MAXIMUM_QOS);
 }
 
-void Properties::retainAvailable(bool v)
+enum StatusCode Properties::retainAvailable(bool v)
 {
-	append(PropertyId::RETAIN_AVAILABLE, v, 1);
+	return append(PropertyId::RETAIN_AVAILABLE, v, 1);
 }
 
 bool Properties::retainAvailable(void) const
@@ -553,16 +558,16 @@ bool Properties::retainAvailable(void) const
 	return valueNum(PropertyId::RETAIN_AVAILABLE);
 }
 
-void Properties::userProperty(const uint8_t *key, uint16_t keySize,
+enum StatusCode Properties::userProperty(const uint8_t *key, uint16_t keySize,
 			      const uint8_t *value, uint16_t valueSize)
 {
-	append(key, keySize, value, valueSize);
+	return append(key, keySize, value, valueSize);
 }
 
-void Properties::userProperty(const char *key, const char *val)
+enum StatusCode Properties::userProperty(const char *key, const char *val)
 {
-	userProperty((const uint8_t *)key, strlen(key),
-		     (const uint8_t *)val, strlen(val));
+	return userProperty((const uint8_t *)key, strlen(key),
+			    (const uint8_t *)val, strlen(val));
 }
 
 const UserProperty &Properties::userProperty(void) const
@@ -570,9 +575,9 @@ const UserProperty &Properties::userProperty(void) const
 	return userProps;
 }
 
-void Properties::maximumPacketSize(uint32_t v)
+enum StatusCode Properties::maximumPacketSize(uint32_t v)
 {
-	append(PropertyId::MAXIMUM_PACKET_SIZE, v, 4);
+	return append(PropertyId::MAXIMUM_PACKET_SIZE, v, 4);
 }
 
 uint32_t Properties::maximumPacketSize(void) const
@@ -580,9 +585,9 @@ uint32_t Properties::maximumPacketSize(void) const
 	return valueNum(PropertyId::MAXIMUM_PACKET_SIZE);
 }
 
-void Properties::wildcardSubscriptionAvailable(bool v)
+enum StatusCode Properties::wildcardSubscriptionAvailable(bool v)
 {
-	append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v, 1);
+	return append(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
 bool Properties::wildcardSubscriptionAvailable(void) const
@@ -590,9 +595,9 @@ bool Properties::wildcardSubscriptionAvailable(void) const
 	return valueNum(PropertyId::WILDCARD_SUBSCRIPTION_AVAILABLE);
 }
 
-void Properties::subscriptionIdentifierAvailable(bool v)
+enum StatusCode Properties::subscriptionIdentifierAvailable(bool v)
 {
-	append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v, 1);
+	return append(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE, v, 1);
 }
 
 bool Properties::subscriptionIdentifierAvailable(void) const
@@ -600,9 +605,9 @@ bool Properties::subscriptionIdentifierAvailable(void) const
 	return valueNum(PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE);
 }
 
-void Properties::sharedSubscriptionAvailable(bool v)
+enum StatusCode Properties::sharedSubscriptionAvailable(bool v)
 {
-	append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v, 1);
+	return append(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE, v, 1);
 }
 
 bool Properties::sharedSubscriptionAvailable(void) const
@@ -610,7 +615,7 @@ bool Properties::sharedSubscriptionAvailable(void) const
 	return valueNum(PropertyId::SHARED_SUBSCRIPTION_AVAILABLE);
 }
 
-uint32_t Properties::read(AppBuf &buf)
+enum StatusCode Properties::read(AppBuf &buf)
 {
 	enum StatusCode rc;
 	uint32_t fieldLen;
@@ -623,11 +628,11 @@ uint32_t Properties::read(AppBuf &buf)
 
 	rc = buf.readVBI(propWS, propWSWS);
 	if (rc != StatusCode::SUCCESS) {
-		return propWSWS;
+		return rc;
 	}
 
 	if (propWS > buf.bytesToRead()) {
-		throw std::invalid_argument("Invalid input buffer");
+		return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 	}
 
 	const uint32_t bytesAtBeginning = buf.bytesToRead();
@@ -644,12 +649,16 @@ uint32_t Properties::read(AppBuf &buf)
 		case PropertyId::SUBSCRIPTION_IDENTIFIER_AVAILABLE:
 		case PropertyId::SHARED_SUBSCRIPTION_AVAILABLE:
 			if (buf.bytesToRead() < 1) {
-				throw std::invalid_argument("Invalid input buffer");
+				return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 			}
 
 			number = buf.readNum8();
 			fieldLen = 1;
-			this->append((PropertyId)id, number, fieldLen);
+
+			rc = this->append((PropertyId)id, number, fieldLen);
+			if (rc != StatusCode::SUCCESS) {
+				return rc;
+			}
 			break;
 
 		case PropertyId::SERVER_KEEP_ALIVE:
@@ -657,12 +666,16 @@ uint32_t Properties::read(AppBuf &buf)
 		case PropertyId::TOPIC_ALIAS_MAXIMUM:
 		case PropertyId::TOPIC_ALIAS:
 			if (buf.bytesToRead() < 2) {
-				throw std::invalid_argument("Invalid input buffer");
+				return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 			}
 
 			number = buf.readNum16();
 			fieldLen = 2;
-			this->append((PropertyId)id, number, fieldLen);
+
+			rc = this->append((PropertyId)id, number, fieldLen);
+			if (rc != StatusCode::SUCCESS) {
+				return rc;
+			}
 			break;
 
 		case PropertyId::PUBLICATION_EXPIRY_INTERVAL:
@@ -670,12 +683,16 @@ uint32_t Properties::read(AppBuf &buf)
 		case PropertyId::WILL_DELAY_INTERVAL:
 		case PropertyId::MAXIMUM_PACKET_SIZE:
 			if (buf.bytesToRead() < 4) {
-				throw std::invalid_argument("Invalid input buffer");
+				return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 			}
 
 			number = buf.readNum32();
 			fieldLen = 4;
-			this->append((PropertyId)id, number, fieldLen);
+
+			rc = this->append((PropertyId)id, number, fieldLen);
+			if (rc != StatusCode::SUCCESS) {
+				return rc;
+			}
 			break;
 
 		case PropertyId::CONTENT_TYPE:
@@ -690,18 +707,27 @@ uint32_t Properties::read(AppBuf &buf)
 			value = new ByteArray();
 			rc = buf.readBinary(*value);
 			if (rc != StatusCode::SUCCESS) {
-				delete value;
-				goto lb_exit;
+				goto lb_cleanup;
 			}
-			this->append((PropertyId)id, value);
+
+			rc = this->append((PropertyId)id, value);
+			if (rc != StatusCode::SUCCESS) {
+			lb_cleanup:
+				delete value;
+				return rc;
+			}
 			break;
 
 		case PropertyId::SUBSCRIPTION_IDENTIFIER:
 			rc = buf.readVBI(number, numberWS);
 			if (rc != StatusCode::SUCCESS) {
-				goto lb_exit;
+				return rc;
 			}
-			this->append((PropertyId)id, number, numberWS);
+
+			rc = this->append((PropertyId)id, number, numberWS);
+			if (rc != StatusCode::SUCCESS) {
+				return rc;
+			}
 			break;
 
 		case PropertyId::USER_PROPERTY:
@@ -709,24 +735,29 @@ uint32_t Properties::read(AppBuf &buf)
 			value = new ByteArray();
 			rc = buf.readKeyValue(*key, *value);
 			if (rc != StatusCode::SUCCESS) {
+				goto lb_cleanup_kv;
+			}
+
+			rc = this->append(key, value);
+			if (rc != StatusCode::SUCCESS) {
+			lb_cleanup_kv:
 				delete key;
 				delete value;
-				goto lb_exit;
+
+				return rc;
 			}
-			this->append(key, value);
 			break;
 		default:
-			throw std::invalid_argument("Invalid Property Id");
+			return StatusCode::INVALID_PROPERTY;
 		}
 	}
 
 	/* bytes read is different to wire size */
 	if (propWS != this->wireSize()) {
-		throw std::invalid_argument("Invalid input buffer");
+		return StatusCode::INVALID_REMLEN;
 	}
 
-lb_exit:
-	return this->wireSize();
+	return StatusCode::SUCCESS;
 }
 
 
@@ -740,16 +771,16 @@ static void writeNumProp(AppBuf &buf, uint32_t num, uint8_t size)
 	(buf.*ptr)(num);
 }
 
-uint32_t Properties::write(AppBuf &buf)
+enum StatusCode Properties::write(AppBuf &buf)
 {
 	uint8_t propWSWS = VBIWireSize(this->wireSize());
 
 	if (propWSWS == 0) {
-		return 0;
+		return StatusCode::SUCCESS;
 	}
 
 	if (propWSWS + this->wireSize() > buf.bytesToWrite()) {
-		return 0;
+		return StatusCode::NOT_ENOUGH_SPACE_IN_BUFFER;
 	}
 
 	buf.writeVBI(this->wireSize());
@@ -792,7 +823,7 @@ uint32_t Properties::write(AppBuf &buf)
 		itUser++;
 	}
 
-	return propWSWS + this->wireSize();
+	return StatusCode::SUCCESS;
 }
 
 }

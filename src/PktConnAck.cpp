@@ -250,11 +250,7 @@ enum StatusCode PktConnAck::writeVariableHeader(AppBuf &buf)
 	buf.writeNum8(this->_sessionPresent ? 0x01 : 0x00);
 	buf.writeNum8(this->_reasonCode);
 
-	if (properties.write(buf) == 0) {
-		status(StatusCode::PROPERTY_WRITE_ERROR);
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktConnAck::writePayload(AppBuf &buf)
@@ -282,9 +278,7 @@ enum StatusCode PktConnAck::readVariableHeader(AppBuf &buf)
 	this->_sessionPresent = number ? true : false;
 	this->_reasonCode = buf.readNum8();
 
-	properties.read(buf);
-
-	return StatusCode::SUCCESS;
+	return properties.read(buf);
 }
 
 enum StatusCode PktConnAck::readPayload(AppBuf &buf)

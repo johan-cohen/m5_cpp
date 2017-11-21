@@ -94,11 +94,7 @@ enum StatusCode PktPubMsg::writeVariableHeader(AppBuf &buf)
 	buf.writeNum16(this->packetId());
 	buf.writeNum8((uint8_t)this->reasonCode());
 
-	if (properties.write(buf) == 0) {
-		return StatusCode::PROPERTY_WRITE_ERROR;
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktPubMsg::writePayload(AppBuf &buf)
@@ -125,9 +121,7 @@ enum StatusCode PktPubMsg::readVariableHeader(AppBuf &buf)
 
 	this->reasonCode((enum ReasonCode)buf.readNum8());
 
-	properties.read(buf);
-
-	return StatusCode::SUCCESS;
+	return properties.read(buf);
 }
 
 enum StatusCode PktPubMsg::readPayload(AppBuf &buf)

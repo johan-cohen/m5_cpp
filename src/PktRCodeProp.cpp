@@ -94,11 +94,7 @@ enum StatusCode PktRCodeProp::writeVariableHeader(AppBuf &buf)
 {
 	buf.writeNum8(this->_reasonCode);
 
-	if (properties.write(buf) == 0) {
-		return StatusCode::PROPERTY_WRITE_ERROR;
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktRCodeProp::writePayload(AppBuf &buf)
@@ -121,7 +117,7 @@ enum StatusCode PktRCodeProp::readVariableHeader(AppBuf &buf)
 	if (remainingLength > 0) {
 		reasonCode((enum ReasonCode)buf.readNum8());
 		if (remainingLength > 1) {
-			properties.read(buf);
+			return properties.read(buf);
 		}
 	} else {
 		reasonCode((enum ReasonCode)0x00);

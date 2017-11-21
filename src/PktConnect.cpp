@@ -161,11 +161,7 @@ enum StatusCode PktConnect::writeVariableHeader(AppBuf &buf)
 	buf.writeNum8(packConnectFlags());
 	buf.writeNum16(keepAlive());
 
-	if (properties.write(buf) == 0) {
-		return StatusCode::PROPERTY_WRITE_ERROR;
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktConnect::writePayload(AppBuf &buf)
@@ -221,9 +217,7 @@ enum StatusCode PktConnect::readVariableHeader(AppBuf &buf)
 
 	keepAlive(buf.readNum16());
 
-	properties.read(buf);
-
-	return StatusCode::SUCCESS;
+	return properties.read(buf);
 }
 
 enum StatusCode PktConnect::readPayload(AppBuf &buf)

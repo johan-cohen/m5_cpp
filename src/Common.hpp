@@ -203,6 +203,8 @@ enum class StatusCode {
 	INVALID_TOPIC_NAME,
 	INVALID_PACKET_ID,
 	INVALID_ARGUMENT,
+	INVALID_PROPERTY,
+	INTERNAL_ERROR,
 };
 
 static inline uint8_t VBIWireSize(uint32_t value)

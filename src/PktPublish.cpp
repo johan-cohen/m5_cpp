@@ -197,11 +197,7 @@ enum StatusCode PktPublish::writeVariableHeader(AppBuf &buf)
 		buf.writeNum16(this->packetId());
 	}
 
-	if (properties.write(buf) == 0) {
-		return StatusCode::PROPERTY_WRITE_ERROR;
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktPublish::writePayload(AppBuf &buf)
@@ -266,9 +262,7 @@ enum StatusCode PktPublish::readVariableHeader(AppBuf &buf)
 		}
 	}
 
-	properties.read(buf);
-
-	return StatusCode::SUCCESS;
+	return properties.read(buf);
 }
 
 enum StatusCode PktPublish::readPayload(AppBuf &buf)

@@ -106,11 +106,7 @@ enum StatusCode PktSubscribe::writeVariableHeader(AppBuf &buf)
 {
 	buf.writeNum16(packetId());
 
-	if (properties.write(buf) == 0) {
-		return StatusCode::PROPERTY_WRITE_ERROR;
-	}
-
-	return StatusCode::SUCCESS;
+	return properties.write(buf);
 }
 
 enum StatusCode PktSubscribe::writePayload(AppBuf &buf)
@@ -144,9 +140,7 @@ enum StatusCode PktSubscribe::readVariableHeader(AppBuf &buf)
 		return rc;
 	}
 
-	properties.read(buf);
-
-	return StatusCode::SUCCESS;
+	return properties.read(buf);
 }
 
 enum StatusCode PktSubscribe::readPayload(AppBuf &buf)
