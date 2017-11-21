@@ -233,6 +233,28 @@ static inline uint8_t firstByte(enum PktType type, uint8_t reserved = 0)
 	return (((uint8_t)type) << 4) | (reserved & 0x0F);
 }
 
+static inline bool validQoS(enum PktQoS qos)
+{
+	switch (qos) {
+	case PktQoS::QoS0:
+	case PktQoS::QoS1:
+	case PktQoS::QoS2:
+		return true;
+	default:
+		return false;
+	}
+}
+
+static inline bool validQoS(uint8_t qos)
+{
+	return validQoS((enum PktQoS)qos);
+}
+
+static inline bool validPacketId(uint16_t packetId)
+{
+	return packetId > 0;
+}
+
 }
 
 #endif
