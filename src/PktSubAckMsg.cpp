@@ -44,11 +44,11 @@
 
 namespace m5 {
 
-PktSubAckMsg::PktSubAckMsg(PktType type) : Packet(type, 0x00)
+PktSubAckMsg::PktSubAckMsg(enum PktType type) : Packet(type, 0x00)
 {
 }
 
-PktSubAckMsg::PktSubAckMsg(PktType type, AppBuf &buf) : Packet(type, 0x00)
+PktSubAckMsg::PktSubAckMsg(enum PktType type, AppBuf &buf) : Packet(type, 0x00)
 {
 	this->readFrom(buf);
 }
@@ -128,7 +128,7 @@ enum StatusCode PktSubAckMsg::readVariableHeader(AppBuf &buf)
 enum StatusCode PktSubAckMsg::readPayload(AppBuf &buf)
 {
 	for (uint32_t i = 0; i < payloadSize; i++) {
-		this->append((ReasonCode)buf.readNum8());
+		this->append((enum ReasonCode)buf.readNum8());
 	}
 
 	return StatusCode::SUCCESS;

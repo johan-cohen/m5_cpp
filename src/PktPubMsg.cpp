@@ -62,7 +62,7 @@ void PktPubMsg::packetId(uint16_t id)
 	this->_packetId = id;
 }
 
-void PktPubMsg::reasonCode(ReasonCode rc)
+void PktPubMsg::reasonCode(enum ReasonCode rc)
 {
 	this->_reasonCode = (uint8_t)rc;
 }

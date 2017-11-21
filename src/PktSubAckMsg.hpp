@@ -62,8 +62,8 @@ private:
 	enum StatusCode readPayload(AppBuf &buf) override;
 
 protected:
-	PktSubAckMsg(PktType type);
-	PktSubAckMsg(PktType type, AppBuf &buf);
+	PktSubAckMsg(enum PktType type);
+	PktSubAckMsg(enum PktType type, AppBuf &buf);
 
 public:
 	virtual ~PktSubAckMsg() {}
@@ -71,7 +71,7 @@ public:
 	void packetId(uint16_t id) { this->_packetId = id; }
 	uint16_t packetId(void) { return this->_packetId; }
 
-	void append(ReasonCode rc) { this->_reasonCodes.push_back((uint8_t)rc); }
+	void append(enum ReasonCode rc) { this->_reasonCodes.push_back((uint8_t)rc); }
 	const std::list<uint8_t> &reasonCodes() const { return _reasonCodes; }
 
 	void reasonString(const uint8_t *data, uint16_t size);

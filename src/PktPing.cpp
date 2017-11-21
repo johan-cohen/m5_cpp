@@ -44,7 +44,7 @@
 
 namespace m5 {
 
-PktPing::PktPing(PktType type) : Packet(type, 0x00)
+PktPing::PktPing(enum PktType type) : Packet(type, 0x00)
 {
 }
 

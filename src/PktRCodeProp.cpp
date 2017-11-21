@@ -53,7 +53,7 @@ PktRCodeProp::PktRCodeProp(enum PktType type, AppBuf &buf) : Packet(type, 0x00)
 	this->readFrom(buf);
 }
 
-void PktRCodeProp::reasonCode(ReasonCode rc)
+void PktRCodeProp::reasonCode(enum ReasonCode rc)
 {
 	this->_reasonCode = (uint8_t)rc;
 }

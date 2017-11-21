@@ -65,8 +65,8 @@ protected:
 public:
 	virtual ~PktRCodeProp() {}
 
-	ReasonCode reasonCode(void) const { return (ReasonCode)_reasonCode; }
-	void reasonCode(ReasonCode rc);
+	ReasonCode reasonCode(void) const { return (enum ReasonCode)_reasonCode; }
+	void reasonCode(enum ReasonCode rc);
 
 	void reasonString(const uint8_t *data, uint16_t size);
 	void reasonString(const char *str);

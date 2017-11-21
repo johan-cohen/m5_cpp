@@ -69,8 +69,8 @@ public:
 	void packetId(uint16_t id);
 	uint16_t packetId(void) { return this->_packetId; }
 
-	void reasonCode(ReasonCode rc);
-	ReasonCode reasonCode(void) { return (ReasonCode)this->_reasonCode; }
+	void reasonCode(enum ReasonCode rc);
+	ReasonCode reasonCode(void) { return (enum ReasonCode)this->_reasonCode; }
 
 	void reasonString(const uint8_t *data, uint16_t size);
 	void reasonString(const char *str);
