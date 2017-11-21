@@ -46,6 +46,42 @@
 
 namespace  m5 {
 
+Properties::Properties(const PktType type)
+{
+	this->resetPacketType(type);
+}
+
+Properties::~Properties()
+{
+	auto itBin = binProps.begin();
+	while (itBin != binProps.end())
+	{
+		auto pair = *itBin;
+		ByteArray *value = pair.second;
+
+		delete value;
+
+		itBin++;
+	}
+
+	auto itUser = userProps.begin();
+	while (itUser != userProps.end()) {
+		ByteArray *key = (*itUser).first;
+		ByteArray *value = (*itUser).second;
+
+		delete key;
+		delete value;
+
+		itUser++;
+	}
+}
+
+void Properties::resetPacketType(const PktType type)
+{
+	this->pktType = type;
+	this->computePktFlags();
+}
+
 static uint64_t pow2(enum PropertyId id)
 {
 	return (uint64_t)0x01 << (uint8_t)id;
@@ -129,42 +165,6 @@ void Properties::computePktFlags(void)
 	default:
 		break;
 	}
-}
-
-Properties::Properties(const PktType type)
-{
-	this->resetPacketType(type);
-}
-
-Properties::~Properties()
-{
-	auto itBin = binProps.begin();
-	while (itBin != binProps.end())
-	{
-		auto pair = *itBin;
-		ByteArray *value = pair.second;
-
-		delete value;
-
-		itBin++;
-	}
-
-	auto itUser = userProps.begin();
-	while (itUser != userProps.end()) {
-		ByteArray *key = (*itUser).first;
-		ByteArray *value = (*itUser).second;
-
-		delete key;
-		delete value;
-
-		itUser++;
-	}
-}
-
-void Properties::resetPacketType(const PktType type)
-{
-	this->pktType = type;
-	this->computePktFlags();
 }
 
 bool Properties::isAllowed(PropertyId id) const
