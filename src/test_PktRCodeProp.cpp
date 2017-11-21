@@ -38,37 +38,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "test_Common.hpp"
-
 #include "PktDisconnect.hpp"
+#include "test_Common.hpp"
 #include "PktAuth.hpp"
 
-#include <stdexcept>
 #include <cstring>
 
 int test(void)
 {
-	m5::ReasonCode rc = m5::ReasonCode::CONTINUE_AUTHENTICATION;
+	const m5::ReasonCode rc = m5::ReasonCode::SUCCESS;
 	const char str[] = "Hello, World!";
 	m5::AppBuf buf(128);
 	m5::PktAuth *auth;
-	uint32_t bytes;
+	m5::StatusCode sc;
 
 	auth = new m5::PktAuth();
 	auth->reasonCode(rc);
-	auth->authenticationMethod(str);
-	auth->authenticationData((const uint8_t *)str, strlen(str));
-	auth->userProperty(str, str);
 
-	bytes = auth->writeTo(buf);
-	if (bytes == 0) {
-		throw std::logic_error("write");
+	sc = auth->authenticationMethod(str);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("authenticationMethod");
+	}
+
+	sc = auth->authenticationData((const uint8_t *)str, strlen(str));
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("authenticationData");
+	}
+
+	sc = auth->userProperty(str, str);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("userProperty");
+	}
+
+	auth->writeTo(buf);
+	if (auth->status() != m5::StatusCode::SUCCESS) {
+		error_exit("writeTo");
 	}
 
 	m5::PktAuth authRead(buf);
+	if (authRead.status() != m5::StatusCode::SUCCESS) {
+		error_exit("readFrom");
+	}
 
 	if (auth->reasonCode() != authRead.reasonCode()) {
-		throw std::logic_error("read: Reason Code");
+		error_exit("read: Reason Code");
 	}
 
 	delete auth;
@@ -78,29 +91,48 @@ int test(void)
 
 int testDisconnect(void)
 {
-	m5::ReasonCode rc = m5::ReasonCode::SERVER_MOVED;
+	const m5::ReasonCode rc = m5::ReasonCode::SUCCESS;
 	const char str[] = "Hello, World!";
+	m5::PktDisconnect *disconnect;
 	uint32_t u32 = 0x01ABCDEF;
 	m5::AppBuf buf(128);
-	m5::PktDisconnect *disconnect;
-	uint32_t bytes;
+	m5::StatusCode sc;
 
 	disconnect = new m5::PktDisconnect();
 	disconnect->reasonCode(rc);
-	disconnect->sessionExpiryInterval(u32);
-	disconnect->reasonString(str);
-	disconnect->serverReference(str);
-	disconnect->userProperty(str, str);
 
-	bytes = disconnect->writeTo(buf);
-	if (bytes == 0) {
-		throw std::logic_error("write");
+	sc = disconnect->sessionExpiryInterval(u32);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("sessionExpiryInterval");
+	}
+
+	sc = disconnect->reasonString(str);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("reasonString");
+	}
+
+	sc = disconnect->serverReference(str);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("serverReference");
+	}
+
+	sc = disconnect->userProperty(str, str);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("userProperty");
+	}
+
+	disconnect->writeTo(buf);
+	if (disconnect->status() != m5::StatusCode::SUCCESS) {
+		error_exit("writeTo");
 	}
 
 	m5::PktDisconnect disconnectRead(buf);
+	if (disconnectRead.status() != m5::StatusCode::SUCCESS) {
+		error_exit("readFrom");
+	}
 
 	if (disconnect->reasonCode() != disconnectRead.reasonCode()) {
-		throw std::logic_error("read: Reason Code");
+		error_exit("read: Reason Code");
 	}
 
 	delete disconnect;
