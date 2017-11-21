@@ -65,59 +65,59 @@ public:
 	PktConnAck(AppBuf &buf);
 	~PktConnAck() {}
 
-	void assignedClientIdentifier(const uint8_t *data, uint16_t size);
-	void assignedClientIdentifier(const char *str);
+	enum StatusCode assignedClientIdentifier(const uint8_t *data, uint16_t size);
+	enum StatusCode assignedClientIdentifier(const char *str);
 	const ByteArray &assignedClientIdentifier(void) const;
 
-	void serverKeepAlive(uint16_t v);
+	enum StatusCode serverKeepAlive(uint16_t v);
 	uint16_t serverKeepAlive(void) const;
 
-	void authenticationMethod(const uint8_t *data, uint16_t size);
-	void authenticationMethod(const char *str);
+	enum StatusCode authenticationMethod(const uint8_t *data, uint16_t size);
+	enum StatusCode authenticationMethod(const char *str);
 	const ByteArray &authenticationMethod(void) const;
 
-	void authenticationData(const uint8_t *data, uint16_t size);
+	enum StatusCode authenticationData(const uint8_t *data, uint16_t size);
 	const ByteArray &authenticationData(void) const;
 
-	void responseInformation(const uint8_t *data, uint16_t size);
-	void responseInformation(const char *str);
+	enum StatusCode responseInformation(const uint8_t *data, uint16_t size);
+	enum StatusCode responseInformation(const char *str);
 	const ByteArray &responseInformation(void) const;
 
-	void serverReference(const uint8_t *data, uint16_t size);
-	void serverReference(const char *str);
+	enum StatusCode serverReference(const uint8_t *data, uint16_t size);
+	enum StatusCode serverReference(const char *str);
 	const ByteArray &serverReference(void) const;
 
-	void reasonString(const uint8_t *data, uint16_t size);
-	void reasonString(const char *str);
+	enum StatusCode reasonString(const uint8_t *data, uint16_t size);
+	enum StatusCode reasonString(const char *str);
 	const ByteArray &reasonString(void) const;
 
-	void receiveMaximum(uint16_t v);
+	enum StatusCode receiveMaximum(uint16_t v);
 	uint16_t receiveMaximum(void) const;
 
-	void topicAliasMaximum(uint16_t v);
+	enum StatusCode topicAliasMaximum(uint16_t v);
 	uint16_t topicAliasMaximum(void) const;
 
-	void maximumQoS(enum PktQoS qos);
+	enum StatusCode maximumQoS(enum PktQoS qos);
 	enum PktQoS maximumQoS(void) const;
 
-	void retainAvailable(bool v);
+	enum StatusCode retainAvailable(bool v);
 	bool retainAvailable(void) const;
 
-	void userProperty(const uint8_t *key, uint16_t keySize,
-			  const uint8_t *value, uint16_t valueSize);
-	void userProperty(const char *key, const char *val);
+	enum StatusCode userProperty(const uint8_t *key, uint16_t keySize,
+				     const uint8_t *value, uint16_t valueSize);
+	enum StatusCode userProperty(const char *key, const char *val);
 	const UserProperty &userProperty(void) const;
 
-	void maximumPacketSize(uint32_t v);
+	enum StatusCode maximumPacketSize(uint32_t v);
 	uint32_t maximumPacketSize(void) const;
 
-	void wildcardSubscriptionAvailable(bool v);
+	enum StatusCode wildcardSubscriptionAvailable(bool v);
 	bool wildcardSubscriptionAvailable(void) const;
 
-	void subscriptionIdentifierAvailable(bool v);
+	enum StatusCode subscriptionIdentifierAvailable(bool v);
 	bool subscriptionIdentifierAvailable(void) const;
 
-	void sharedSubscriptionAvailable(bool v);
+	enum StatusCode sharedSubscriptionAvailable(bool v);
 	bool sharedSubscriptionAvailable(void) const;
 
 	uint32_t writeTo(AppBuf &buf) override;
