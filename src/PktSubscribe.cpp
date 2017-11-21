@@ -41,7 +41,6 @@
 #include "PktSubscribe.hpp"
 
 #include <cstring>
-#include <cerrno>
 
 namespace m5 {
 

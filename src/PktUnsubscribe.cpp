@@ -41,7 +41,6 @@
 #include "PktUnsubscribe.hpp"
 
 #include <cstring>
-#include <cerrno>
 
 namespace m5 {
 

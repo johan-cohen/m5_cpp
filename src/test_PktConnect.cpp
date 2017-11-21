@@ -43,7 +43,6 @@
 
 #include <stdexcept>
 #include <cstring>
-#include <cerrno>
 
 namespace m5 {
 	bool operator==(const PktConnect &a, const PktConnect &b) {

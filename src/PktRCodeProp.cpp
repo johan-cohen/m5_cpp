@@ -40,8 +40,6 @@
 
 #include "PktRCodeProp.hpp"
 
-#include <cerrno>
-
 namespace m5 {
 
 PktRCodeProp::PktRCodeProp(enum PktType type) : Packet(type, 0x00)

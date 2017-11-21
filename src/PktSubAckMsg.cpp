@@ -40,8 +40,6 @@
 
 #include"PktSubAckMsg.hpp"
 
-#include <cerrno>
-
 namespace m5 {
 
 PktSubAckMsg::PktSubAckMsg(enum PktType type) : Packet(type, 0x00)

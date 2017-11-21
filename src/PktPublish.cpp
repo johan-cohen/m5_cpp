@@ -41,7 +41,6 @@
 #include "PktPublish.hpp"
 
 #include <cstring>
-#include <cerrno>
 
 namespace m5 {
 

@@ -40,8 +40,6 @@
 
 #include "PktPing.hpp"
 
-#include <stdexcept>
-
 namespace m5 {
 
 PktPing::PktPing(enum PktType type) : Packet(type, 0x00)
