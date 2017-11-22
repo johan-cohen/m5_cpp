@@ -81,7 +81,7 @@ public:
 	StatusCode packetId(uint16_t id) { return Packet::packetId(id); }
 	uint16_t packetId(void) const { return Packet::packetId(); }
 
-	void subscriptionIdentifier(uint32_t v);
+	enum StatusCode subscriptionIdentifier(uint32_t v);
 	uint32_t subscriptionIdentifier(void) const;
 
 	uint32_t writeTo(AppBuf &buf) override;

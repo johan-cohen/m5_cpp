@@ -91,9 +91,9 @@ void PktSubscribe::append(const char *topic, uint8_t options)
 	append((const uint8_t *)topic, strlen(topic), options);
 }
 
-void PktSubscribe::subscriptionIdentifier(uint32_t v)
+enum StatusCode PktSubscribe::subscriptionIdentifier(uint32_t v)
 {
-	properties.subscriptionIdentifier(v);
+	return properties.subscriptionIdentifier(v);
 }
 
 uint32_t PktSubscribe::subscriptionIdentifier(void) const
