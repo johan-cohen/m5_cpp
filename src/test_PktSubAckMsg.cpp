@@ -3,15 +3,13 @@
 #include "PktUnsubAck.hpp"
 #include "PktSubAck.hpp"
 
-#include <stdexcept>
-
 template <typename T>
 int test(m5::ReasonCode *codes, std::size_t size)
 {
-	T *pkt;
 	const char msg[] = "Hello, World!";
 	m5::AppBuf buf(256);
-	uint32_t bytes;
+	m5::StatusCode sc;
+	T *pkt;
 
 	pkt = new T();
 	pkt->packetId(0xABCD);
@@ -20,21 +18,36 @@ int test(m5::ReasonCode *codes, std::size_t size)
 		pkt->append(codes[i]);
 	}
 
-	pkt->userProperty(msg, msg);
-	pkt->reasonString(msg);
-	pkt->userProperty(msg, msg);
-	bytes = pkt->writeTo(buf);
-	if (bytes == 0) {
-		throw std::logic_error("write");
+	sc = pkt->userProperty(msg, msg);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("userProperty");
+	}
+
+	sc = pkt->reasonString(msg);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("userProperty");
+	}
+
+	sc = pkt->userProperty(msg, msg);
+	if (sc != m5::StatusCode::SUCCESS) {
+		error_exit("userProperty");
+	}
+
+	pkt->writeTo(buf);
+	if (pkt->status() != m5::StatusCode::SUCCESS) {
+		error_exit("write");
 	}
 
 	T pktRead(buf);
+	if (pktRead.status() != m5::StatusCode::SUCCESS) {
+		error_exit("readFrom");
+	}
 
 	if (pkt->packetId() != pktRead.packetId()) {
-		throw std::logic_error("read/write: Packet Id");
+		error_exit("read/write: Packet Id");
 	}
 	if (pkt->reasonCodes() != pktRead.reasonCodes()) {
-		throw std::logic_error("read/write: Reason Codes");
+		error_exit("read/write: Reason Codes");
 	}
 
 	delete pkt;
