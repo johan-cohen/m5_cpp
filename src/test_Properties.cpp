@@ -104,7 +104,7 @@ int test_Properties(void)
 	}
 	wireSize += m5::propertyIdSize + 4;
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: publicationExpiryInterval");
+		error_exit("wireSize: publicationExpiryInterval");
 	}
 
 	rc = propList->topicAlias(testU16);
@@ -113,11 +113,11 @@ int test_Properties(void)
 	}
 	u16 = propList->topicAlias();
 	if (u16 != testU16) {
-		throw std::logic_error("topicAlias");
+		error_exit("topicAlias");
 	}
 	wireSize += m5::propertyIdSize + 2;
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: topicAlias");
+		error_exit("wireSize: topicAlias");
 	}
 
 	rc = propList->responseTopic(MSG);
@@ -125,11 +125,11 @@ int test_Properties(void)
 		error_exit("responseTopic");
 	}
 	if (msg != propList->responseTopic()) {
-		throw std::logic_error("responseTopic");
+		error_exit("responseTopic");
 	}
 	wireSize += m5::propertyIdSize + m5::stringLenSize + MSG_LEN;
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: responseTopic");
+		error_exit("wireSize: responseTopic");
 	}
 
 	/* rewrite property value */
@@ -138,11 +138,11 @@ int test_Properties(void)
 		error_exit("responseTopic");
 	}
 	if (msg == propList->responseTopic()) {
-		throw std::logic_error("responseTopic");
+		error_exit("responseTopic");
 	}
 	wireSize += -MSG_LEN + 5;
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: responseTopic");
+		error_exit("wireSize: responseTopic");
 	}
 
 	rc = propList->correlationData(DATA, DATA_LEN);
@@ -150,11 +150,11 @@ int test_Properties(void)
 		error_exit("correlationData");
 	}
 	if (msg != propList->correlationData()) {
-		throw std::logic_error("correlationData");
+		error_exit("correlationData");
 	}
 	wireSize += m5::propertyIdSize + m5::binaryLenSize + DATA_LEN;
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: correlationData");
+		error_exit("wireSize: correlationData");
 	}
 
 	rc = propList->subscriptionIdentifier(testU32);
@@ -163,11 +163,11 @@ int test_Properties(void)
 	}
 	u32 = propList->subscriptionIdentifier();
 	if (u32 != testU32) {
-		throw std::logic_error("subscriptionIdentifier");
+		error_exit("subscriptionIdentifier");
 	}
 	wireSize += m5::propertyIdSize + m5::VBIWireSize(testU32);
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: subscriptionIdentifier");
+		error_exit("wireSize: subscriptionIdentifier");
 	}
 
 	rc = propList->contentType(MSG);
@@ -175,11 +175,11 @@ int test_Properties(void)
 		error_exit("contentType");
 	}
 	if (msg != propList->contentType()) {
-		throw std::logic_error("contentType");
+		error_exit("contentType");
 	}
 	wireSize += m5::propertyIdSize + m5::stringLenSize + MSG_LEN;
 	if (propList->wireSize() != wireSize) {
-		throw std::logic_error("wireSize: contentType");
+		error_exit("wireSize: contentType");
 	}
 
 	delete propList;
@@ -192,7 +192,7 @@ int test_Properties(void)
 	}
 	u32 = propList->sessionExpiryInterval();
 	if (u32 != testU32) {
-		throw std::logic_error("sessionExpiryInterval");
+		error_exit("sessionExpiryInterval");
 	}
 	wireSize = m5::propertyIdSize + 4;
 	if (propList->wireSize() != wireSize) {
