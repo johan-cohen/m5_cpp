@@ -45,8 +45,6 @@
 #include <cstdint>
 #include <vector>
 
-#define WARN_UNUSED_RC __attribute__((warn_unused_result))
-
 namespace m5 {
 
 typedef std::vector<uint8_t> ByteArray;

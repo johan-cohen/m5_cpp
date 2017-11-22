@@ -94,13 +94,13 @@ public:
 	uint32_t readNum32(void);
 
 	/* this routine does bound checking */
-	StatusCode readBinary(ByteArray &dst) WARN_UNUSED_RC;
+	StatusCode readBinary(ByteArray &dst);
 	ByteArray *readBinary(void);
 
 	/* this routine does bound checking */
-	StatusCode readKeyValue(ByteArray &key, ByteArray &value) WARN_UNUSED_RC;
+	StatusCode readKeyValue(ByteArray &key, ByteArray &value);
 
-	StatusCode readVBI(uint32_t &v, uint8_t &wireSize) WARN_UNUSED_RC;
+	StatusCode readVBI(uint32_t &v, uint8_t &wireSize);
 
 	/* readSkip does not do bound checking, use bytesToRead */
 	void readSkip(std::size_t n, bool forward = true);
