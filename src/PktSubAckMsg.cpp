@@ -51,14 +51,14 @@ PktSubAckMsg::PktSubAckMsg(enum PktType type, AppBuf &buf) : Packet(type, 0x00)
 	this->readFrom(buf);
 }
 
-void PktSubAckMsg::reasonString(const uint8_t *data, uint16_t size)
+enum StatusCode PktSubAckMsg::reasonString(const uint8_t *data, uint16_t size)
 {
-	properties.reasonString(data, size);
+	return properties.reasonString(data, size);
 }
 
-void PktSubAckMsg::reasonString(const char *str)
+enum StatusCode PktSubAckMsg::reasonString(const char *str)
 {
-	properties.reasonString(str);
+	return properties.reasonString(str);
 }
 
 const ByteArray &PktSubAckMsg::reasonString(void) const
@@ -66,15 +66,15 @@ const ByteArray &PktSubAckMsg::reasonString(void) const
 	return properties.reasonString();
 }
 
-void PktSubAckMsg::userProperty(const uint8_t *key, uint16_t keySize,
-				const uint8_t *value, uint16_t valueSize)
+enum StatusCode PktSubAckMsg::userProperty(const uint8_t *key, uint16_t keySize,
+					   const uint8_t *value, uint16_t valueSize)
 {
-	properties.userProperty(key, keySize, value, valueSize);
+	return properties.userProperty(key, keySize, value, valueSize);
 }
 
-void PktSubAckMsg::userProperty(const char *key, const char *val)
+enum StatusCode PktSubAckMsg::userProperty(const char *key, const char *val)
 {
-	properties.userProperty(key, val);
+	return properties.userProperty(key, val);
 }
 
 const UserProperty &PktSubAckMsg::userProperty(void) const
