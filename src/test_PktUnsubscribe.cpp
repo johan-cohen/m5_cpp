@@ -41,8 +41,6 @@
 #include "PktUnsubscribe.hpp"
 #include "test_Common.hpp"
 
-#include <stdexcept>
-
 bool cmp(const std::list<m5::ByteArray *> &a, const std::list<m5::ByteArray *> &b)
 {
 	if (a.size() != b.size()) {
@@ -72,7 +70,6 @@ int test(void)
 	m5::PktUnsubscribe *unsubs;
 	const char msg[] = "Hello, World!";
 	m5::AppBuf buf(256);
-	uint32_t bytes;
 
 	unsubs = new m5::PktUnsubscribe();
 	unsubs->packetId(0xABCD);
@@ -80,18 +77,21 @@ int test(void)
 	unsubs->append(msg);
 	unsubs->append(msg);
 
-	bytes = unsubs->writeTo(buf);
-	if (bytes == 0) {
-		throw std::logic_error("write");
+	unsubs->writeTo(buf);
+	if (unsubs->status() != m5::StatusCode::SUCCESS) {
+		error_exit("writeTo");
 	}
 
 	m5::PktUnsubscribe unsubsRead(buf);
+	if (unsubsRead.status() != m5::StatusCode::SUCCESS) {
+		error_exit("readFrom");
+	}
 
 	if (unsubs->packetId() != unsubsRead.packetId()) {
-		throw std::logic_error("read/write: Packet Id");
+		error_exit("read/write: Packet Id");
 	}
 	if (cmp(unsubs->topics(), unsubsRead.topics()) != true) {
-		throw std::logic_error("read/write: Topics");
+		error_exit("read/write: Topics");
 	}
 
 	delete unsubs;
